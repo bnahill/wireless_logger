@@ -8,8 +8,6 @@
 
 #include "mma8452q.h"
 
-#define __MMA8452Q_CPP_
-
 #include "platform.h"
 
 bool MMA8452Q::init(){

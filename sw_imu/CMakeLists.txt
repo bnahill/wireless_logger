@@ -169,6 +169,7 @@ set(IMU_SOURCES
 	#${IMU_DIR}/spi3.cpp
     #${IMU_DIR}/spi4.cpp
 	${IMU_DIR}/mma8452q.cpp
+	${IMU_DIR}/mag3110.cpp
     #${IMU_DIR}/l3gd20.cpp
     #${IMU_DIR}/services.cpp
     #${IMU_DIR}/lsm303.cpp

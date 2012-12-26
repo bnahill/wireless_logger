@@ -1,0 +1,138 @@
+/*!
+ @file 
+ 
+ @brief 
+ 
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
+#ifndef __MAG3110_H_
+#define __MAG3110_H_
+
+#include "imu/i2c.h"
+
+class MAG3110 {
+public:
+	typedef enum {
+		MODE_STANDBY = 0,
+		MODE_ACTIVE = 1
+	} mode_t;
+	
+	/*!
+	 @brief The output data rate
+	 */
+	typedef enum {
+		DR_80 = 0,
+		DR_40 = 1,
+		DR_20 = 2,
+		DR_10 = 3,
+		DR_5   = 4,
+		DR_2_5 = 5,
+		DR_1_25 = 6,
+		DR_0_63 = 7
+	} dr_t;
+	
+	/*!
+	 @brief Oversampling ratio. Deviation from OR_16 will reduce the output
+	 rate accordingly.
+	 */
+	typedef enum {
+		OS_16  = 0,
+		OS_32 = 1,
+		OS_64 = 2,
+		OS_128 = 3
+	} os_t;
+	
+	typedef enum {
+		AUTORESET_OFF = 0,
+		AUTORESET_ON = 1
+	} autoreset_mode_t;
+	
+	typedef enum {
+		RAW_MODE_DISABLE = 0,
+		RAW_MODE_ENABLE = 1
+	} raw_mode_t;
+	
+	MAG3110(I2C &i2c, uint8_t devaddr) : 
+		i2c(i2c), devaddr(devaddr),
+		dr(DR_80), os(OS_128), mode(MODE_STANDBY),
+		autoreset_mode(AUTORESET_ON), raw_mode(RAW_MODE_DISABLE)
+		{}
+
+	bool init();
+	
+	void read();
+	
+
+	
+	//! @name Configuration
+	//! @{
+	dr_t dr;
+	os_t os;
+	mode_t mode;
+	autoreset_mode_t autoreset_mode;
+	raw_mode_t raw_mode;
+	//! @}
+
+	void set_dr(dr_t new_dr){
+		dr = new_dr;
+		write_ctrl_reg1();
+	}
+	
+	void set_os(os_t new_os){
+		os = new_os;
+		write_ctrl_reg1();
+	}
+	
+	void set_mode(mode_t new_mode){
+		mode = new_mode;
+		write_ctrl_reg1();
+	}
+	
+	void set_autoreset_mode(autoreset_mode_t new_autoreset_mode){
+		autoreset_mode = new_autoreset_mode;
+		write_ctrl_reg2();
+	}
+	
+	//! Reading in uT
+	euclidean3_t reading;
+	
+private:
+	void write_ctrl_reg1();
+	void write_ctrl_reg2();
+	
+	typedef enum {
+		REG_DR_STATUS        = 0x00,
+		REG_OUT_X_MSB     = 0x01,
+		REG_OUT_X_LSB     = 0x02,
+		REG_OUT_Y_MSB     = 0x03,
+		REG_OUT_Y_LSB     = 0x04,
+		REG_OUT_Z_MSB     = 0x05,
+		REG_OUT_Z_LSB     = 0x06,
+		REG_WHO_AM_I      = 0x07,
+		REG_SYSMOD        = 0x08,
+		
+		REG_OFF_X_MSB     = 0x09,
+		REG_OFF_X_LSB     = 0x0A,
+		REG_OFF_Y_MSB     = 0x0B,
+		REG_OFF_Y_LSB     = 0x0C,
+		REG_OFF_Z_MSB     = 0x0D,
+		REG_OFF_Z_LSB     = 0x0E,
+		
+		REG_DIE_TEMP      = 0x0F,
+		REG_CTRL_REG1     = 0x10,
+		REG_CTRL_REG2     = 0x11
+	} reg_t;
+	
+	uint8_t const devaddr;
+	
+	//! A transfer to use for periodic reads
+	uint8_t xfer_buffer[6];
+	
+	//! I2C device to use
+	I2C &i2c;
+	
+	static const uint8_t whoami = 0xC4;
+};
+
+#endif

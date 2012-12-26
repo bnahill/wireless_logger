@@ -26,6 +26,7 @@ static msg_t AccThread(void *arg) {
 	}
 }
 
+
 static WORKING_AREA(waMagThread, 512);
 static msg_t MagThread(void *arg) {
 	EventListener listener;
@@ -34,8 +35,13 @@ static msg_t MagThread(void *arg) {
 
 	chEvtRegisterMask(&Acquisition::tick_source4, &listener, 1);
 	
+	mag1.init();
+	mag1.set_mode(MAG3110::MODE_ACTIVE);
+	
+	
 	while(1){
 		chEvtWaitOne(1);
+		mag1.read();
 		mag_count++;
 	}
 }

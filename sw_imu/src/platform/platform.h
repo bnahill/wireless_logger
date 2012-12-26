@@ -21,6 +21,7 @@
 //#include <imu/spi.h>
 
 #include <imu/mma8452q.h>
+#include <imu/mag3110.h>
 
 
 
@@ -31,17 +32,12 @@ I2C i2c1(I2CD1, OPMODE_I2C, FAST_DUTY_CYCLE_2, 100000);
 extern I2C i2c1;
 
 #ifdef __IMU_PLATFORM_CPP_ // Instantiate just once
-MMA8452Q acc1(i2c1, 0x38 >> 1);
+MMA8452Q acc1(i2c1, 0x1C);
+MAG3110 mag1(i2c1, 0x0E);
 #endif
 
 extern MMA8452Q acc1;
-
-
-
-
-
-
-
+extern MAG3110 mag1;
 
 
 
