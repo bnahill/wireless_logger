@@ -59,11 +59,19 @@ public:
 		autoreset_mode(AUTORESET_ON), raw_mode(RAW_MODE_DISABLE)
 		{}
 
+	/*!
+	 @brief Initialize MAG3110 device
+	 @return True if successful
+	 @pre OS initialized
+	 @post I2C device and MAG3110 intialized
+	 */
 	bool init();
 	
-	void read();
 	
-
+	/*!
+	 @brief Take a reading
+	 */
+	void read();
 	
 	//! @name Configuration
 	//! @{
@@ -74,21 +82,44 @@ public:
 	raw_mode_t raw_mode;
 	//! @}
 
-	void set_dr(dr_t new_dr){
+	/*!
+	 @brief Set the data rate
+	 @param new_dr New data rate
+	 @param update Actually update registers?
+	 */
+	void set_dr(dr_t new_dr, bool update = true){
 		dr = new_dr;
-		write_ctrl_reg1();
+		if(update)
+			write_ctrl_reg1();
 	}
 	
-	void set_os(os_t new_os){
+	/*!
+	 @brief Set oversampling ratio
+	 @param new_os New oversampling ratio
+	 @param update Actually update registers?
+	 */
+	void set_os(os_t new_os, bool update = true){
 		os = new_os;
-		write_ctrl_reg1();
+		if(update)
+			write_ctrl_reg1();
 	}
 	
-	void set_mode(mode_t new_mode){
+	/*!
+	 @brief Set operating mode
+	 @param new_mode New mode
+	 @param update Actually update registers?
+	 */
+	void set_mode(mode_t new_mode, bool update = true){
 		mode = new_mode;
-		write_ctrl_reg1();
+		if(update)
+			write_ctrl_reg1();
 	}
 	
+	/*!
+	 @brief Set operating mode
+	 @param new_mode New mode
+	 @param update Actually update registers?
+	 */
 	void set_autoreset_mode(autoreset_mode_t new_autoreset_mode){
 		autoreset_mode = new_autoreset_mode;
 		write_ctrl_reg2();
@@ -98,11 +129,19 @@ public:
 	euclidean3_t reading;
 	
 private:
+	/*!
+	 @brief Write current settings to CTRL_REG1
+	 */
 	void write_ctrl_reg1();
+	
+	/*!
+	 @brief Write current settings to CTRL_REG2
+	 */
 	void write_ctrl_reg2();
 	
+	//! @brief Register address map
 	typedef enum {
-		REG_DR_STATUS        = 0x00,
+		REG_DR_STATUS     = 0x00,
 		REG_OUT_X_MSB     = 0x01,
 		REG_OUT_X_LSB     = 0x02,
 		REG_OUT_Y_MSB     = 0x03,
@@ -124,6 +163,7 @@ private:
 		REG_CTRL_REG2     = 0x11
 	} reg_t;
 	
+	//! The I2C slave address
 	uint8_t const devaddr;
 	
 	//! A transfer to use for periodic reads
@@ -132,6 +172,7 @@ private:
 	//! I2C device to use
 	I2C &i2c;
 	
+	//! The value expected at REG_WHO_AM_I
 	static const uint8_t whoami = 0xC4;
 };
 

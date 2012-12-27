@@ -15,7 +15,6 @@ bool MAG3110::init(){
 	i2c.init();
 	i2c.read_byte(devaddr, REG_WHO_AM_I);
 	if(i2c.read_byte(devaddr, REG_WHO_AM_I) != whoami){
-		while(1);
 		return false;
 	}
 	
