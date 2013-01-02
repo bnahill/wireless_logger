@@ -1,3 +1,11 @@
+/*!
+ @file platform.cpp
+ 
+ @brief Threads realting to sensor acquisition
+ 
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #include "acquisition.h"
 
 EventSource Acquisition::tick_source;
@@ -23,6 +31,14 @@ static msg_t AccThread(void *arg) {
 		chEvtWaitOne(1);
 		acc1.read();
 		acc_count++;
+		
+		if((acc1.reading.x * acc1.reading.x +
+		    acc1.reading.y * acc1.reading.y +
+		    acc1.reading.z * acc1.reading.z) > 3){
+			//led1.on();
+		} else {
+			//led1.off();
+		}
 	}
 }
 
@@ -43,6 +59,35 @@ static msg_t MagThread(void *arg) {
 		chEvtWaitOne(1);
 		mag1.read();
 		mag_count++;
+	}
+}
+
+static WORKING_AREA(waGyroThread, 512);
+static msg_t GyroThread(void *arg) {
+	EventListener listener, listener8;
+	eventmask_t event;
+	(void)arg;
+	chRegSetThreadName("GyroThread");
+
+	chEvtRegisterMask(&Acquisition::tick_source, &listener, 1);
+	chEvtRegisterMask(&Acquisition::tick_source8, &listener8, 8);
+	
+	gyro1.init();
+	gyro1.set_full_scale(decltype(gyro1)::FS_250);
+	gyro1.set_power_mode(decltype(gyro1)::POWER_NORMAL);
+	
+	while(1){
+		event = chEvtWaitOne(8 + 1);
+		switch(event){
+			case 1:
+				gyro1.read();
+				break;
+			case 8:
+				gyro1.read_temperature();
+				break;
+			default:
+				break;
+		}
 	}
 }
 
@@ -71,6 +116,7 @@ void Acquisition::init(){
 	chEvtInit(&Acquisition::tick_source8);
 	chThdCreateStatic(waAccThread, sizeof(waAccThread), NORMALPRIO, AccThread, NULL);
 	chThdCreateStatic(waMagThread, sizeof(waMagThread), NORMALPRIO, MagThread, NULL);
+	chThdCreateStatic(waGyroThread, sizeof(waGyroThread), NORMALPRIO, GyroThread, NULL);
 	static GPTConfig const gpt_config = {10000, Acquisition::tick};
 	
 	gptStart(&timer, &gpt_config);

@@ -3,7 +3,6 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "imu/sensor_config.h"
 
 class I2C {
 public:

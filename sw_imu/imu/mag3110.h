@@ -9,6 +9,7 @@
 #ifndef __MAG3110_H_
 #define __MAG3110_H_
 
+#include "imu/imu_math.h"
 #include "imu/i2c.h"
 
 class MAG3110 {
@@ -126,7 +127,7 @@ public:
 	}
 	
 	//! Reading in uT
-	euclidean3_t reading;
+	Euclidean3_f32 reading;
 	
 private:
 	/*!

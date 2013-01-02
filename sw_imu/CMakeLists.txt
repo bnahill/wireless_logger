@@ -51,25 +51,27 @@ set(OS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/os)
 # Build Options
 ########################################################
 
+set(OPTIMIZATION "-O0")
+set(LTO )#"-flto")
+
 set(MCU cortex-m4)
 
-#set(MCFLAGS "-mtune=${MCU} -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -D__NEWLIB__ -DTHUMB_PRESENT -mno-thumb-interwork -DTHUMB_NO_INTERWORKING -fomit-frame-pointer")
 set(MCFLAGS "-mcpu=${MCU} -g -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -D__NEWLIB__ -fomit-frame-pointer")
 
 add_definitions(${MCFLAGS})
-#add_definitions(-g -ffunction-sections  -fdata-sections -Wredundant-decls -Wcast-qual -Wcast-align)
-add_definitions(-DSTM32F4XXk -DHSE_VALUE=8000000 -DARM_MATH_CM4 -D__FPU_PRESENT)
-# add_definitions(-DHSE_VALUE=8000000 -DARM_MATH_CM4 -D__FPU_PRESENT)
-
-set(OPTIMIZATION "-O0")
-set(LTO)# "-flto")
+add_definitions(-DHSE_VALUE=8000000 -DARM_MATH_CM4 -D__FPU_PRESENT)
 
 set(LINKER_SCRIPT ${OS_DIR}/ports/GCC/ARMCMx/STM32F4xx/ld/STM32F407xG.ld)
 
+###################################################
+# Compiler Flags
+###################################################
+# Flags for both C and C++ compilers
+set(COMMON_FLAGS "${LTO} ${OPTIMIZATION} -ffunction-sections -fdata-sections ${MCFLAGS}")
 # Eliminate the need for a bunch of extra support code that may not work on the chip anyways
-set(CMAKE_CXX_FLAGS "${LTO} --std=gnu++0x -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections -fno-common  ${MCFLAGS}")
+set(CMAKE_CXX_FLAGS "--std=gnu++11 -fno-rtti -fno-exceptions ${COMMON_FLAGS}")
 # Use the new C11 standard
-set(CMAKE_C_FLAGS "--std=gnu1x ${LTO} -ffunction-sections -fdata-sections  ${MCFLAGS}")
+set(CMAKE_C_FLAGS "--std=gnu1x ${COMMON_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "-T${LINKER_SCRIPT} ${LTO} ${OPTIMIZATION} -Wl,-Map=${TARGET}.map,--cref,-static,--gc-sections -nodefaultlibs  ${MCFLAGS} ${CMAKE_EXE_LINKER_FLAGS}")
 
 
@@ -147,6 +149,7 @@ set(OS_SOURCES
 	${OS_DIR}/hal/platforms/STM32F4xx/adc_lld.c
 	${OS_DIR}/hal/platforms/STM32F4xx/hal_lld.c
 	${OS_DIR}/hal/platforms/STM32F4xx/stm32_dma.c
+	${OS_DIR}/hal/platforms/STM32F4xx/ext_lld_isr.c
 	${OS_DIR}/hal/platforms/STM32/GPIOv2/pal_lld.c
 	${OS_DIR}/hal/platforms/STM32/I2Cv1/i2c_lld.c
 	${OS_DIR}/hal/platforms/STM32/SPIv1/spi_lld.c
@@ -154,23 +157,25 @@ set(OS_SOURCES
 	${OS_DIR}/hal/platforms/STM32/pwm_lld.c
 	${OS_DIR}/hal/platforms/STM32/i2s_lld.c
 	${OS_DIR}/hal/platforms/STM32/sdc_lld.c
+	${OS_DIR}/hal/platforms/STM32/ext_lld.c
 )
 
 set(APP_SOURCES
 	src/main.cpp
 	src/acquisition.cpp
 	src/platform/board.c
+	src/platform/platform.cpp
 )
 
 
 set(IMU_SOURCES
-	${IMU_DIR}/platform.cpp
+	${IMU_DIR}/button.cpp
+	${IMU_DIR}/ltc3559.cpp
 	#${IMU_DIR}/i2c.cpp
 	#${IMU_DIR}/spi3.cpp
     #${IMU_DIR}/spi4.cpp
 	${IMU_DIR}/mma8452q.cpp
 	${IMU_DIR}/mag3110.cpp
-    #${IMU_DIR}/l3gd20.cpp
     #${IMU_DIR}/services.cpp
     #${IMU_DIR}/lsm303.cpp
     #${IMU_DIR}/adxl345.cpp
@@ -185,7 +190,7 @@ set(IMU_SOURCES
 
 #add_library(imu_lib STATIC ${IMU_SOURCES})
 add_executable(${OUTFILE} ${APP_SOURCES} ${OS_SOURCES} ${IMU_SOURCES})
-target_link_libraries(${OUTFILE}  stdc++ gcc c)
+target_link_libraries(${OUTFILE} gcc)
 
 
 # Warnings only for application code -- Optimizations only on ST/ARM code

@@ -10,6 +10,7 @@
 #define __MMA8452Q_H_
 
 #include "imu/i2c.h"
+#include "imu_math.h"
 
 class MMA8452Q {
 public:
@@ -97,10 +98,20 @@ public:
 		oversmp_mode_sleep(OVERSMP_NORMAL)
 		{}
 
+	/*!
+	 @brief Initialize hardware and set configuration registers
+	 @return Success
+	 */
 	bool init();
 	
+	/*!
+	 @brief Read new measurements from the sensor
+	 */
 	void read();
 	
+	/*!
+	 @brief Write new values to the control registers
+	 */
 	void update_ctrl_regs();
 	
 	void reset();
@@ -117,7 +128,7 @@ public:
 	autosleep_t autosleep;
 	//! @}
 
-	euclidean3_t reading;
+	Euclidean3_f32 reading;
 	
 private:
 	typedef enum {

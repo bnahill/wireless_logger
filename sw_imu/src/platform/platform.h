@@ -17,87 +17,44 @@
 #define __IMU_PLATFORM_H_
 
 #include <hal.h>
+
+#include "imu/imu.h"
+
 #include <imu/i2c.h>
-//#include <imu/spi.h>
+#include <imu/spi.h>
 
 #include <imu/mma8452q.h>
 #include <imu/mag3110.h>
+#include <imu/button.h>
+#include <imu/l3gd20.h>
+#include <imu/ltc3559.h>
 
-
-
-#ifdef __IMU_PLATFORM_CPP_ // Instantiate just once
-I2C i2c1(I2CD1, OPMODE_I2C, FAST_DUTY_CYCLE_2, 100000);
-#endif
-
-extern I2C i2c1;
-
-#ifdef __IMU_PLATFORM_CPP_ // Instantiate just once
-MMA8452Q acc1(i2c1, 0x1C);
-MAG3110 mag1(i2c1, 0x0E);
-#endif
-
-extern MMA8452Q acc1;
-extern MAG3110 mag1;
-
-
-
-///////////////////////////////////////////
-// SPI Platform
-///////////////////////////////////////////
-
-
-#ifdef __SPI4_CPP_
-
-///////////////////////////////////////////
-// Declare all 4-wire SPI peripherals here
-///////////////////////////////////////////
-
-const SPI_4WireConfig SPI1_Config = {
-	GPIO_AF_SPI1,
-	{GPIOB, BIT(4), GPIO_PinSource4, RCC_Periph_GPIOB},
-	{GPIOB, BIT(5), GPIO_PinSource5, RCC_Periph_GPIOB},
-	{GPIOA, BIT(5), GPIO_PinSource5, RCC_Periph_GPIOB},
-	1,
-	DMA2_Stream0,
-	DMA2_Stream3,
-	DMA2,
-	DMA_Channel_3,
-	DMA_IT_TCIF0,
-	DMA_FLAG_TCIF0,
-	DMA_FLAG_TCIF3,
-	DMA2_Stream0_IRQn,
-	RCC_Periph_DMA2,
-	SPI1_IRQn,
-	RCC_Periph_SPI1
+/*!
+ @brief Platform-dependent component definitions
+ 
+ This namespace contains all platform-dependent devices. This includes all
+ external peripherals and their on-chip interfaces. All of these items shall
+ be instantiantiated in platform.cpp.
+ */
+namespace Platform {
+	extern I2C i2c1;
+	extern MMA8452Q acc1;
+	extern MAG3110 mag1;
+	
+	extern SPI spi1;
+	extern SPI spi2;
+	extern L3GD20_SPI gyro1;
+	
+	extern Button button1, button2, button3;
+	
+	extern gpio_pin_t led1;
+	
+	void EXTInit();
+	extern const EXTConfig extcfg;
+	
+	extern LTC3559 reg1;
 };
 
-
-SPI_4Wire spi1(SPI1_Config, SPI1);
-
-extern "C" {void DMA2_Stream0_IRQHandler();}
-void DMA2_Stream0_IRQHandler(){
-	spi1.isr_dma_rx();
-}
-
-
-#endif
-
-#ifdef __SPI3_CPP_
-
-///////////////////////////////////////////
-// Declare all 3-wire SPI peripherals here
-///////////////////////////////////////////
-
-#endif
-
-///////////////////////////////////////////
-// End SPI platform
-///////////////////////////////////////////
-
-
-
-
-
-
+using namespace Platform;
 
 #endif // __IMU_PLATFORM_H_
