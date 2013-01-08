@@ -11,10 +11,10 @@ void LTC3559::buck_mode(buck_mode_t new_mode) const{
 	}
 }
 
-void LTC3559::high_power(bool new_hp) const{
+void LTC3559::high_power(bool new_hp) const {
 	hp_pin.assign(new_hp);
 }
 
-void LTC3559::suspend(bool new_susp) const{
+void LTC3559::suspend(bool new_susp) const {
 	susp_pin.assign(new_susp);
 }

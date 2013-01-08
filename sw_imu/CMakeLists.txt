@@ -61,7 +61,7 @@ set(MCFLAGS "-mcpu=${MCU} -g -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -D__NEWL
 add_definitions(${MCFLAGS})
 add_definitions(-DHSE_VALUE=8000000 -DARM_MATH_CM4 -D__FPU_PRESENT)
 
-set(LINKER_SCRIPT ${OS_DIR}/ports/GCC/ARMCMx/STM32F4xx/ld/STM32F407xG.ld)
+set(LINKER_SCRIPT ${OS_DIR}/ports/GCC/ARMCMx/STM32F4xx/ld/STM32F405xG.ld)
 
 ###################################################
 # Compiler Flags
@@ -72,7 +72,7 @@ set(COMMON_FLAGS "${LTO} ${OPTIMIZATION} -ffunction-sections -fdata-sections ${M
 set(CMAKE_CXX_FLAGS "--std=gnu++11 -fno-rtti -fno-exceptions ${COMMON_FLAGS}")
 # Use the new C11 standard
 set(CMAKE_C_FLAGS "--std=gnu1x ${COMMON_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "-T${LINKER_SCRIPT} ${LTO} ${OPTIMIZATION} -Wl,-Map=${TARGET}.map,--cref,-static,--gc-sections -nodefaultlibs  ${MCFLAGS} ${CMAKE_EXE_LINKER_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "-T${LINKER_SCRIPT} ${LTO} ${OPTIMIZATION} -Wl,-Map=${TARGET}.map,--cref,-static,--gc-sections -nostartfiles  ${MCFLAGS} ${CMAKE_EXE_LINKER_FLAGS}")
 
 
 include_directories(
@@ -171,16 +171,12 @@ set(APP_SOURCES
 set(IMU_SOURCES
 	${IMU_DIR}/button.cpp
 	${IMU_DIR}/ltc3559.cpp
-	#${IMU_DIR}/i2c.cpp
-	#${IMU_DIR}/spi3.cpp
-    #${IMU_DIR}/spi4.cpp
 	${IMU_DIR}/mma8452q.cpp
 	${IMU_DIR}/mag3110.cpp
-    #${IMU_DIR}/services.cpp
-    #${IMU_DIR}/lsm303.cpp
-    #${IMU_DIR}/adxl345.cpp
-    #${IMU_DIR}/sdio.cpp
-    #${IMU_DIR}/sdio_ll.cpp
+	${IMU_DIR}/i2c.cpp
+	${IMU_DIR}/ssd1306.cpp
+	
+	${IMU_DIR}/graphics/smallfont.cpp
 )
 
 
@@ -190,7 +186,7 @@ set(IMU_SOURCES
 
 #add_library(imu_lib STATIC ${IMU_SOURCES})
 add_executable(${OUTFILE} ${APP_SOURCES} ${OS_SOURCES} ${IMU_SOURCES})
-target_link_libraries(${OUTFILE} gcc)
+target_link_libraries(${OUTFILE} gcc c)
 
 
 # Warnings only for application code -- Optimizations only on ST/ARM code

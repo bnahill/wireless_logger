@@ -133,5 +133,16 @@ public:
 
 typedef Euclidean3<float> Euclidean3_f32;
 
+template<typename typea, typename typeb>
+typea max(typea const &a, typeb const &b){
+	return (a > (typea)b) ? a : (typea)b;
+}
+
+
+template<typename typea, typename typeb>
+typea min(typea const &a, typeb const &b){
+	return (a < (typea)b) ? a : (typea)b;
+}
+
 
 #endif //__IMU_MATH_H_

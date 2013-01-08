@@ -28,6 +28,7 @@
 #include <imu/button.h>
 #include <imu/l3gd20.h>
 #include <imu/ltc3559.h>
+#include <imu/ssd1306.h>
 
 /*!
  @brief Platform-dependent component definitions
@@ -53,6 +54,8 @@ namespace Platform {
 	extern const EXTConfig extcfg;
 	
 	extern LTC3559 reg1;
+	
+	extern LY091WG15 oled;
 };
 
 using namespace Platform;

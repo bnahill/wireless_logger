@@ -58,7 +58,6 @@ public:
 	
 	bool is_pressed() const {return state == ST_PRESSED;}
 	
-	static void init();
 	
 	/*!
 	 @brief Static callback from EXT driver

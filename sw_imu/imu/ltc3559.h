@@ -39,7 +39,7 @@ public:
 
 	void buck_mode(buck_mode_t new_mode) const;
 protected:
-	gpio_pin_t const &susp_pin, &hp_pin, &mode_pin, &nchrg_pin;
+	gpio_pin_t const susp_pin, hp_pin, mode_pin, nchrg_pin;
 };
 
 #endif // __IMU_LTC3559_H_

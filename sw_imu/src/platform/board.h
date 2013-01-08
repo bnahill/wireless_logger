@@ -71,10 +71,12 @@
 #define GPIOA_SWDIO             13
 #define GPIOA_SWCLK             14
 
-#define GPIOB_OLED_NCS          2
+#define GPIOB_OLED_NRES         2
 #define GPIOB_SWO               3
 #define GPIOB_I2C1_SCL          6
 #define GPIOB_I2C1_SDA          7
+#define GPIOB_OLED_NDC          10
+#define GPIOB_OLED_NCS          11
 #define GPIOB_FLASH_NCS         12
 #define GPIOB_SPI2_SCK          13
 #define GPIOB_SPI2_MISO         14
@@ -188,7 +190,7 @@
  */
 #define VAL_GPIOB_MODER     (PIN_MODE_INPUT(0) |                            \
                              PIN_MODE_INPUT(1) |                            \
-                             PIN_MODE_OUTPUT(GPIOB_OLED_NCS) |              \
+                             PIN_MODE_OUTPUT(GPIOB_OLED_NRES) |             \
                              PIN_MODE_INPUT(3) |                            \
                              PIN_MODE_INPUT(4) |                            \
                              PIN_MODE_INPUT(5) |                            \
@@ -196,8 +198,8 @@
                              PIN_MODE_ALTERNATE(GPIOB_I2C1_SDA) |           \
                              PIN_MODE_INPUT(8) |                            \
                              PIN_MODE_INPUT(9) |                            \
-                             PIN_MODE_INPUT(10) |                           \
-                             PIN_MODE_INPUT(11) |                           \
+                             PIN_MODE_OUTPUT(GPIOB_OLED_NDC) |              \
+                             PIN_MODE_OUTPUT(GPIOB_OLED_NCS) |              \
                              PIN_MODE_OUTPUT(GPIOB_FLASH_NCS) |             \
                              PIN_MODE_ALTERNATE(GPIOB_SPI2_SCK) |           \
                              PIN_MODE_ALTERNATE(GPIOB_SPI2_MISO) |          \
@@ -221,7 +223,8 @@
                              PIN_PUDR_PULLUP(13) |                          \
                              PIN_PUDR_PULLUP(14) |                          \
                              PIN_PUDR_PULLUP(15))
-#define VAL_GPIOB_ODR       0xFFFFFFFF
+#define VAL_GPIOB_ODR       (0xFFFFFFFF &                                   \
+                           ~(PIN(GPIOB_OLED_NRES)))
 #define VAL_GPIOB_AFRL      (PIN_AFIO_AF(GPIOB_SWO, 0) |                    \
                              PIN_AFIO_AF(GPIOB_I2C1_SCL, 4) |               \
                              PIN_AFIO_AF(GPIOB_I2C1_SDA, 4))

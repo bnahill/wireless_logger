@@ -19,6 +19,9 @@ L3GD20< spi_class >::L3GD20(spi_class& spi, typename spi_class::slave_config_t s
 template < class spi_class >
 bool L3GD20< spi_class >::init(){
 	uint8_t buffer[32];
+	
+	spi.init();
+	
 	if(spi_read_reg(REG_WHO_AM_I) != whoami)
 		while(1);
 	
@@ -35,7 +38,7 @@ void L3GD20< spi_class >::read(){
 	
 	tx_buff = 0x80 | 0x40 | REG_OUT_X_H;
 	
-	spi.exchange(spi_config, 7, &tx_buff, rx_buff);
+	spi.exchange_sync(spi_config, 7, &tx_buff, rx_buff);
 		
 	tmp = (rx_buff[2] << 8) | rx_buff[1];
 	reading.x = (float)tmp * dps_scale;
@@ -67,7 +70,7 @@ void L3GD20< spi_class >::set_full_scale(fs_t new_fs, bool write){
 template < class spi_class >
 void L3GD20< spi_class >::spi_read(reg_t addr, size_t n, uint8_t *dst){
 	addr = (reg_t) (addr | FLAG_READ | FLAG_SEQ);
-	spi.exchange(spi_config, n, &addr, dst);
+	spi.exchange_sync(spi_config, n, &addr, dst);
 }
 
 template < class spi_class >
@@ -76,7 +79,7 @@ uint8_t L3GD20< spi_class >::spi_read_reg(reg_t addr){
 	uint8_t tx_buff[2];
 	tx_buff[0] = ((uint8_t)addr) | FLAG_READ;
 	tx_buff[1] = 0;
-	spi.exchange(spi_config, 2, tx_buff, rx_buff);
+	spi.exchange_sync(spi_config, 2, tx_buff, rx_buff);
 	return rx_buff[1];
 }
 
@@ -86,7 +89,7 @@ void L3GD20< spi_class >::spi_write_reg(reg_t addr, uint8_t value){
 	uint8_t tx_buff[2];
 	tx_buff[0] = addr;
 	tx_buff[1] = value;
-	spi.exchange(spi_config, 2, tx_buff, rx_buff);
+	spi.exchange_sync(spi_config, 2, tx_buff, rx_buff);
 }
 
 template < class spi_class >
@@ -141,7 +144,7 @@ void L3GD20< spi_class >::update_ctrl_regs(){
 	tx_buff[3] = update_reg_ctrl3(false);
 	tx_buff[4] = update_reg_ctrl4(false);
 	tx_buff[5] = update_reg_ctrl5(false);
-	spi.exchange(spi_config, 6, tx_buff, rx_buff);
+	spi.exchange_sync(spi_config, 6, tx_buff, rx_buff);
 }
 
 template < class spi_class >

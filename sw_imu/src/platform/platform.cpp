@@ -5,6 +5,7 @@
  
  @author Ben Nahill <bnahill@gmail.com>
  */
+#define __PLATFORM_CPP_
 
 #include "platform.h"
 
@@ -85,3 +86,19 @@ gpio_pin_t Platform::led1(GPIOC, 3);
 
 
 LTC3559 Platform::reg1({GPIOC, 2}, {GPIOC, 1}, {GPIOA, 4}, {GPIOA, 1});
+
+///////////////////////////////////////////
+// OLED display platform configuration
+///////////////////////////////////////////
+
+LY091WG15 Platform::oled(spi2,
+                        {NULL, GPIOB, 11, SPI_CR1_BR_1 | SPI_CR1_CPOL | SPI_CR1_CPHA},
+                        {GPIOB, 10}, {GPIOB, 2});
+
+extern "C" {
+void NMIVector(void){while(1);}
+void HardFaultVector(void){while(1);}
+void MemManageVector(void){while(1);}
+void BusFaultVector(void){while(1);}
+void UsageFaultVector(void){while(1);}
+}
