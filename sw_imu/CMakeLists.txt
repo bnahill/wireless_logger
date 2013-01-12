@@ -16,6 +16,14 @@
 # Author: Ben Nahill <bnahill@gmail.com>
 #
 
+if(WIN32)
+SET(CMAKE_ECLIPSE_VERSION "4.2 (Juno)")
+SET(CMAKE_C_COMPILER arm-none-eabi-gcc.exe)
+SET(CMAKE_CXX_COMPILER arm-none-eabi-g++.exe)
+SET(CMAKE_OBJDUMP arm-none-eabi-objdump.exe)
+SET(CMAKE_OBJCOPY arm-none-eabi-objcopy.exe)
+MESSAGE("Apples")
+endif(WIN32)
 
 # Use the Sourcery ARM EABI toolchain
 set(TC_PREFIX arm-none-eabi-)
@@ -177,6 +185,9 @@ set(IMU_SOURCES
 	${IMU_DIR}/ssd1306.cpp
 	
 	${IMU_DIR}/graphics/smallfont.cpp
+	${IMU_DIR}/graphics/mediumfont.cpp
+	${IMU_DIR}/graphics/comicsans4.cpp
+	${IMU_DIR}/graphics/courier3.cpp
 )
 
 
@@ -237,8 +248,10 @@ add_dependencies(gdb gdb_script)
 add_dependencies(gdbtui gdb_script)
 add_dependencies(ddd gdb_script)
 
+if(${UNIX})
 add_custom_command(OUTPUT start.gdb COMMAND cat ${CMAKE_SOURCE_DIR}/start.gdb > start.gdb DEPENDS ${CMAKE_SOURCE_DIR}/start.gdb)
 add_custom_target(gdb_script ALL DEPENDS start.gdb)
+endif(${UNIX})
 
 ##############################################################
 # Assembly output
