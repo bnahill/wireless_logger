@@ -11,6 +11,8 @@
 #include "platform.h"
 
 bool MMA8452Q::init(){
+	chSemInit(&result_lock, 1);
+	
 	// Initialize I2C -- don't care about return value
 	i2c.init();
 	
@@ -44,9 +46,11 @@ void MMA8452Q::reset(){
 void MMA8452Q::read(){
 	static const uint8_t addr = REG_OUT_X_MSB;
 	i2c.transmit(devaddr, &addr, 1, xfer_buffer, 6, MS2ST(4));
+	chSemWait(&result_lock);
 	reading.x = ((float)((int16_t)(xfer_buffer[0] << 8) + xfer_buffer[1]) / (512.0 * 16));
 	reading.y = ((float)((int16_t)(xfer_buffer[2] << 8) + xfer_buffer[3]) / (512.0 * 16));
 	reading.z = ((float)((int16_t)(xfer_buffer[4] << 8) + xfer_buffer[5]) / (512.0 * 16));
+	chSemSignal(&result_lock);
 }
 
 

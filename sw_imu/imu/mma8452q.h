@@ -11,6 +11,7 @@
 
 #include "imu/i2c.h"
 #include "imu_math.h"
+#include "ch.h"
 
 class MMA8452Q {
 public:
@@ -127,9 +128,13 @@ public:
 	oversmp_mode_t oversmp_mode_sleep;
 	autosleep_t autosleep;
 	//! @}
-
-	Euclidean3_f32 reading;
 	
+	void get_reading(Euclidean3_f32 &dst){
+		chSemWait(&result_lock);
+		dst = reading;
+		chSemSignal(&result_lock);
+	}
+
 private:
 	typedef enum {
 		REG_STATUS        = 0x00,
@@ -175,6 +180,10 @@ private:
 		REG_OFF_Y         = 0x31,
 		REG_OFF_Z         = 0x0D
 	} reg_t;
+	
+	Semaphore result_lock;
+	
+	Euclidean3_f32 reading;
 	
 	uint8_t const devaddr;
 	

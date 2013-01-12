@@ -3,7 +3,6 @@
 
 #include "platform.h"
 #include "acquisition.h"
-#include <graphics/smallfont.h>
 
 extern "C"{
 	int main(void);
@@ -11,20 +10,22 @@ extern "C"{
 
 void ui_init();
 
+static enum {
+	MODE_ACC,
+	MODE_GYRO,
+	MODE_MAG
+} mode = MODE_ACC;
+
 void handle_button1(uint32_t *){
-	oled.fb.write_text<SmallFont>("Apples",0,0);
-	oled.fb.write_text<SmallFont>("are",1,0);
-	oled.fb.write_text<SmallFont>("awesome!",2,0);
+	mode = MODE_ACC;
 }
 
 void handle_button2(uint32_t *){
-	oled.fb.clear();
+	mode = MODE_GYRO;
 }
 
 void handle_button3(uint32_t *){
-	oled.fb.write_text<SmallFont>("EAT",1,64);
-	oled.fb.write_text<SmallFont>("THEM",2,64);
-	oled.fb.write_text<SmallFont>("ALWAYS!",3,64);
+	mode = MODE_MAG;
 }
 
 char *uint_to_string(uint32_t i, char * s, bool ignore_leading=true){
@@ -83,14 +84,17 @@ int main(void) {
 	
 	count = 0;
 	
-	//button1.set_press_handler(handle_button1);
-	//button2.set_press_handler(handle_button2);
-	//button3.set_press_handler(handle_button3);
+	button1.set_press_handler(handle_button1);
+	button2.set_press_handler(handle_button2);
+	button3.set_press_handler(handle_button3);
 	/*
 	oled.fb.draw_horizontal_mask(3, 0x80, 0, 127);
 	oled.fb.draw_horizontal_mask(0, 0x88, 0, 25);
 	oled.fb.draw_vertical(0, 3, 62);
 	*/
+	
+	Euclidean3_f32 measurement;
+	
 	while (TRUE) {
 		chEvtWaitOne(1);
 		if(++count == 50){
@@ -98,16 +102,31 @@ int main(void) {
 			
 			led1.toggle();
 		}
-		if(count & 1){
-			float_to_string(acc1.reading.x, some_string);
-			oled.fb.write_text<SmallFont>(some_string, 0, 0);
-			float_to_string(acc1.reading.y, some_string);
-			oled.fb.write_text<SmallFont>(some_string, 1, 0);
-			float_to_string(acc1.reading.z, some_string);
-			oled.fb.write_text<SmallFont>(some_string, 2, 0);
+		//if(count & 1){
+			oled.fb.clear_area(0, 3, 0, 90);
+			switch(mode){
+			case MODE_ACC:
+				oled.fb.write_text<Courier3>("ACC:", 0, 0, 90);
+				acc1.get_reading(measurement);
+				break;
+			case MODE_GYRO:
+				oled.fb.write_text<Courier3>("GYR:", 0, 0, 90);
+				gyro1.get_reading(measurement);
+				break;
+			case MODE_MAG:
+				oled.fb.write_text<Courier3>("MAG:", 0, 0, 90);
+				mag1.get_reading(measurement);
+				break;
+			}
+			float_to_string(measurement.x, some_string);
+			oled.fb.write_text<SmallFont>(some_string, 0, 90);
+			float_to_string(measurement.y, some_string);
+			oled.fb.write_text<SmallFont>(some_string, 1, 90);
+			float_to_string(measurement.z, some_string);
+			oled.fb.write_text<SmallFont>(some_string, 2, 90);
 			
 			oled.update();
-		}
+		//}
 	}
 }
 

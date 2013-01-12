@@ -20,6 +20,8 @@ template < class spi_class >
 bool L3GD20< spi_class >::init(){
 	uint8_t buffer[32];
 	
+	chSemInit(&result_lock, 1);
+	
 	spi.init();
 	
 	if(spi_read_reg(REG_WHO_AM_I) != whoami)
@@ -39,13 +41,14 @@ void L3GD20< spi_class >::read(){
 	tx_buff = 0x80 | 0x40 | REG_OUT_X_H;
 	
 	spi.exchange_sync(spi_config, 7, &tx_buff, rx_buff);
-		
+	chSemWait(&result_lock);
 	tmp = (rx_buff[2] << 8) | rx_buff[1];
 	reading.x = (float)tmp * dps_scale;
 	tmp = (rx_buff[4] << 8) | rx_buff[3];
 	reading.y = (float)tmp * dps_scale;
 	tmp = (rx_buff[6] << 8) | rx_buff[5];
 	reading.z = (float)tmp * dps_scale;
+	chSemSignal(&result_lock);
 }
 
 template < class spi_class >

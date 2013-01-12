@@ -12,7 +12,8 @@
  */
 class SmallFont {
 public:
-	static bool write_text(uint8_t * buff, uint8_t line, char const * text, uint32_t &n_cols);
+	static bool write_text(uint8_t * buff, uint8_t line, char const * text,
+	                       uint32_t &n_cols, uint32_t max_cols = 0 - 1);
 	static uint32_t get_num_cols(char const * text);
 	
 	static constexpr uint32_t n_lines = 1;

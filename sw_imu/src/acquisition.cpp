@@ -26,15 +26,13 @@ static msg_t AccThread(void *arg) {
 	acc1.init();
 
 	chEvtRegisterMask(&Acquisition::tick_source, &listener, 1);
-	
+	Euclidean3_f32 measurement;
 	while(1){
 		chEvtWaitOne(1);
 		acc1.read();
 		acc_count++;
-		
-		if((acc1.reading.x * acc1.reading.x +
-		    acc1.reading.y * acc1.reading.y +
-		    acc1.reading.z * acc1.reading.z) > 3){
+		acc1.get_reading(measurement);
+		if(measurement.mag_squared()> 3){
 			//led1.on();
 		} else {
 			//led1.off();
@@ -120,5 +118,5 @@ void Acquisition::init(){
 	static GPTConfig const gpt_config = {10000, Acquisition::tick};
 	
 	gptStart(&timer, &gpt_config);
-	gptStartContinuous(&timer, 200);
+	gptStartContinuous(&timer, 100);
 }

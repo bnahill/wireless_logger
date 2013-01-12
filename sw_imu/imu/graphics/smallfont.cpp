@@ -1,6 +1,7 @@
 #include "graphics/smallfont.h"
 
-bool SmallFont::write_text(uint8_t * buff, uint8_t line, char const * text, uint32_t &n_cols){
+bool SmallFont::write_text(uint8_t * buff, uint8_t line, char const * text,
+	                       uint32_t &n_cols, uint32_t max_cols){
 	if(line >= n_lines)
 		return false;
 	
@@ -8,6 +9,7 @@ bool SmallFont::write_text(uint8_t * buff, uint8_t line, char const * text, uint
 	
 	uint8_t const * char_ptr;
 	uint32_t i;
+	max_cols -= char_width + letter_spacing;
 	// Iterate over each character of text
 	while(true){
 		// First column of letter in font
@@ -23,6 +25,9 @@ bool SmallFont::write_text(uint8_t * buff, uint8_t line, char const * text, uint
 		
 		// Check for exit before adding spacing
 		if(*(++text) == 0)
+			break;
+		
+		if((uint32_t)(buff - buff_orig) > max_cols)
 			break;
 		
 		// Add spacing

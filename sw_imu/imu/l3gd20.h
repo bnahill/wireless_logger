@@ -117,8 +117,13 @@ public:
 	
 	//! The latest temperature reading
 	uint8_t get_temperature() const{return temperature;}
+	
 	//! The latest angular velocity reading
-	Euclidean3_f32 const &get_reading() const{return reading;}
+	void get_reading(Euclidean3_f32 &dst){
+		chSemWait(&result_lock);
+		dst = reading;
+		chSemSignal(&result_lock);
+	}
 	
 protected:
 	//! @brief Register address map
@@ -217,6 +222,7 @@ protected:
 	//! The current reading
 	Euclidean3_f32 reading;
 	
+	
 	//! The current temperature
 	int8_t temperature;
 	
@@ -244,6 +250,9 @@ protected:
 	
 	//! The current sensitivity in degrees/lsb
 	float dps_scale;
+	
+	Semaphore result_lock;
+	
 	
 	static float get_dps_scale(fs_t fs);
 	

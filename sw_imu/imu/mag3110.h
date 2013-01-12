@@ -126,8 +126,12 @@ public:
 		write_ctrl_reg2();
 	}
 	
-	//! Reading in uT
-	Euclidean3_f32 reading;
+	
+	void get_reading(Euclidean3_f32 &dst){
+		chSemWait(&result_lock);
+		dst = reading;
+		chSemSignal(&result_lock);
+	}
 	
 private:
 	/*!
@@ -174,7 +178,13 @@ private:
 	I2C &i2c;
 	
 	//! The value expected at REG_WHO_AM_I
-	static const uint8_t whoami = 0xC4;
+	static constexpr uint8_t whoami = 0xC4;
+	
+	//! Reading in uT
+	Euclidean3_f32 reading;
+	
+	Semaphore result_lock;
+	
 };
 
 #endif
