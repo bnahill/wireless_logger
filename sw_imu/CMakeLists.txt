@@ -22,7 +22,9 @@ SET(CMAKE_C_COMPILER arm-none-eabi-gcc.exe)
 SET(CMAKE_CXX_COMPILER arm-none-eabi-g++.exe)
 SET(CMAKE_OBJDUMP arm-none-eabi-objdump.exe)
 SET(CMAKE_OBJCOPY arm-none-eabi-objcopy.exe)
-MESSAGE("Apples")
+set(UNIX_HOST false)
+else(WIN32)
+set(UNIX_HOST true)
 endif(WIN32)
 
 # Use the Sourcery ARM EABI toolchain
@@ -206,31 +208,6 @@ set_target_properties(${OUTFILE} PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 #set_target_properties(cmsis_dsp PROPERTIES COMPILE_FLAGS "-w -O2")
 
 ##############################################################
-# Ctags
-##############################################################
-
-set(CTAG_OPTS -R --c-kinds=+p --fields=+iaS --extra=+q)
-set(CTAG_SEARCH_LIST
-	${STD_PERIPH_DIR}/inc
-	${CMSIS_DIR}/Device/ST/STM32F4xx/Include
-	${CMSIS_DIR}/Include/arm_math.h
-	${CMSIS_DIR}/Include/arm_common_tables.h
-	${CMSIS_DIR}/Include/core_cm4.h
-	${CMSIS_DIR}/Include/core_cm4_simd.h
-	${CMSIS_DIR}/Include/core_cmFunc.h
-	${CMSIS_DIR}/Include/core_cmInstr.h
-)
-
-foreach(p ${CTAG_SEARCH_LIST})
-	set(CTAG_SEARCH ${CTAG_SEARCH} ${CMAKE_SOURCE_DIR}/${p})
-endforeach(p)
-
-add_custom_target(ctags
-	ctags ${CTAG_OPTS} -f ${CMAKE_SOURCE_DIR}/src/ext_tags ${CTAG_SEARCH}
-	COMMENT "Generating Ctags..."
-)
-
-##############################################################
 # Configuration for GDB
 ##############################################################
 
@@ -248,10 +225,7 @@ add_dependencies(gdb gdb_script)
 add_dependencies(gdbtui gdb_script)
 add_dependencies(ddd gdb_script)
 
-if(${UNIX})
-add_custom_command(OUTPUT start.gdb COMMAND cat ${CMAKE_SOURCE_DIR}/start.gdb > start.gdb DEPENDS ${CMAKE_SOURCE_DIR}/start.gdb)
-add_custom_target(gdb_script ALL DEPENDS start.gdb)
-endif(${UNIX})
+configure_file(${CMAKE_SOURCE_DIR}/start.gdb.in ${CMAKE_CURRENT_BINARY_DIR}/start.gdb)
 
 ##############################################################
 # Assembly output

@@ -9,8 +9,9 @@ define l
 	set language c
 end
 
-file xnemo.elf
+set remotetimeout 2
+
+file ${TARGET}.elf
 target remote :3333
 monitor reset init
 
-display/i $pc
