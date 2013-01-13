@@ -3,6 +3,7 @@
 
 #include "platform.h"
 #include "acquisition.h"
+#include "stdio.h"
 
 extern "C"{
 	int main(void);
@@ -84,9 +85,9 @@ int main(void) {
 	
 	count = 0;
 	
-	button1.set_press_handler(handle_button1);
-	button2.set_press_handler(handle_button2);
-	button3.set_press_handler(handle_button3);
+	button[0].set_press_handler(handle_button1);
+	button[1].set_press_handler(handle_button2);
+	button[2].set_press_handler(handle_button3);
 	/*
 	oled.fb.draw_horizontal_mask(3, 0x80, 0, 127);
 	oled.fb.draw_horizontal_mask(0, 0x88, 0, 25);
@@ -99,40 +100,38 @@ int main(void) {
 		chEvtWaitOne(1);
 		if(++count == 50){
 			count = 0;
-			
-			led1.toggle();
+			led1.assign(reg1.is_charging());
 		}
-		//if(count & 1){
-			oled.fb.clear_area(0, 3, 0, 90);
-			switch(mode){
-			case MODE_ACC:
-				oled.fb.write_text<Courier3>("ACC:", 0, 0, 90);
-				acc1.get_reading(measurement);
-				break;
-			case MODE_GYRO:
-				oled.fb.write_text<Courier3>("GYR:", 0, 0, 90);
-				gyro1.get_reading(measurement);
-				break;
-			case MODE_MAG:
-				oled.fb.write_text<Courier3>("MAG:", 0, 0, 90);
-				mag1.get_reading(measurement);
-				break;
-			}
-			float_to_string(measurement.x, some_string);
-			oled.fb.write_text<SmallFont>(some_string, 0, 90);
-			float_to_string(measurement.y, some_string);
-			oled.fb.write_text<SmallFont>(some_string, 1, 90);
-			float_to_string(measurement.z, some_string);
-			oled.fb.write_text<SmallFont>(some_string, 2, 90);
-			
-			oled.update();
-		//}
+
+		oled.fb.clear_area(0, 3, 0, 90);
+		switch(mode){
+		case MODE_ACC:
+			oled.fb.write_text<Courier3>("ACC:", 0, 0, 90);
+			acc1.get_reading(measurement);
+			break;
+		case MODE_GYRO:
+			oled.fb.write_text<Courier3>("GYR:", 0, 0, 90);
+			gyro1.get_reading(measurement);
+			break;
+		case MODE_MAG:
+			oled.fb.write_text<Courier3>("MAG:", 0, 0, 90);
+			mag1.get_reading(measurement);
+			break;
+		}
+		float_to_string(measurement.x, some_string);
+		oled.fb.write_text<SmallFont>(some_string, 0, 90);
+		float_to_string(measurement.y, some_string);
+		oled.fb.write_text<SmallFont>(some_string, 1, 90);
+		float_to_string(measurement.z, some_string);
+		oled.fb.write_text<SmallFont>(some_string, 2, 90);
+		
+		oled.update();
 	}
 }
 
 void ui_init(){
 	Platform::EXTInit();
-	button1.enable();
-	button2.enable();
-	button3.enable();
+	button[0].enable();
+	button[1].enable();
+	button[2].enable();
 }

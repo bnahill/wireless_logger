@@ -36,10 +36,14 @@ L3GD20_SPI Platform::gyro1(Platform::spi1, {NULL, GPIOC, 4, SPI_CR1_BR_2 | SPI_C
 
 EXTDriver &Button::driver = EXTD1;
 
-Button Platform::button1(GPIOC, 12, Button::ACTIVE_LOW);
-Button Platform::button2(GPIOC, 10, Button::ACTIVE_LOW);
-Button Platform::button3(GPIOC, 11, Button::ACTIVE_LOW);
-
+//Button Platform::button1(GPIOC, 12, Button::ACTIVE_LOW);
+//Button Platform::button2(GPIOC, 10, Button::ACTIVE_LOW);
+//Button Platform::button3(GPIOC, 11, Button::ACTIVE_LOW);
+Button Platform::button[3] = {
+	{GPIOC, 12, Button::ACTIVE_LOW},
+	{GPIOC, 10, Button::ACTIVE_LOW},
+	{GPIOC, 11, Button::ACTIVE_LOW}
+};
 
 ///////////////////////////////////////////
 // Edge-trigger interrupt configuration

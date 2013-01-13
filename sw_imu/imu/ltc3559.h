@@ -38,6 +38,7 @@ public:
 	void high_power(bool new_hp) const;
 
 	void buck_mode(buck_mode_t new_mode) const;
+	bool is_charging() const {return !nchrg_pin.read();}
 protected:
 	gpio_pin_t const susp_pin, hp_pin, mode_pin, nchrg_pin;
 };

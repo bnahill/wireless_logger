@@ -16,27 +16,27 @@
 # Author: Ben Nahill <bnahill@gmail.com>
 #
 
-if(WIN32)
-SET(CMAKE_ECLIPSE_VERSION "4.2 (Juno)")
-SET(CMAKE_C_COMPILER arm-none-eabi-gcc.exe)
-SET(CMAKE_CXX_COMPILER arm-none-eabi-g++.exe)
-SET(CMAKE_OBJDUMP arm-none-eabi-objdump.exe)
-SET(CMAKE_OBJCOPY arm-none-eabi-objcopy.exe)
-set(UNIX_HOST false)
-else(WIN32)
-set(UNIX_HOST true)
-endif(WIN32)
 
-# Use the Sourcery ARM EABI toolchain
-set(TC_PREFIX arm-none-eabi-)
-set(CMAKE_TOOLCHAIN_FILE toolchain.cmake)
-
-set(TARGET xnemo)
+set(TARGET imu_logger)
 set(OUTFILE ${TARGET}.elf)
 
 project(${TARGET})
 cmake_minimum_required(VERSION 2.8)
 
+
+
+# Use the GNU ARM EABI toolchain
+set(TC_PREFIX arm-none-eabi-)
+
+# Include the correct toolchain file and set a variable so that we can
+# determine the correct host type later
+if(WIN32)
+set(CMAKE_TOOLCHAIN_FILE toolchain_win32.cmake)
+set(UNIX_HOST false)
+else(WIN32)
+set(UNIX_HOST true)
+set(CMAKE_TOOLCHAIN_FILE toolchain.cmake)
+endif(WIN32)
 
 ########################################################
 # Source locations
@@ -215,6 +215,7 @@ set(GDB    ${TC_PREFIX}gdb)
 set(GDBTUI ${TC_PREFIX}gdbtui)
 
 set(GDB_ARGS -x start.gdb)
+set(GDB_ARGS -e ${TARGET}.elf)
 add_custom_target(gdb COMMAND ${GDB} ${GDB_ARGS})
 add_custom_target(gdbtui COMMAND ${GDBTUI} ${GDB_ARGS})
 add_custom_target(ddd COMMAND ddd --gdb --debugger \"${GDB} ${GDB_ARGS}\" > /dev/null 2>&1 &
@@ -225,7 +226,7 @@ add_dependencies(gdb gdb_script)
 add_dependencies(gdbtui gdb_script)
 add_dependencies(ddd gdb_script)
 
-configure_file(${CMAKE_SOURCE_DIR}/start.gdb.in ${CMAKE_CURRENT_BINARY_DIR}/start.gdb)
+configure_file(${CMAKE_SOURCE_DIR}/start.gdb.in ${CMAKE_CURRENT_BINARY_DIR}/.gdbinit)
 
 ##############################################################
 # Assembly output

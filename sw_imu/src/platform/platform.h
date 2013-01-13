@@ -46,7 +46,7 @@ namespace Platform {
 	extern SPI spi2;
 	extern L3GD20_SPI gyro1;
 	
-	extern Button button1, button2, button3;
+	extern Button button[3];
 	
 	extern gpio_pin_t led1;
 	
