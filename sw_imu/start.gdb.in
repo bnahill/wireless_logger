@@ -10,7 +10,13 @@ define l
 end
 
 set remotetimeout 2
+file @OUTFILE@
 
 target remote :3333
 monitor reset init
+
+l
+r
+b main
+
 

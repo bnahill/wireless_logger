@@ -17,13 +17,6 @@
 #
 
 
-set(TARGET imu_logger)
-set(OUTFILE ${TARGET}.elf)
-
-project(${TARGET})
-cmake_minimum_required(VERSION 2.8)
-
-
 
 # Use the GNU ARM EABI toolchain
 set(TC_PREFIX arm-none-eabi-)
@@ -31,12 +24,28 @@ set(TC_PREFIX arm-none-eabi-)
 # Include the correct toolchain file and set a variable so that we can
 # determine the correct host type later
 if(WIN32)
-set(CMAKE_TOOLCHAIN_FILE toolchain_win32.cmake)
-set(UNIX_HOST false)
-else(WIN32)
-set(UNIX_HOST true)
-set(CMAKE_TOOLCHAIN_FILE toolchain.cmake)
+	message("Detected WIN32 build environment")
+	set(IS_UNIX false)
+	set(DETECTED_HOST "Windows")
+	set(CMAKE_TOOLCHAIN_FILE toolchain_win32.cmake)
+	set(ENV{HOME} ${CMAKE_CURRENT_BINARY_DIR})
 endif(WIN32)
+
+if(UNIX)
+	message("Detected UNIX build environment")
+	set(DETECTED_HOST "UNIX")
+	set(CMAKE_TOOLCHAIN_FILE toolchain.cmake)
+endif(UNIX)
+
+set(BUILD_HOST ${DETECTED_HOST} CACHE STRING "Build host (Check this!)")
+
+
+set(TARGET imu_logger)
+set(OUTFILE ${TARGET}.elf)
+
+project(${TARGET})
+cmake_minimum_required(VERSION 2.8)
+
 
 ########################################################
 # Source locations
@@ -214,8 +223,15 @@ set_target_properties(${OUTFILE} PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 set(GDB    ${TC_PREFIX}gdb)
 set(GDBTUI ${TC_PREFIX}gdbtui)
 
+if(${DETECTED_HOST} STREQUAL "Windows")
+configure_file(${CMAKE_SOURCE_DIR}/start.gdb.in ${CMAKE_CURRENT_BINARY_DIR}/start.gdb)
 set(GDB_ARGS -x start.gdb)
-set(GDB_ARGS -e ${TARGET}.elf)
+endif(${DETECTED_HOST} STREQUAL "Windows")
+
+if(${DETECTED_HOST} STREQUAL "Linux")
+configure_file(${CMAKE_SOURCE_DIR}/start.gdb.in ${CMAKE_CURRENT_BINARY_DIR}/.gdbinit)
+endif(${DETECTED_HOST} STREQUAL "Linux")
+
 add_custom_target(gdb COMMAND ${GDB} ${GDB_ARGS})
 add_custom_target(gdbtui COMMAND ${GDBTUI} ${GDB_ARGS})
 add_custom_target(ddd COMMAND ddd --gdb --debugger \"${GDB} ${GDB_ARGS}\" > /dev/null 2>&1 &
@@ -226,7 +242,7 @@ add_dependencies(gdb gdb_script)
 add_dependencies(gdbtui gdb_script)
 add_dependencies(ddd gdb_script)
 
-configure_file(${CMAKE_SOURCE_DIR}/start.gdb.in ${CMAKE_CURRENT_BINARY_DIR}/.gdbinit)
+
 
 ##############################################################
 # Assembly output
