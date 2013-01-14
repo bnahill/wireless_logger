@@ -31,7 +31,6 @@ void handle_button3(uint32_t *){
 
 char *uint_to_string(uint32_t i, char * s, bool ignore_leading=true){
 	uint32_t div;
-	uint32_t rem;
 	uint32_t place = 1000000;
 	
 	bool start_printing = !ignore_leading;
@@ -69,7 +68,6 @@ int main(void) {
 	uint32_t count;
 	EventListener listener;
 	char some_string[64];
-	char * tmp;
 	
 	halInit();
 	chSysInit();

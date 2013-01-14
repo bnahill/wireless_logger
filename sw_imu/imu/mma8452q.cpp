@@ -35,6 +35,8 @@ bool MMA8452Q::init(){
 	
 	// Enable device
 	i2c.write_byte(devaddr, REG_CTRL_REG1, 0x21);
+	
+	return true;
 }
 
 void MMA8452Q::reset(){

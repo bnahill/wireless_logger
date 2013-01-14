@@ -21,7 +21,7 @@ bool ComicSans4::write_text(uint8_t * buff, uint8_t line, char const * text,
 		else
 			letter = text[0]-32;
 		// First column of letter in font
-		char_ptr = &font[letter][line][0];
+		char_ptr = &font[(uint8_t)letter][line][0];
 		
 		// Copy letter data
 		for(i = 0; i < char_width; i++){

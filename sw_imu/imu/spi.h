@@ -192,6 +192,7 @@ protected:
 			}
 			spiStop(&driver);
 		}
+		return 0;
 	}
 	
 	static constexpr uint32_t stack_size = 1024;
@@ -205,6 +206,7 @@ protected:
 	
 	static msg_t start_thread(SPI *spi){
 		spi->run();
+		return 0;
 	}
 	
 	/*!

@@ -38,6 +38,7 @@ static msg_t AccThread(void *arg) {
 			//led1.off();
 		}
 	}
+	return 0;
 }
 
 
@@ -58,6 +59,7 @@ static msg_t MagThread(void *arg) {
 		mag1.read();
 		mag_count++;
 	}
+	return 0;
 }
 
 static WORKING_AREA(waGyroThread, 512);
@@ -87,6 +89,7 @@ static msg_t GyroThread(void *arg) {
 				break;
 		}
 	}
+	return 0;
 }
 
 void Acquisition::tick(GPTDriver* driver){

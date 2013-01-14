@@ -53,6 +53,8 @@ public:
 			return (0 == (gpio.IDR & mask)) ? ST_PRESSED : ST_RELEASED;
 		case ACTIVE_HIGH:
 			return (0 != (gpio.IDR & mask)) ? ST_PRESSED : ST_RELEASED;
+		default:
+			return ST_RELEASED;
 		}
 	}
 	

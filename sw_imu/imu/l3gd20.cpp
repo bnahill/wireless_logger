@@ -18,8 +18,6 @@ L3GD20< spi_class >::L3GD20(spi_class& spi, typename spi_class::slave_config_t s
 
 template < class spi_class >
 bool L3GD20< spi_class >::init(){
-	uint8_t buffer[32];
-	
 	chSemInit(&result_lock, 1);
 	
 	spi.init();
