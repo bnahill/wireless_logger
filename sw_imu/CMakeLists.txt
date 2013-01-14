@@ -230,8 +230,8 @@ set_target_properties(${OUTFILE} PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 set(GDB    ${TC_PREFIX}gdb)
 set(GDBTUI ${TC_PREFIX}gdbtui)
 
-if(${DETECTED_HOST} STREQUAL "Windows")
 configure_file(${CMAKE_SOURCE_DIR}/start.gdb.in ${CMAKE_CURRENT_BINARY_DIR}/start.gdb)
+if(${DETECTED_HOST} STREQUAL "Windows")
 set(GDB_ARGS -x start.gdb)
 endif(${DETECTED_HOST} STREQUAL "Windows")
 
@@ -267,10 +267,14 @@ set(OPENOCD_SCRIPTS
 	board/stm32f4discovery.cfg
 )
 foreach(s ${OPENOCD_SCRIPTS})
-	set(OPENOCD_ARGS ${OPENOCD_ARGS} -f ${s} -c "stm32f4x.cpu configure -rtos auto")
+	set(OPENOCD_ARGS ${OPENOCD_ARGS} -f ${s})
 endforeach(s)
 
-add_custom_target(openocd COMMAND ${OPENOCD} ${OPENOCD_ARGS}
+add_custom_target(openocd COMMAND ${OPENOCD} ${OPENOCD_ARGS} -c "stm32f4x.cpu configure -rtos auto"
+	COMMENT "Launching OpenOCD..."
+)
+
+add_custom_target(openocd_no_os COMMAND ${OPENOCD} ${OPENOCD_ARGS}
 	COMMENT "Launching OpenOCD..."
 )
 

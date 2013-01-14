@@ -81,16 +81,18 @@ int main(void) {
 	
 	oled.init();
 	
+	enum {DISP_NUMBER, DISP_PROGRESS} display_mode;
+	
+	if(button[0].check_gpio() == Button::ST_PRESSED)
+		display_mode = DISP_PROGRESS;
+	else
+		display_mode = DISP_NUMBER;
+	
 	count = 0;
 	
 	button[0].set_press_handler(handle_button1);
 	button[1].set_press_handler(handle_button2);
 	button[2].set_press_handler(handle_button3);
-	/*
-	oled.fb.draw_horizontal_mask(3, 0x80, 0, 127);
-	oled.fb.draw_horizontal_mask(0, 0x88, 0, 25);
-	oled.fb.draw_vertical(0, 3, 62);
-	*/
 	
 	Euclidean3_f32 measurement;
 	
@@ -106,23 +108,34 @@ int main(void) {
 		case MODE_ACC:
 			oled.fb.write_text<Courier3>("ACC:", 0, 0, 90);
 			acc1.get_reading(measurement);
+			if(display_mode == DISP_PROGRESS) measurement *= 0.2;
 			break;
 		case MODE_GYRO:
 			oled.fb.write_text<Courier3>("GYR:", 0, 0, 90);
 			gyro1.get_reading(measurement);
+			if(display_mode == DISP_PROGRESS) measurement *= 0.01;
 			break;
 		case MODE_MAG:
 			oled.fb.write_text<Courier3>("MAG:", 0, 0, 90);
 			mag1.get_reading(measurement);
+			if(display_mode == DISP_PROGRESS) measurement *= 0.01;
 			break;
 		}
-		float_to_string(measurement.x, some_string);
-		oled.fb.write_text<SmallFont>(some_string, 0, 90);
-		float_to_string(measurement.y, some_string);
-		oled.fb.write_text<SmallFont>(some_string, 1, 90);
-		float_to_string(measurement.z, some_string);
-		oled.fb.write_text<SmallFont>(some_string, 2, 90);
-		
+		switch(display_mode){
+		case DISP_NUMBER:
+			float_to_string(measurement.x, some_string);
+			oled.fb.write_text<SmallFont>(some_string, 0, 90);
+			float_to_string(measurement.y, some_string);
+			oled.fb.write_text<SmallFont>(some_string, 1, 90);
+			float_to_string(measurement.z, some_string);
+			oled.fb.write_text<SmallFont>(some_string, 2, 90);
+			break;
+		case DISP_PROGRESS:
+			oled.fb.draw_pos_neg_bar(measurement.x, 0, 80, 127);
+			oled.fb.draw_pos_neg_bar(measurement.y, 1, 80, 127);
+			oled.fb.draw_pos_neg_bar(measurement.z, 2, 80, 127);
+			break;
+		}
 		oled.update();
 	}
 }

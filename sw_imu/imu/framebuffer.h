@@ -51,9 +51,16 @@ public:
 	 @param col_start The first column to apply this to
 	 @param length The number of columns to write
 	 */
-	void draw_horizontal_mask(uint8_t page, uint8_t mask, uint32_t col_start, uint32_t length);
+	void draw_horizontal_mask(uint8_t page, uint8_t mask,
+	                          uint32_t col_start, uint32_t length);
 	
 	void draw_vertical(uint8_t start_page, uint8_t end_page, uint32_t column);
+	
+	void draw_progress_bar(float value, uint8_t page,
+	                       uint32_t start_column, uint32_t end_column);
+	
+	void draw_pos_neg_bar(float value, uint8_t page,
+	                      uint32_t start_column, uint32_t end_column);
 	
 	/*!
 	 @brief Reset bounds of area to update

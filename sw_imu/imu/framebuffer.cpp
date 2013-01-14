@@ -109,6 +109,84 @@ void FrameBuffer< pages, columns >::draw_vertical(uint8_t start_page,
 	unlock();
 }
 
+template <uint32_t pages, uint32_t columns>
+void FrameBuffer< pages, columns >::draw_progress_bar(float value,
+	 uint8_t page, uint32_t start_column, uint32_t end_column){
+
+	uint8_t iter;
+	uint32_t progress;
+	
+	value = clamp(value, 0.0f, 1.0f);
+	
+	progress = value * (end_column - start_column) + 0.5; 
+	
+	lock();
+	limits.x_min = min(limits.x_min, start_column);
+	limits.x_max = max(limits.x_max, end_column);
+	limits.y_min = min(limits.y_min, page);
+	limits.x_max = max(limits.y_max, page);
+	
+	fb[page][start_column] = 0xFF;
+	fb[page][end_column] = 0xFF;
+	
+	fb[page][start_column + 1] = 0x81;
+	for(iter = start_column + 2; iter < progress; iter++){
+		fb[page][iter] = 0b10111101; // 0xAD
+	}
+	for(iter = progress; iter < end_column - 2; iter++){
+		fb[page][iter] = 0b10000001; // 0x81
+	}
+	
+	unlock();
+}
+
+template <uint32_t pages, uint32_t columns>
+void FrameBuffer< pages, columns >::draw_pos_neg_bar(float value,
+	  uint8_t page, uint32_t start_column, uint32_t end_column){
+	uint8_t iter;
+	uint32_t progress;
+	uint32_t length = end_column - start_column - 4;
+	uint32_t zero_column = start_column + 2 + length / 2;
+	
+	value = clamp(value, -1.0f, 1.0f);
+	
+	progress = (int32_t)(0.5f * value * length + 0.5) + zero_column;
+	
+	lock();
+	limits.x_min = min(limits.x_min, start_column);
+	limits.x_max = max(limits.x_max, end_column);
+	limits.y_min = min(limits.y_min, page);
+	limits.x_max = max(limits.y_max, page);
+	
+	fb[page][start_column] = 0xFF;
+	fb[page][end_column] = 0xFF;
+	
+	// Check if progress bar is to left of zero	
+	if(progress < zero_column){
+		for(iter = start_column + 1; iter < progress; iter++){
+			fb[page][iter] = 0b10000001; // 0x81
+		}
+		for(iter = progress; iter <= zero_column; iter++){
+			fb[page][iter] = 0b10111101; // 0xAD
+		}
+		for(iter = zero_column + 1; iter < end_column; iter++){
+			fb[page][iter] = 0b10000001; // 0x81
+		}
+	} else {
+		for(iter = start_column + 1; iter < zero_column; iter++){
+			fb[page][iter] = 0b10000001; // 0x81
+		}
+		for(iter = zero_column; iter <= progress; iter++){
+			fb[page][iter] = 0b10111101; // 0xAD
+		}
+		for(iter = progress + 1; iter < end_column; iter++){
+			fb[page][iter] = 0b10000001; // 0x81
+		}
+	}
+	
+	unlock();
+}
+
 /*!
 	@brief Reset bounds of area to update
 	*/

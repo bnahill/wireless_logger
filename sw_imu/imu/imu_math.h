@@ -3,6 +3,7 @@
 
 #include "ch.h"
 #include "hal.h"
+#include "math.h"
 
 /*!
  @brief A 3-dimensional vector in euclidean space
@@ -115,9 +116,16 @@ public:
 		return *this;
 	}
 	
-	
+	/*!
+	 @brief Return the magnitude squared
+	 @return The minimum of a and b
+	*/
 	datatype mag_squared() const {
 		return x*x + y*y + z*z;
+	}
+	
+	datatype mag() const {
+		return sqrtf(mag_squared());
 	}
 	
 	union {
@@ -133,16 +141,36 @@ public:
 
 typedef Euclidean3<float> Euclidean3_f32;
 
+/*!
+ @brief Return the maximum of two values
+ @return The maximum of a and b
+ */
 template<typename typea, typename typeb>
 typea max(typea const &a, typeb const &b){
 	return (a > (typea)b) ? a : (typea)b;
 }
 
-
+/*!
+ @brief Return the minimum of two values
+ @return The minimum of a and b
+ */
 template<typename typea, typename typeb>
 typea min(typea const &a, typeb const &b){
 	return (a < (typea)b) ? a : (typea)b;
 }
 
+/*!
+ @brief Clamp a value to a range
+ @param value The value to clamp
+ @param min The minimum value to output
+ @param max The maximum values to output
+ @return The clamped value
+ */
+template<typename t, typename comptype>
+t clamp(t value, comptype min, comptype max){
+	if(value > (t)max) return (t)max;
+	if(value < (t)min) return (t)min;
+	return value;
+}
 
 #endif //__IMU_MATH_H_
