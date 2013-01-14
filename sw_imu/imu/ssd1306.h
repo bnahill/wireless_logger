@@ -54,8 +54,10 @@ public:
 		write_cmd(CMD_SETSTARTLINE | 0x00);
 		write_cmd(CMD_CHARGEPUMP, 0x14);
 		write_cmd(CMD_MEMORYMODE, 0); // Horizontal addressing
-		write_cmd(CMD_SEGREMAP | 0x01);
-		write_cmd(CMD_COMSCANDEC);
+		//write_cmd(CMD_SEGREMAP | 0x01);
+		//write_cmd(CMD_COMSCANDEC);
+		write_cmd(CMD_SEGREMAP);
+		write_cmd(CMD_COMSCANINC);
 		write_cmd(CMD_SETCOMPINS, val_compins);
 		write_cmd(CMD_SETCONTRAST, val_contrast);
 		write_cmd(CMD_SETPRECHARGE, val_precharge);
