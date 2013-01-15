@@ -61,4 +61,8 @@ struct gpio_pin_t {
 	uint16_t mask;
 };
 
+char *uint_to_string(uint32_t i, char * s, bool ignore_leading=true);
+
+void float_to_string(float f, char * s);
+
 #endif // __IMU_H_

@@ -15,8 +15,8 @@ void FrameBuffer< pages, columns >::clear_area(
 	  uint32_t start_column, uint32_t end_column){
 	uint32_t i, j;
 	lock();
-	for(i = start_page; i < end_page; i++){
-		for(j = start_column; j < end_column; j++){
+	for(i = start_page; i <= end_page; i++){
+		for(j = start_column; j <= end_column; j++){
 			fb[i][j] = 0;
 		}
 	}
@@ -44,7 +44,7 @@ void FrameBuffer< pages, columns >::clear(){
 	the caller to make sure that this doesn't overflow the buffer.
 	*/
 template <uint32_t pages, uint32_t columns>
-template<typename font_class>
+template<class font_class>
 uint32_t FrameBuffer< pages, columns >::write_text(char const * text,
 	  uint8_t page, uint8_t column, uint32_t max_end_column){
 	uint32_t i = 0;
@@ -68,6 +68,16 @@ uint32_t FrameBuffer< pages, columns >::write_text(char const * text,
 	unlock();
 	
 	return n_cols + column;
+}
+
+template <uint32_t pages, uint32_t columns>
+template<class font_class>
+uint32_t FrameBuffer< pages, columns >::write_text_centered(char const * text,
+	  uint8_t page, uint8_t center_column, uint32_t max_width) {
+	uint32_t width = font_class::get_num_cols(text);
+	uint32_t start = max((int)(center_column - (width / 2)), (int)0);
+	
+	return write_text<font_class>(text, page, start, max(start + max_width, columns));
 }
 
 

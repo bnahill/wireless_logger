@@ -15,11 +15,11 @@ void Button::handle_callback(){
 		switch(new_state){
 		case ST_PRESSED:
 			if(press_handler){
-				press_handler(param);
+				press_handler(press_param);
 			}
 		case ST_RELEASED:
 			if(release_handler){
-				release_handler(param);
+				release_handler(release_param);
 			}
 		}
 	}

@@ -191,6 +191,10 @@ set(APP_SOURCES
 	src/acquisition.cpp
 	src/platform/board.c
 	src/platform/platform.cpp
+	src/ui/ui.cpp
+	src/ui/menu.cpp
+	src/ui/mainmenu.cpp
+	src/ui/sensor_view.cpp
 )
 
 
@@ -201,6 +205,7 @@ set(IMU_SOURCES
 	${IMU_DIR}/mag3110.cpp
 	${IMU_DIR}/i2c.cpp
 	${IMU_DIR}/ssd1306.cpp
+	${IMU_DIR}/imu.cpp
 	
 	${IMU_DIR}/graphics/smallfont.cpp
 	${IMU_DIR}/graphics/mediumfont.cpp
@@ -231,12 +236,12 @@ set(GDB    ${TC_PREFIX}gdb)
 set(GDBTUI ${TC_PREFIX}gdbtui)
 
 configure_file(${CMAKE_SOURCE_DIR}/start.gdb.in ${CMAKE_CURRENT_BINARY_DIR}/start.gdb)
-if(${DETECTED_HOST} STREQUAL "Windows")
 set(GDB_ARGS -x start.gdb)
+if(${DETECTED_HOST} STREQUAL "Windows")
 endif(${DETECTED_HOST} STREQUAL "Windows")
 
 if(${DETECTED_HOST} STREQUAL "Linux")
-configure_file(${CMAKE_SOURCE_DIR}/start.gdb.in ${CMAKE_CURRENT_BINARY_DIR}/.gdbinit)
+#configure_file(${CMAKE_SOURCE_DIR}/start.gdb.in ${CMAKE_CURRENT_BINARY_DIR}/.gdbinit)
 endif(${DETECTED_HOST} STREQUAL "Linux")
 
 add_custom_target(gdb COMMAND ${GDB} ${GDB_ARGS})

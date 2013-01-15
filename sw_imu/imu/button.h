@@ -24,16 +24,14 @@ public:
 		state = check_gpio();
 	}
 	
-	void set_press_handler(button_handler new_handler){
+	void set_press_handler(button_handler new_handler, uint32_t *param = nullptr){
 		press_handler = new_handler;
+		press_param = param;
 	}
 	
-	void set_release_handler(button_handler new_handler){
+	void set_release_handler(button_handler new_handler, uint32_t *param = nullptr){
 		release_handler = new_handler;
-	}
-	
-	void set_callback_param(uint32_t *new_param){
-		param = new_param;
+		release_param = param;
 	}
 	
 	void enable(){
@@ -42,6 +40,11 @@ public:
 	
 	void disable(){
 		extChannelDisable(&driver, channel);
+	}
+	
+	void clear_callbacks(){
+		press_handler = nullptr;
+		release_handler = nullptr;
 	}
 	
 	//! The number of channels available for use
@@ -75,7 +78,8 @@ protected:
 	//! @{
 	button_handler press_handler;
 	button_handler release_handler;
-	uint32_t *param;
+	uint32_t *press_param;
+	uint32_t *release_param;
 	//! @}
 	
 	state_t state;

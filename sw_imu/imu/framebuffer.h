@@ -38,9 +38,13 @@ public:
 	 The height of the result depends on the font. It is the responsibility of
 	 the caller to make sure that this doesn't overflow the buffer.
 	 */
-	template<typename font_class>
+	template<class font_class>
 	uint32_t write_text(char const * text, uint8_t page, uint8_t column,
 	                uint32_t max_end_column = columns);
+	
+	template<class font_class>
+	uint32_t write_text_centered(char const * text, uint8_t page, uint8_t center_column,
+	                uint32_t max_width);
 	
 	
 	
@@ -74,12 +78,14 @@ public:
 		chMtxUnlock();
 	}
 	
+	uint32_t get_center_col() const {return columns / 2;}
+	uint32_t get_num_columns() const {return columns;}
+	uint32_t get_num_pages() const {return pages;}
+	
 	uint8_t const * get_fb() const {return fb[0];}
 	uint8_t const * get_fb(uint32_t page) const {return fb[page];}
 	limits_t const &get_limits() const {return limits;}
 protected:
-	
-	
 	
 	uint8_t fb[pages][columns];
 	limits_t limits;
