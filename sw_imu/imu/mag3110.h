@@ -12,6 +12,13 @@
 #include "imu/imu_math.h"
 #include "imu/i2c.h"
 
+//! @addtogroup IMU
+//! @{
+//! @addtogroup Sensors
+//! @{
+//! @addtogroup MAG3110
+//! @{
+
 class MAG3110 {
 public:
 	typedef enum {
@@ -186,5 +193,7 @@ private:
 	Semaphore result_lock;
 	
 };
+
+//! @} @} @}
 
 #endif

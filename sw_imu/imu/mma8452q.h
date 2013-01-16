@@ -13,6 +13,13 @@
 #include "imu_math.h"
 #include "ch.h"
 
+//! @addtogroup IMU
+//! @{
+//! @addtogroup Sensors
+//! @{
+//! @addtogroup MMA8452Q
+//! @{
+
 class MMA8452Q {
 public:
 	typedef enum {
@@ -193,5 +200,7 @@ private:
 	//! I2C device to use
 	I2C &i2c;
 };
+
+//! @} @} @}
 
 #endif

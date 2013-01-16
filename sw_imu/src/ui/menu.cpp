@@ -24,8 +24,8 @@ void Menu::draw(bool update){
 		*line_end = 0;
 		oled.fb.write_text_centered<SmallFont>(
 			line_start, i,
-			oled.fb.get_center_col(),
-			oled.fb.get_num_columns() - 30
+			oled.fb.num_columns / 2,
+			oled.fb.num_columns - 30
 		);
 		line_end++;
 	}
@@ -33,7 +33,7 @@ void Menu::draw(bool update){
 		oled.fb.write_text<MediumFont>("<",1,0);
 	}
 	if(item_index < num_items - 1){
-		oled.fb.write_text<MediumFont>(">",1,oled.fb.get_num_columns() - MediumFont::char_width);
+		oled.fb.write_text<MediumFont>(">",1,oled.fb.num_columns - MediumFont::char_width);
 	}
 	if(update)
 		oled.update();

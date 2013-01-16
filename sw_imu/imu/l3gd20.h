@@ -6,6 +6,13 @@
 #include "imu/imu_math.h"
 #include "imu/spi.h"
 
+//! @addtogroup IMU
+//! @{
+//! @addtogroup Sensors
+//! @{
+//! @addtogroup L3GD20
+//! @{
+
 template <class spi_class>
 class L3GD20 {
 public:
@@ -276,5 +283,7 @@ protected:
 
 //! @brief A 4-wire SPI L3GD20 configuration
 typedef L3GD20<SPI> L3GD20_SPI;
+
+//! @} @} @}
 
 #endif // __IMU_L3GD20_H_

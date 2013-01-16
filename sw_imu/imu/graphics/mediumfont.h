@@ -5,6 +5,11 @@
 #include "ch.h"
 #include "hal.h"
 
+//! @addtogroup IMU
+//! @{
+//! @addtogroup FrameBuffer
+//! @{
+
 /*!
  @brief A font class for a larger double-page font
  
@@ -23,5 +28,7 @@ public:
 	
 	static const uint8_t font[num_letters][n_lines][char_width];
 };
+
+//! @} @}
 
 #endif // __IMU_MEDIUMFONT_H_

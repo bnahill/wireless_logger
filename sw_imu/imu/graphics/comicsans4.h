@@ -5,6 +5,11 @@
 #include "ch.h"
 #include "hal.h"
 
+//! @addtogroup IMU
+//! @{
+//! @addtogroup FrameBuffer
+//! @{
+
 /*!
  @brief A font class for a larger full-screen font
  
@@ -24,5 +29,7 @@ public:
 	
 	static const uint8_t font[num_letters][n_lines][char_width];
 };
+
+//! @} @}
 
 #endif // __IMU_COMICSANS4_H_

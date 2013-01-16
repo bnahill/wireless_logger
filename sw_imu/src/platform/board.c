@@ -28,6 +28,13 @@
 #include "ch.h"
 #include "hal.h"
 
+//! @addtogroup Platform
+//! @{
+//! @addtogroup ChibiOS
+//! @{
+//! @addtogroup Board
+//! @{
+
 /**
  * @brief   PAL setup.
  * @details Digital I/O ports static configuration as defined in @p board.h.
@@ -63,3 +70,5 @@ void __early_init(void) {
  */
 void boardInit(void) {
 }
+
+//! @} @} @}

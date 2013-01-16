@@ -1,5 +1,10 @@
 #include "imu/framebuffer.h"
 
+//! @addtogroup IMU
+//! @{
+//! @addtogroup FrameBuffer
+//! @{
+
 template <uint32_t pages, uint32_t columns>
 FrameBuffer< pages, columns >::FrameBuffer(){
 	limits.x_min = columns - 1;
@@ -81,14 +86,6 @@ uint32_t FrameBuffer< pages, columns >::write_text_centered(char const * text,
 }
 
 
-
-/*!
-	@brief Draw a horizontally with a bit mask
-	@param page The page to mask
-	@param mask The mask to use
-	@param col_start The first column to apply this to
-	@param length The number of columns to write
-	*/
 template <uint32_t pages, uint32_t columns>
 void FrameBuffer< pages, columns >::draw_horizontal_mask(uint8_t page,
 	  uint8_t mask, uint32_t col_start, uint32_t length){
@@ -213,3 +210,5 @@ void FrameBuffer< pages, columns >::sync(bool do_lock){
 	if(do_lock)
 		unlock();
 }
+
+//! @} @}

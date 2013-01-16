@@ -4,7 +4,10 @@
 #include "ch.h"
 #include "hal.h"
 
-class SPI_Transfer;
+//! @addtogroup IMU
+//! @{
+//! @addtogroup SPI
+//! @{
 
 class SPI {
 public:
@@ -218,5 +221,6 @@ protected:
 };
 
 
+//! @} @}
 
 #endif // __IMU_SPI_H_

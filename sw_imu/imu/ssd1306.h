@@ -5,10 +5,10 @@
 #include "imu/spi.h"
 #include "imu/framebuffer.h"
 
-typedef enum {
-	SSD1306_32_128,
-	SSD1306_64_128,
-} ssd1306_resolution;
+//! @addtogroup IMU
+//! @{
+//! @addtogroup Display
+//! @{
 
 template <uint32_t pages, uint32_t columns>
 class SSD1306 {
@@ -192,5 +192,7 @@ protected:
 };
 
 typedef SSD1306<4,128> LY091WG15;
+
+//! @} @}
 
 #endif // __IMU_SSD1306_H_

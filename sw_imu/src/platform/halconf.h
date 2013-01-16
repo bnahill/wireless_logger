@@ -25,14 +25,20 @@
  *          various device drivers from your application. You may also use
  *          this file in order to override the device drivers default settings.
  *
- * @addtogroup HAL_CONF
- * @{
  */
 
 #ifndef _HALCONF_H_
 #define _HALCONF_H_
 
 #include "mcuconf.h"
+
+//! @addtogroup Platform
+//! @{
+//! @addtogroup ChibiOS
+//! @{
+//! @addtogroup HAL
+//! @{
+
 
 /**
  * @brief   Enables the TM subsystem.
@@ -337,6 +343,7 @@
 #define SPI_USE_MUTUAL_EXCLUSION    TRUE
 #endif
 
+//! @} @} @}
+
 #endif /* _HALCONF_H_ */
 
-/** @} */

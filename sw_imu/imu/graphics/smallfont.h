@@ -5,6 +5,11 @@
 #include "ch.h"
 #include "hal.h"
 
+//! @addtogroup IMU
+//! @{
+//! @addtogroup FrameBuffer
+//! @{
+
 /*!
  @brief A font class for a small single-page font
  
@@ -22,5 +27,7 @@ public:
 	
 	static const uint8_t font[];
 };
+
+//! @} @}
 
 #endif // __IMU_SMALLFONT_H_

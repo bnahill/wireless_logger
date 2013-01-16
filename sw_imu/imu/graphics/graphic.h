@@ -5,6 +5,11 @@
 #include "ch.h"
 #include "hal.h"
 
+//! @addtogroup IMU
+//! @{
+//! @addtogroup FrameBuffer
+//! @{
+
 /*!
  @brief A simple drawing
  */
@@ -21,5 +26,7 @@ public:
 namespace Graphics {
 	
 };
+
+//! @} @}
 
 #endif // __IMU_GRAPHIC_H_

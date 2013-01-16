@@ -32,6 +32,13 @@
  * 0...3        Lowest...Highest.
  */
 
+//! @addtogroup Platform
+//! @{
+//! @addtogroup ChibiOS
+//! @{
+//! @addtogroup MCU
+//! @{
+
 #define STM32F4xx_MCUCONF
 
 /*
@@ -254,4 +261,4 @@
 #define STM32_USB_OTG_THREAD_STACK_SIZE     128
 #define STM32_USB_OTGFIFO_FILL_BASEPRI      0
 
-
+//! @} @} @}

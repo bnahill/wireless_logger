@@ -24,13 +24,17 @@
  * @details A copy of this file must be placed in each project directory, it
  *          contains the application specific kernel settings.
  *
- * @addtogroup config
- * @details Kernel related settings and hooks.
- * @{
  */
 
 #ifndef _CHCONF_H_
 #define _CHCONF_H_
+
+//! @addtogroup Platform
+//! @{
+//! @addtogroup ChibiOS
+//! @{
+//! @addtogroup Kernel
+//! @{
 
 /*===========================================================================*/
 /**
@@ -524,7 +528,7 @@
 }
 #endif
 
-/** @} */
+//! @} @} @}
 
 /*===========================================================================*/
 /* Port-specific settings (override port settings defaulted in chcore.h).    */
@@ -532,4 +536,3 @@
 
 #endif  /* _CHCONF_H_ */
 
-/** @} */

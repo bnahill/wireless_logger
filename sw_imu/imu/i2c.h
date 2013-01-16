@@ -4,6 +4,11 @@
 #include "ch.h"
 #include "hal.h"
 
+//! @addtogroup IMU
+//! @{
+//! @addtogroup I2C
+//! @{
+
 class I2C {
 public:
 	/*!
@@ -63,5 +68,7 @@ protected:
 	//! ChibiOS I2C driver
 	I2CDriver &driver;
 };
+
+//! @} @}
 
 #endif

@@ -28,6 +28,11 @@
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
+//! @addtogroup Platform
+//! @{
+//! @addtogroup ChibiOS
+//! @{
+
 /*
  * Setup for STMicroelectronics STM32F4-Discovery board.
  */
@@ -510,5 +515,7 @@ extern "C" {
 }
 #endif
 #endif /* _FROM_ASM_ */
+
+//! @} @}
 
 #endif /* _BOARD_H_ */
