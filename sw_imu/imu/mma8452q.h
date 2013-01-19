@@ -124,6 +124,13 @@ public:
 	
 	void reset();
 	
+	/*!
+	 @brief Set a new output rate
+	 @param new_dr The new output rate
+	 @param update Update registers immediately
+	 */
+	void set_dr(dr_t new_dr, bool update=true);
+	
 	//! @name Configuration
 	//! @{
 	dr_t dr;

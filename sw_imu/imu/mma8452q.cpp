@@ -26,15 +26,14 @@ bool MMA8452Q::init(){
 	
 	//i2c.write_byte(devaddr, REG_CTRL_REG2, 0x40);
 	
-	// Set for 50Hz
-	i2c.write_byte(devaddr, REG_CTRL_REG1, 0x20);
-	
 	// Set for +/-4g
 	i2c.write_byte(devaddr, REG_XYZ_DATA_CFG, 0x01);
 	i2c.write_byte(devaddr, REG_SYSMOD, 0x02);
 	
 	// Enable device
-	i2c.write_byte(devaddr, REG_CTRL_REG1, 0x21);
+	//i2c.write_byte(devaddr, REG_CTRL_REG1, 0x21);
+	
+	update_ctrl_regs();
 	
 	return true;
 }
@@ -66,4 +65,10 @@ void MMA8452Q::update_ctrl_regs(){
 	           oversmp_mode_active;
 	
 	i2c.transmit(devaddr, tx, 3, NULL, 0, TIME_INFINITE);
+}
+
+void MMA8452Q::set_dr(dr_t new_dr, bool update){
+	dr = new_dr;
+	if(update)
+		update_ctrl_regs();
 }
