@@ -54,6 +54,7 @@ cmake_minimum_required(VERSION 2.8)
 set(IMU_DIR imu)
 # Path to CMSIS
 set(CMSIS_DIR CMSIS)
+set(DSP_SRC ${CMSIS_DIR}/DSP_Lib/Source)
 set(OS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/os)
 
 
@@ -104,6 +105,7 @@ set(CMAKE_EXE_LINKER_FLAGS "-T${LINKER_SCRIPT} ${LTO} ${OPTIMIZATION} -Wl,-Map=$
 include_directories(
 	.
 	src
+	${CMSIS_DIR}/Include
 	${OS_DIR}/kernel/include
 	${OS_DIR}/hal/include
 	${OS_DIR}/hal/platforms/STM32F4xx
@@ -117,7 +119,6 @@ include_directories(
 	${OS_DIR}/hal/platforms/STM32/I2Cv1
 	${OS_DIR}/hal/platforms/STM32/SPIv1
 	${OS_DIR}/hal/platforms/STM32/OTGv1
-	
 	
 	${IMU_DIR}
 	
@@ -215,20 +216,26 @@ set(IMU_SOURCES
 	${IMU_DIR}/graphics/courier3.cpp
 )
 
+# Add required CMSIS-DSP sources as needed
+set(DSP_SOURCES
+	${DSP_SRC}/BasicMathFunctions/arm_abs_f32.c
+)
 
 ##############################################################
 # Executable and library targets
 ##############################################################
 
-add_library(chibios STATIC ${OS_SOURCES})
+#add_library(chibios STATIC ${OS_SOURCES})
+add_library(dsp_lib STATIC ${DSP_SOURCES})
 add_library(imu_lib STATIC ${IMU_SOURCES})
-add_executable(${OUTFILE} ${APP_SOURCES})
-target_link_libraries(${OUTFILE} chibios imu_lib gcc c)
+add_executable(${OUTFILE} ${APP_SOURCES} ${OS_SOURCES})
+target_link_libraries(${OUTFILE}  imu_lib dsp_lib gcc c)
 
 
 # Warnings only for application code -- Optimizations only on ST/ARM code
-set_target_properties(chibios PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
+#set_target_properties(chibios PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 set_target_properties(imu_lib PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
+set_target_properties(dsp_lib PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 set_target_properties(${OUTFILE} PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 #set_target_properties(imu_lib PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 #set_target_properties(cmsis_dsp PROPERTIES COMPILE_FLAGS "-w -O2")
