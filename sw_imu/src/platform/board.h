@@ -172,7 +172,7 @@
                              PIN_PUDR_PULLUP(6) |                           \
                              PIN_PUDR_PULLUP(7) |                           \
                              PIN_PUDR_PULLUP(8) |                           \
-                             PIN_PUDR_FLOATING(GPIOA_VBUS_FS) |             \
+                             PIN_PUDR_PULLDOWN(GPIOA_VBUS_FS) |             \
                              PIN_PUDR_FLOATING(GPIOA_OTG_FS_ID) |           \
                              PIN_PUDR_FLOATING(GPIOA_OTG_FS_DM) |           \
                              PIN_PUDR_FLOATING(GPIOA_OTG_FS_DP) |           \

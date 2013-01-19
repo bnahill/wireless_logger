@@ -4,6 +4,11 @@
 #include "ui/ui.h"
 #include "ui/menu.h"
 
+//! @addtogroup UI
+//! @{
+//! @addtogroup Screens
+//! @{
+
 class MainMenu {
 public:
 	MainMenu() : 
@@ -18,6 +23,7 @@ private:
 	
 	static void launch_sensor_view_bar();
 	static void launch_sensor_view_num();
+	static void launch_usb_mode();
 	
 	Menu menu;
 	
@@ -26,5 +32,7 @@ private:
 	static constexpr uint32_t item_count = 3;
 	static MenuItem const items[item_count];
 };
+
+//! @} @}
 
 #endif // __MAINMENU_H_

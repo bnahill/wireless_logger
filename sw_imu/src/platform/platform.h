@@ -58,7 +58,7 @@ namespace Platform {
 	
 	extern LY091WG15 oled;
 	
-	typedef USBSerial<USBD2> usbserial1_t;
+	typedef USBSerial<USBD1> usbserial1_t;
 	extern usbserial1_t usbserial1;
 };
 

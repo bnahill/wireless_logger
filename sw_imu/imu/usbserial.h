@@ -4,6 +4,8 @@
 #include "ch.h"
 #include "hal.h"
 #include "usb_cdc.h"
+#include "chprintf.h"
+#include "imu.h"
 
 //! @addtogroup IMU
 //! @{
@@ -18,7 +20,9 @@
 template <USBDriver &usb_driver>
 class USBSerial {
 public:
-	USBSerial< usb_driver >(){
+	USBSerial< usb_driver >(gpio_pin_t const &vusb_pin) :
+		vusb_pin(vusb_pin)
+	{
 		sduObjectInit(&driver);
 	}
 	
@@ -32,11 +36,23 @@ public:
 		chThdSleepMilliseconds(1000);
 		usbStart(conf.usbp, &usbcfg);
 	}
+	
+	void stop(){
+		usbStop(conf.usbp);
+		sduStop(&driver);
+	}
+	
+	bool is_connected() const { return vusb_pin.read(); }
+	
+	BaseSequentialStream * stream() const {
+		return (BaseSequentialStream *)&driver;
+	}
 
 protected:
 	//! @name Implemtented in driver
 	//! @{	
 	SerialUSBDriver driver;
+	gpio_pin_t const vusb_pin;
 	
 	USBInEndpointState ep1instate;
 	USBOutEndpointState ep1outstate;

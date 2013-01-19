@@ -5,6 +5,15 @@
 #include "acquisition.h"
 #include "ui/ui.h"
 
+//! @addtogroup UI
+//! @{
+//! @addtogroup Screens
+//! @{
+
+/*!
+ @brief A screen displaying pretty sensor readings either numerically
+ or in bar graphs
+ */
 class SensorView {
 public:
 	typedef enum {
@@ -44,5 +53,7 @@ protected:
 	mode_t mode;
 	display_mode_t display_mode;
 };
+
+//! @} @}
 
 #endif // __UI_SENSOR_VIEW_H_

@@ -109,6 +109,7 @@ include_directories(
 	${OS_DIR}/kernel/include
 	${OS_DIR}/hal/include
 	${OS_DIR}/hal/platforms/STM32F4xx
+	${OS_DIR}/various
 	${OS_DIR}/ports/GCC/ARMCMx
 	${OS_DIR}/ports/GCC/ARMCMx/STM32F4xx
 	${OS_DIR}/ports/common/ARMCMx
@@ -187,6 +188,7 @@ set(OS_SOURCES
 	${OS_DIR}/hal/platforms/STM32/i2s_lld.c
 	${OS_DIR}/hal/platforms/STM32/sdc_lld.c
 	${OS_DIR}/hal/platforms/STM32/ext_lld.c
+	${OS_DIR}/various/chprintf.c
 )
 
 set(APP_SOURCES
@@ -198,6 +200,7 @@ set(APP_SOURCES
 	src/ui/menu.cpp
 	src/ui/mainmenu.cpp
 	src/ui/sensor_view.cpp
+	src/ui/usbscreen.cpp
 )
 
 

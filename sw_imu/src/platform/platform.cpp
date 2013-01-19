@@ -107,7 +107,7 @@ LY091WG15 Platform::oled(spi2,
 // 
 // USBSerial Platform::usbserial1(&USBD2);
 
-usbserial1_t Platform::usbserial1;
+usbserial1_t Platform::usbserial1({GPIOA, 9});
 
 extern "C" {
 void NMIVector(void){while(1);}

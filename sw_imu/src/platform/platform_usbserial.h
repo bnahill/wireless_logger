@@ -4,7 +4,7 @@
 #include "imu/usbserial.h"
 #include "platform.h"
 
-typedef USBSerial<USBD2> usbserial1_t;
+typedef USBSerial<USBD1> usbserial1_t;
 
 template <>
 const uint8_t usbserial1_t::vcom_device_descriptor_data[18] = {

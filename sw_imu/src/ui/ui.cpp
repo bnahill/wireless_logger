@@ -5,6 +5,10 @@ UI UI::ui;
 
 msg_t UI::run(){
 	MainMenu menu;
+	button[0].enable();
+	button[1].enable();
+	button[2].enable();
+	
 	button[0].clear_callbacks();
 	button[1].clear_callbacks();
 	button[2].clear_callbacks();

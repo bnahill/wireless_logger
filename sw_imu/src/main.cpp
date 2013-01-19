@@ -16,24 +16,27 @@ void ui_init();
 int main(void) {
 	halInit();
 	chSysInit();
-	ui_init();
 	
+	// Turn the 
 	reg1.high_power(true);
+	
+	ui_init();
 	
 	Acquisition::init();
 	
-	oled.init();
-	
-	usbserial1.init();
-	
 	UI::ui.start();
+	
+	while(true){
+		chThdSleep(MS2ST(10));
+		led1.clear();
+		
+	}
 	
 	chThdSleep(TIME_INFINITE);
 }
 
 void ui_init(){
 	Platform::EXTInit();
-	button[0].enable();
-	button[1].enable();
-	button[2].enable();
+	
+	oled.init();
 }
