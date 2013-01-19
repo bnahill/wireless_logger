@@ -8,6 +8,7 @@
 #define __PLATFORM_CPP_
 
 #include "platform.h"
+#include "platform_usbserial.h"
 
 
 I2C Platform::i2c1(I2CD1, OPMODE_I2C, FAST_DUTY_CYCLE_2, 100000);
@@ -98,6 +99,15 @@ LTC3559 Platform::reg1({GPIOC, 2}, {GPIOC, 1}, {GPIOA, 4}, {GPIOA, 1});
 LY091WG15 Platform::oled(spi2,
                         {NULL, GPIOB, 11, SPI_CR1_BR_1 | SPI_CR1_CPOL | SPI_CR1_CPHA},
                         {GPIOB, 10}, {GPIOB, 2});
+
+
+// USBSerial &Platform::get_usb_serial(USBDriver *usbp){
+// 	return usbserial1;
+// }
+// 
+// USBSerial Platform::usbserial1(&USBD2);
+
+usbserial1_t Platform::usbserial1;
 
 extern "C" {
 void NMIVector(void){while(1);}

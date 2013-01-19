@@ -24,6 +24,8 @@ int main(void) {
 	
 	oled.init();
 	
+	usbserial1.init();
+	
 	UI::ui.start();
 	
 	chThdSleep(TIME_INFINITE);

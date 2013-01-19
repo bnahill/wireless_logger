@@ -116,6 +116,7 @@ include_directories(
 	${OS_DIR}/hal/platforms/STM32/GPIOv2
 	${OS_DIR}/hal/platforms/STM32/I2Cv1
 	${OS_DIR}/hal/platforms/STM32/SPIv1
+	${OS_DIR}/hal/platforms/STM32/OTGv1
 	
 	
 	${IMU_DIR}
@@ -179,6 +180,7 @@ set(OS_SOURCES
 	${OS_DIR}/hal/platforms/STM32/GPIOv2/pal_lld.c
 	${OS_DIR}/hal/platforms/STM32/I2Cv1/i2c_lld.c
 	${OS_DIR}/hal/platforms/STM32/SPIv1/spi_lld.c
+	${OS_DIR}/hal/platforms/STM32/OTGv1/usb_lld.c
 	${OS_DIR}/hal/platforms/STM32/gpt_lld.c
 	${OS_DIR}/hal/platforms/STM32/pwm_lld.c
 	${OS_DIR}/hal/platforms/STM32/i2s_lld.c
