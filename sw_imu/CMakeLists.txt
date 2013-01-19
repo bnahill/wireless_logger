@@ -220,12 +220,15 @@ set(IMU_SOURCES
 # Executable and library targets
 ##############################################################
 
-#add_library(imu_lib STATIC ${IMU_SOURCES})
-add_executable(${OUTFILE} ${APP_SOURCES} ${OS_SOURCES} ${IMU_SOURCES})
-target_link_libraries(${OUTFILE} gcc c)
+add_library(chibios STATIC ${OS_SOURCES})
+add_library(imu_lib STATIC ${IMU_SOURCES})
+add_executable(${OUTFILE} ${APP_SOURCES})
+target_link_libraries(${OUTFILE} chibios imu_lib gcc c)
 
 
 # Warnings only for application code -- Optimizations only on ST/ARM code
+set_target_properties(chibios PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
+set_target_properties(imu_lib PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 set_target_properties(${OUTFILE} PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 #set_target_properties(imu_lib PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 #set_target_properties(cmsis_dsp PROPERTIES COMPILE_FLAGS "-w -O2")
