@@ -99,7 +99,7 @@ set(COMMON_FLAGS "${LTO} ${OPTIMIZATION} -ffunction-sections -fdata-sections ${M
 set(CMAKE_CXX_FLAGS "--std=gnu++11 -fno-rtti -fno-exceptions ${CXX_WARNINGS} ${COMMON_FLAGS}")
 # Use the new C11 standard
 set(CMAKE_C_FLAGS "--std=gnu1x ${C_WARNINGS} ${COMMON_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "-T${LINKER_SCRIPT} ${LTO} ${OPTIMIZATION} -Wl,-Map=${TARGET}.map,--cref,-static,--gc-sections -nostartfiles  ${MCFLAGS} ${CMAKE_EXE_LINKER_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "-T${LINKER_SCRIPT} ${LTO} ${OPTIMIZATION} -Wl,-Map=${TARGET}.map,--cref,-static,--gc-sections -nostartfiles --entry=ResetHandler ${MCFLAGS} ${CMAKE_EXE_LINKER_FLAGS}")
 
 
 include_directories(
@@ -229,13 +229,13 @@ set(DSP_SOURCES
 add_library(dsp_lib STATIC ${DSP_SOURCES})
 add_library(imu_lib STATIC ${IMU_SOURCES})
 add_executable(${OUTFILE} ${APP_SOURCES} ${OS_SOURCES})
-target_link_libraries(${OUTFILE}  imu_lib dsp_lib gcc c)
+target_link_libraries(${OUTFILE} imu_lib dsp_lib gcc c)
 
 
 # Warnings only for application code -- Optimizations only on ST/ARM code
-#set_target_properties(chibios PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
-set_target_properties(imu_lib PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
-set_target_properties(dsp_lib PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
+#set_target_properties(chibios PROPERTIES COMPILE_FLAGS "${OPTIMIZATION}")
+set_target_properties(imu_lib PROPERTIES COMPILE_FLAGS "${OPTIMIZATION}")
+set_target_properties(dsp_lib PROPERTIES COMPILE_FLAGS "-O2 ${LTO}")
 set_target_properties(${OUTFILE} PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 #set_target_properties(imu_lib PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 #set_target_properties(cmsis_dsp PROPERTIES COMPILE_FLAGS "-w -O2")
