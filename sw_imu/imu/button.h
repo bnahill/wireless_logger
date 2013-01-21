@@ -13,6 +13,7 @@
 /*!
  @brief A class for a button associated with a GPIO pin and external interrupt
  */
+template <EXTDriver &driver>
 class Button {
 public:
 	//! Button handler function type
@@ -96,8 +97,6 @@ public:
 protected:
 	expchannel_t channel;
 	
-	static EXTDriver &driver;
-	
 	//! @name Event handlers
 	//! @{
 	button_handler press_handler;
@@ -127,5 +126,7 @@ protected:
 
 //! @} // Button
 //! @} // IMU
+
+#include "button.cpp"
 
 #endif // __BUTTON_H_

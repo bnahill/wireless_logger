@@ -1,13 +1,16 @@
 #include "button.h"
 
-Button *Button::buttons[num_channels];
+template <EXTDriver &driver>
+Button< driver > *Button< driver >::buttons[num_channels];
 
-void Button::callback(EXTDriver* , expchannel_t channel){
+template <EXTDriver &driver>
+void Button< driver >::callback(EXTDriver* , expchannel_t channel){
 	if(buttons[channel])
 		buttons[channel]->handle_callback();
 }
 
-void Button::handle_callback(){
+template <EXTDriver &driver>
+void Button< driver >::handle_callback(){
 	state_t new_state = check_gpio();
 	// Transition!
 	if(state != new_state){

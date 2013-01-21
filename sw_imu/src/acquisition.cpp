@@ -127,9 +127,9 @@ void Acquisition::init(){
 	
 	chEvtInit(&Acquisition::sensor_source);
 
-	chThdCreateStatic(waAccThread, sizeof(waAccThread), NORMALPRIO, AccThread, NULL);
-	chThdCreateStatic(waMagThread, sizeof(waMagThread), NORMALPRIO, MagThread, NULL);
-	chThdCreateStatic(waGyroThread, sizeof(waGyroThread), NORMALPRIO, GyroThread, NULL);
+	chThdCreateStatic(waAccThread, sizeof(waAccThread), NORMALPRIO + 10, AccThread, NULL);
+	chThdCreateStatic(waMagThread, sizeof(waMagThread), NORMALPRIO + 10, MagThread, NULL);
+	chThdCreateStatic(waGyroThread, sizeof(waGyroThread), NORMALPRIO + 10, GyroThread, NULL);
 	static GPTConfig const gpt_config = {10000, Acquisition::tick};
 	
 	gptStart(&timer, &gpt_config);

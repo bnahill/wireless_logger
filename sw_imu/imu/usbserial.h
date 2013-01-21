@@ -47,6 +47,14 @@ public:
 	BaseSequentialStream * stream() const {
 		return (BaseSequentialStream *)&driver;
 	}
+	
+	SerialUSBDriverVMT const * vmt() const {
+		return driver.vmt;
+	}
+	
+	size_t read(uint8_t *bp, size_t n, systime_t time){
+		return chIQReadTimeout(&driver.iqueue, bp, n, time);
+	}
 
 protected:
 	//! @name Implemtented in driver

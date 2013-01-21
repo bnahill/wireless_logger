@@ -30,24 +30,34 @@ public:
 	
 	//! The main UI thread
 	Thread * thread;
+	//! A thread to just monitor the device and periodically update
+	Thread * monitor_thread;
 	
 	//! A singe static instance
 	static UI ui;
 	
 	//! The thread stack size to use
 	static constexpr uint32_t stack_size = 8192;
+	
+	static constexpr uint32_t monitor_stack_size = 1024;
 private:
 	UI() :
-		thread(nullptr)
+		thread(nullptr), monitor_thread(nullptr)
 	{}
 	
 	msg_t run();
+	msg_t run_monitor();
 	
+	WORKING_AREA(MonitorThread, monitor_stack_size);
 	//! Stack area for the thread
 	WORKING_AREA(UIThread, stack_size);
 	
 	static msg_t start_thread(UI * the_ui){
 		return the_ui->run();
+	}
+	
+	static msg_t start_monitor_thread(UI * the_ui){
+		return the_ui->run_monitor();
 	}
 	
 	static void handle_left(UI * the_ui){

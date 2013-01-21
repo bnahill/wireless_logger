@@ -120,6 +120,7 @@ include_directories(
 	${OS_DIR}/hal/platforms/STM32/I2Cv1
 	${OS_DIR}/hal/platforms/STM32/SPIv1
 	${OS_DIR}/hal/platforms/STM32/OTGv1
+	${OS_DIR}/hal/platforms/STM32/RTCv2
 	
 	${IMU_DIR}
 	
@@ -183,6 +184,7 @@ set(OS_SOURCES
 	${OS_DIR}/hal/platforms/STM32/I2Cv1/i2c_lld.c
 	${OS_DIR}/hal/platforms/STM32/SPIv1/spi_lld.c
 	${OS_DIR}/hal/platforms/STM32/OTGv1/usb_lld.c
+	${OS_DIR}/hal/platforms/STM32/RTCv2/rtc_lld.c
 	${OS_DIR}/hal/platforms/STM32/gpt_lld.c
 	${OS_DIR}/hal/platforms/STM32/pwm_lld.c
 	${OS_DIR}/hal/platforms/STM32/i2s_lld.c
@@ -205,13 +207,13 @@ set(APP_SOURCES
 
 
 set(IMU_SOURCES
-	${IMU_DIR}/button.cpp
 	${IMU_DIR}/ltc3559.cpp
 	${IMU_DIR}/mma8452q.cpp
 	${IMU_DIR}/mag3110.cpp
 	${IMU_DIR}/i2c.cpp
 	${IMU_DIR}/ssd1306.cpp
 	${IMU_DIR}/imu.cpp
+	${IMU_DIR}/rtc.cpp
 	
 	${IMU_DIR}/graphics/smallfont.cpp
 	${IMU_DIR}/graphics/mediumfont.cpp
