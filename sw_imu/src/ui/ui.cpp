@@ -16,6 +16,8 @@ msg_t UI::run(){
 	button[0].set_press_handler((button_t::button_handler)handle_right, (uint32_t*)this);
 	button[1].set_press_handler((button_t::button_handler)handle_select, (uint32_t*)this);
 	button[2].set_press_handler((button_t::button_handler)handle_left, (uint32_t*)this);
+	led1.set();
+	start_suspend_timer();
 	menu.exec();
 	return 0;
 }

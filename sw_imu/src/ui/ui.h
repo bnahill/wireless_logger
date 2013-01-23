@@ -23,15 +23,39 @@ public:
 	 */
 	enum {
 		MASK_ABORT   = 0x80000000,
-		MASK_SELECT  = 0x40000000,
-		MASK_LEFT    = 0x20000000,
-		MASK_RIGHT   = 0x10000000,
+		MASK_SUSPEND = 0x40000000,
+		MASK_RESUME  = 0x20000000,
+
+		MASK_SELECT  = 0x04000000,
+		MASK_LEFT    = 0x02000000,
+		MASK_RIGHT   = 0x01000000,
 	} ui_event_t;
 	
 	//! The main UI thread
 	Thread * thread;
 	//! A thread to just monitor the device and periodically update
 	Thread * monitor_thread;
+	
+	VirtualTimer timer;
+	
+	/*!
+	 @brief Handle any global events
+	 @param evt New event mask
+	 @return Mask still to handle
+	 */
+	eventmask_t handle_evt(eventmask_t evt){
+		switch(evt){
+		case MASK_RESUME:
+			resume();
+			break;
+		case MASK_SUSPEND:
+			suspend();
+			break;
+		default:
+			break;
+		}
+		return evt;
+	}
 	
 	//! A singe static instance
 	static UI ui;
@@ -40,13 +64,45 @@ public:
 	static constexpr uint32_t stack_size = 8192;
 	
 	static constexpr uint32_t monitor_stack_size = 1024;
+	
+	static constexpr uint32_t suspend_timeout_ms = 30000;
 private:
 	UI() :
-		thread(nullptr), monitor_thread(nullptr)
+		thread(nullptr), monitor_thread(nullptr), is_suspended(false),
+		suspend_enabled(true)
 	{}
 	
 	msg_t run();
 	msg_t run_monitor();
+	
+	bool is_suspended;
+	bool suspend_enabled;
+	
+	
+	void resume(){
+		led1.set();
+		if(suspend_enabled){
+			start_suspend_timer();
+		}
+		if(is_suspended){
+			is_suspended = false;
+			oled.resume();
+		}
+	}
+	
+	void suspend(){
+		oled.sleep();
+		led1.clear();
+		is_suspended = true;
+	}
+	
+	
+	void start_suspend_timer(){
+		chSysLock();
+		chVTReset(&timer);
+		chVTSetI(&timer, MS2ST(suspend_timeout_ms), (vtfunc_t)handle_suspend, this);
+		chSysUnlock();
+	}
 	
 	WORKING_AREA(MonitorThread, monitor_stack_size);
 	//! Stack area for the thread
@@ -61,15 +117,19 @@ private:
 	}
 	
 	static void handle_left(UI * the_ui){
-		chEvtSignal(the_ui->thread, MASK_LEFT);
+		chEvtSignal(the_ui->thread, MASK_LEFT | MASK_RESUME);
 	}
 	
 	static void handle_right(UI * the_ui){
-		chEvtSignal(the_ui->thread, MASK_RIGHT);
+		chEvtSignal(the_ui->thread, MASK_RIGHT | MASK_RESUME);
 	}
 	
 	static void handle_select(UI * the_ui){
-		chEvtSignal(the_ui->thread, MASK_SELECT);
+		chEvtSignal(the_ui->thread, MASK_SELECT | MASK_RESUME);
+	}
+	
+	static void handle_suspend(UI * the_ui){
+		chEvtSignal(the_ui->thread, MASK_SUSPEND);
 	}
 };
 

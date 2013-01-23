@@ -28,8 +28,6 @@ int main(void) {
 	
 	while(true){
 		chThdSleep(MS2ST(10));
-		led1.clear();
-		
 	}
 	
 	chThdSleep(TIME_INFINITE);

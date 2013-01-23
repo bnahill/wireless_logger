@@ -17,11 +17,19 @@ void MainMenu::exec(){
 	
 	while(!chThdShouldTerminate()){
 		evt = chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(5));
+		if(!evt) continue;
+		
+		evt = UI::ui.handle_evt(evt);
 		switch(evt){
-		case 0:
-			continue;
 		case UI::MASK_ABORT:
-			return;
+			break;
+		case UI::MASK_SUSPEND:
+			evt = chEvtWaitOne(UI::MASK_RESUME);
+			chEvtGetAndClearEvents(ALL_EVENTS);
+			UI::ui.handle_evt(UI::MASK_RESUME);
+			break;
+		case UI::MASK_RESUME:
+			break;
 		default:
 			menu.handle(evt);
 		}

@@ -27,6 +27,8 @@ void USBScreen::exec(){
 
 	while(!chThdShouldTerminate()){
 		evt = chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(5));
+		evt = UI::ui.handle_evt(evt);
+		
 		switch(evt){
 		case 0:
 			continue;
@@ -36,6 +38,11 @@ void USBScreen::exec(){
 		case UI::MASK_SELECT:
 			terminate();
 			return;
+		case UI::MASK_SUSPEND:
+			evt = chEvtWaitOne(UI::MASK_RESUME);
+			chEvtGetAndClearEvents(ALL_EVENTS);
+			UI::ui.handle_evt(UI::MASK_RESUME);
+			break;
 		default:
 			break;
 		}

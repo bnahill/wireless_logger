@@ -109,6 +109,13 @@ public:
 			chMBPost(&mb, (msg_t) &xfer, TIME_INFINITE);
 	}
 	
+	void transferI(xfer_t &xfer, bool important=false){
+		if(important)
+			chMBPostAheadI(&mb, (msg_t) &xfer);
+		else
+			chMBPostI(&mb, (msg_t) &xfer);
+	}
+	
 	/*!
 	 @brief Perform a synchronous exchange with a peripheral
 	 @param config The slave configuration to use

@@ -15,27 +15,41 @@ class SSD1306 {
 public:
 	SSD1306<pages, columns>(SPI &spi, SPI::slave_config_t spi_config, gpio_pin_t nDC, gpio_pin_t nRES) :
 		spi(spi), spi_config(spi_config), nDC(nDC), nRES(nRES)
-	{}
+	{
+		chMtxInit(&suspend_lock);
+	}
 	
 	void dump_fb(){
+		lock();
 		write_cmd(0x22, 0, 3);
 		transmit_data_sync(fb.get_fb(), pages*columns);
+		unlock();
 	}
 	
 	void update(){
 		fb.lock();
-		
+		lock();
 		if(fb.get_limits().y_min <= fb.get_limits().y_max){
 			write_cmd(CMD_SETPAGEADDRESS, fb.get_limits().y_min, fb.get_limits().y_max);
 			transmit_data_sync(fb.get_fb(fb.get_limits().y_min), (1 + fb.get_limits().y_max - fb.get_limits().y_min)*columns);
 			fb.sync(false);
 		}
-		
+		unlock();
 		fb.unlock();
 	}
 	
-	void print_line(uint8_t line, char *text){
-		
+	void sleep(){
+		lock();
+		//nRES.clear();
+		write_cmd(CMD_DISPLAYOFF);
+		write_cmd(CMD_CHARGEPUMP, 0x10);
+		//write_cmd(CMD_DISPLAYON);
+	}
+	
+	void resume(){
+		write_cmd(CMD_CHARGEPUMP, 0x14);
+		write_cmd(CMD_DISPLAYON);
+		unlock();
 	}
 	
 	void init(){
@@ -65,9 +79,9 @@ public:
 		write_cmd(CMD_DISPLAYALLON_RESUME);
 		write_cmd(CMD_NORMALDISPLAY);
 		
-		dump_fb();
-		
 		write_cmd(CMD_DISPLAYON);
+		
+		dump_fb();
 	}
 	
 	FrameBuffer<pages,columns> fb;
@@ -161,8 +175,8 @@ protected:
 		
 	}
 	
-	void write_data(uint8_t const * data);
 	
+	void write_data(uint8_t const * data);
 	
 	/*!
 	 @name Configuration for the panel
@@ -181,6 +195,11 @@ protected:
 	
 	SPI &spi;
 	SPI::slave_config_t spi_config;
+	
+	Mutex suspend_lock;
+	
+	void lock(){chMtxLock(&suspend_lock);}
+	void unlock(){chMtxUnlock();}
 	
 	static void callback_set_command(gpio_pin_t *gpio){
 		gpio->clear();
