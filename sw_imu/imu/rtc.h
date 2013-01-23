@@ -4,7 +4,8 @@
 #include "ch.h"
 #include "hal.h"
 
-
+#include "time.h"
+#include "chrtclib.h"
 
 template <RTCDriver &driver>
 class RealTimeClock {
@@ -39,55 +40,23 @@ public:
 		uint32_t dummy5       : 10;
 	};
 
-	static rtc_time_t get_time(){
-		rtc_time_t time;
-		RTCTime t;
-		rtcGetTime(&driver, &t);
-		
-		return time;
-	}
+	static rtc_time_t get_time();
 	
-	static void get_time_text(char * text){
-		RTCTime time;
-		rtcGetTime(&driver, &time);
-		
-		text[0] = 0;
-		return;
-	/*	
-		text[0] = '0';
-		while(time.hours >= 10){
-			text[0] += 1;
-			time.hours -= 10;
-		}
-		text[1] = time.hours + '0';
-		
-		text[2] = ':';
-		
-		text[3] = '0';
-		while(time.minutes >= 10){
-			text[3] += 1;
-			time.minutes -= 10;
-		}
-		text[4] = time.minutes + '0';
-		
-		text[5] = ':';
-		
-		text[6] = '0';
-		while(time.seconds >= 10){
-			text[6] += 1;
-			time.seconds -= 10;
-		}
-		text[7] = time.seconds + '0';
-		text[8] = 0;*/
-	}
+	static void get_time_text(char * text);
 
 	static void get_time(rtc_time_t &time){
 		rtcGetTime(&driver, (RTCTime *)&time);
+	}
+	
+	static void get_time(struct tm * time){
+		rtcGetTimeTm(&driver, time);
 	}
 	
 	static void set_time(rtc_time_t &time){
 		rtcSetTime(&driver, (RTCTime *)&time);
 	}
 };
+
+#include <rtc.cpp>
 
 #endif // __IMU_RTC_H_

@@ -191,6 +191,7 @@ set(OS_SOURCES
 	${OS_DIR}/hal/platforms/STM32/sdc_lld.c
 	${OS_DIR}/hal/platforms/STM32/ext_lld.c
 	${OS_DIR}/various/chprintf.c
+	${OS_DIR}/various/chrtclib.c
 )
 
 set(APP_SOURCES
@@ -213,7 +214,6 @@ set(IMU_SOURCES
 	${IMU_DIR}/i2c.cpp
 	${IMU_DIR}/ssd1306.cpp
 	${IMU_DIR}/imu.cpp
-	${IMU_DIR}/rtc.cpp
 	
 	${IMU_DIR}/graphics/smallfont.cpp
 	${IMU_DIR}/graphics/mediumfont.cpp
