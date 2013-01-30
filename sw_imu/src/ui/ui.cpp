@@ -16,7 +16,6 @@ msg_t UI::run(){
 	button[0].set_press_handler((button_t::button_handler)handle_right, (uint32_t*)this);
 	button[1].set_press_handler((button_t::button_handler)handle_select, (uint32_t*)this);
 	button[2].set_press_handler((button_t::button_handler)handle_left, (uint32_t*)this);
-	led1.set();
 	start_suspend_timer();
 	menu.exec();
 	return 0;
@@ -27,9 +26,9 @@ msg_t UI::run_monitor(){
 	
 	while(!chThdShouldTerminate()){
 		rtc1::get_time_text(text);
-		
 		oled.fb.write_text<SmallFont>(text,0,0);
 		oled.update();
+		led1.assign(reg1.is_charging());
 		chThdSleep(MS2ST(500));
 	}
 	return 0;

@@ -284,7 +284,9 @@
                              PIN_PUDR_PULLUP(14) |                          \
                              PIN_PUDR_PULLUP(15))
 #define VAL_GPIOC_ODR       (0xFFFFFFFF &                                   \
-                           ~(PIN(GPIOC_POW_HPWR) | PIN(GPIOC_POW_SUSP_EN)))
+                           ~(PIN(GPIOC_POW_HPWR) |                          \
+                             PIN(GPIOC_LED1) |                              \
+                             PIN(GPIOC_POW_SUSP_EN)))
 #define VAL_GPIOC_AFRL      0
 #define VAL_GPIOC_AFRH      0
 

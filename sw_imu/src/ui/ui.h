@@ -80,7 +80,6 @@ private:
 	
 	
 	void resume(){
-		led1.set();
 		if(suspend_enabled){
 			start_suspend_timer();
 		}
@@ -92,7 +91,6 @@ private:
 	
 	void suspend(){
 		oled.sleep();
-		led1.clear();
 		is_suspended = true;
 	}
 	
