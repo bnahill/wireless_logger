@@ -106,6 +106,16 @@ LY091WG15 Platform::oled(spi2,
 
 usbserial1_t Platform::usbserial1({GPIOA, 9});
 
+
+///////////////////////////////////////////
+// CC1101 platform configuration
+///////////////////////////////////////////
+
+CC1101 Platform::rf1(spi1,
+                     {NULL, GPIOC, 9, SPI_CR1_BR_2 |
+                      SPI_CR1_CPOL | SPI_CR1_CPHA});
+
+
 extern "C" {
 void NMIVector(void){while(1);}
 void HardFaultVector(void){while(1);}

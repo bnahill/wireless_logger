@@ -13,7 +13,10 @@ These devices must be instantiated for your specific configuration in the
 platform configuration.
 
 
+@defgroup RF RF Drivers
+@{
 
+@}
 
 
 @defgroup Sensors Sensor Drivers

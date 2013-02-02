@@ -31,25 +31,21 @@ public:
 
 	struct xfer_t {
 		//! Constructor for synchronous exchange
-		xfer_t(slave_config_t *config, size_t n, void const * tx_buff, void * rx_buff) :
+		xfer_t(slave_config_t const * config, size_t n, void const * tx_buff, void * rx_buff) :
 			config(config), n(n),
 			tc_callback(nullptr), starting_callback(nullptr),
 			operation(OP_EXCHANGE), rx_buff(rx_buff), tx_buff(tx_buff)
 		{}
 		
 		//! Constructor for send
-		xfer_t(slave_config_t *config, size_t n, void const * tx_buff) :
+		xfer_t(slave_config_t const * config, size_t n, void const * tx_buff) :
 			config(config), n(n),
 			tc_callback(nullptr), starting_callback(nullptr),
 			operation(OP_SEND), tx_buff(tx_buff)
 		{}
 
-		//xfer_t(slave_config_t *config, operation_t operation, size_t n, void * buff, uint16_t addr){
-		//	config(config),
-		//	tc_callback(nullptr), starting_callback(nullptr), para
-		//}
 		//! Slave information
-		slave_config_t * config;
+		slave_config_t const * config;
 		//! @name Callbacks
 		//! @brief Set to 0 to not use
 		//! @{
@@ -124,7 +120,9 @@ public:
 	 @param rx_buff The n-length receive buffer
 	 @param important Force to front of queue?
 	 */
-	void exchange_sync(slave_config_t &config, size_t n, void const * tx_buff, void * rx_buff, bool important=false){
+	void exchange_sync(slave_config_t const &config, size_t n,
+	                   void const * tx_buff, void * rx_buff,
+	                   bool important=false){
 		Semaphore done_sem;
 		xfer_t xfer(&config, n, tx_buff, rx_buff);
 		xfer.tc_sem(&done_sem);
@@ -142,7 +140,8 @@ public:
 	 @param tx_buff The n-length buffer to transmit
 	 @param important Force to front of queue?
 	 */
-	void send_sync(slave_config_t &config, size_t n, void const * tx_buff, bool important=false){
+	void send_sync(slave_config_t const &config, size_t n,
+	               void const * tx_buff, bool important=false){
 		Semaphore done_sem;
 		xfer_t xfer(&config, n, tx_buff);
 		xfer.tc_sem(&done_sem);

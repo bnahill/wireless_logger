@@ -216,6 +216,7 @@ set(IMU_SOURCES
 	${IMU_DIR}/i2c.cpp
 	${IMU_DIR}/ssd1306.cpp
 	${IMU_DIR}/imu.cpp
+	${IMU_DIR}/cc1101.cpp
 	
 	${IMU_DIR}/graphics/smallfont.cpp
 	${IMU_DIR}/graphics/mediumfont.cpp

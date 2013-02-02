@@ -31,6 +31,7 @@
 #include <imu/ssd1306.h>
 #include <imu/usbserial.h>
 #include <imu/rtc.h>
+#include <imu/cc1101.h>
 
 /*!
  @brief Platform-dependent component definitions
@@ -64,6 +65,8 @@ namespace Platform {
 	extern usbserial1_t usbserial1;
 	
 	typedef RealTimeClock<RTCD1> rtc1;
+	
+	extern CC1101 rf1;
 };
 
 using namespace Platform;
