@@ -8,6 +8,7 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 
 from logger_link import LoggerLink
+from params import *
 
 ll = LoggerLink()
 
@@ -109,15 +110,22 @@ class LoggerUI(QMainWindow):
 		self.connectAction.setIcon(
 			QIcon('icons/network-disconnect-3.png')
 		)
-		self.action_list.clear()
 		self.action_list.disable()
 		
 	def status(self, msg):
 		""" Update the status bar"""
 		self.statusBar().showMessage(msg)
 
+
 class ActionList(QListWidget):
+	""" This is that left column listing available actions
+	"""
 	launch = Signal()
+
+	def __init__(self, parent=None):
+		QListWidget.__init__(self,parent)
+		self.itemDoubleClicked.connect(self.select_item)
+		self.items = []
 	
 	def disable(self):
 		self.setDisabled(True)
@@ -126,8 +134,71 @@ class ActionList(QListWidget):
 		self.setDisabled(False)
 	
 	def update(self):
+		self.items = ll.get_command_list()
 		self.clear()
-		self.addItems(ll.get_command_list())
+		
+		for i in self.items:
+			item = QListWidgetItem(i[0], self)
+			item.setData(1, i)
+	
+	def select_item(self, item):
+		item = item.data(1)
+		dialog = ParamDialog(item)
+		layout = QGridLayout(dialog)
+
+		cmdlabel = QLabel("<b>Command: %s</b>" % item[0], parent=dialog)
+		cmdlabel.setAlignment(Qt.AlignHCenter)
+		layout.addWidget(cmdlabel,0,0,1,2)		
+		
+		i = 1
+		for param in item[2]:
+			w = param.make_widget(dialog)
+			if not w:
+				continue
+			l = QLabel(param.name, parent=dialog)
+			layout.addWidget(l, i, 0)
+			layout.addWidget(w, i, 1)
+			i += 1
+
+		cancelbutton = QPushButton("Cancel", dialog)		
+		execbutton = QPushButton("Execute", dialog)
+		
+		def cancel():
+			dialog.done(1)
+		
+		def execute():
+			error_fields = []
+			for param in item[2]:
+				if not param.validate():
+					error_fields.append(param.name)
+			if len(error_fields):
+				msg = QMessageBox(dialog)
+				msg.setText("<b>The following fields are invalid</b>:" +
+					"<br />" +	"<br/>".join(error_fields))
+				msg.setVisible(True)
+				return
+			print item
+			dialog.done(0)
+		
+		cancelbutton.pressed.connect(cancel)
+		execbutton.pressed.connect(execute)
+		
+		group = QButtonGroup(dialog)
+		group.addButton(execbutton)
+		group.addButton(cancelbutton)
+		
+		layout.addWidget(execbutton, i, 1)
+		layout.addWidget(cancelbutton, i, 0)
+		dialog.setLayout(layout)
+		dialog.exec_()
+
+
+class ParamDialog(QDialog):
+	def __init__(self, item, parent=None):
+		QDialog.__init__(self,parent)
+		self.setModal(True)
+	
+	
 	
 
 class PortList(QComboBox):

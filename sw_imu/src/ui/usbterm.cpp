@@ -1,10 +1,30 @@
 #include "usbterm.h"
 
+USBFile * USBTerm::usbfile = nullptr;
+
+void USBTerm::reg_file(USBFile* file){
+	chMtxLock(&file_lock);
+	USBFile * iter;
+	if(usbfile){
+		iter = usbfile;
+		while(iter->next) iter = iter->next;
+		iter->next = file;
+	} else {
+		usbfile = file;
+	}
+	file->next = nullptr;
+	chMtxUnlock();
+}
+
+
+
 ShellCommand const USBTerm::commands[] = {
 	{"listcmds", "s()", (ShellCommand::shell_callback_t)&USBTerm::cmd_listcmds},
 	{"help", "s()", (ShellCommand::shell_callback_t)&USBTerm::cmd_help},
-	{"settime", "b(date:datetime)", (ShellCommand::shell_callback_t)&USBTerm::cmd_settime},
-	{"ping", "s()", (ShellCommand::shell_callback_t)&USBTerm::cmd_ping},
+	{"settime", "(datetime:date)", (ShellCommand::shell_callback_t)&USBTerm::cmd_settime},
+	{"ping", "s(s:ping)", (ShellCommand::shell_callback_t)&USBTerm::cmd_ping},
+	{"listbuffers", "[s:name,u:length,s:format]()", (ShellCommand::shell_callback_t)&USBTerm::cmd_listbuffers},
+	{"fetchbuffer", "u,logbuffer(s:buffer_name)", (ShellCommand::shell_callback_t)&USBTerm::cmd_fetchbuffer}
 };
 
 uint32_t const USBTerm::num_commands = sizeof(commands)/sizeof(*commands);
@@ -19,7 +39,7 @@ msg_t USBTerm::terminate(){
 
 void USBTerm::thread_action(){
 	//Euclidean3_f32 m;
-	uint8_t command[64];
+	uint8_t command[256];
 	uint8_t *iter;
 	uint32_t i;
 	
@@ -27,35 +47,55 @@ void USBTerm::thread_action(){
 	
 	iter = command;
 	
+	enum {
+		ST_IDLE,
+		ST_READING,
+	} state = ST_IDLE;
+	
+	uint_fast8_t length;
+	
 	while(!chThdShouldTerminate()){
-		if(!usbserial1.read(iter, 1, MS2ST(10)))
+		// Try to read a byte
+		if(!usbserial1.read(iter, 1, MS2ST(50)))
 			continue;
 		
-		if('\r' == *iter){
-			iter = command;
-			for(i = 0; i < num_commands; i++){
-				if(commands[i].match(command)){
-					if(0 == commands[i].call(command, *this)){
-						chprintf(usbserial1.stream(), "OK\r\n");
-					} else {
-						chprintf(usbserial1.stream(), "ER\r\n");
+		switch(state){
+		case ST_IDLE:
+			length = *iter;
+			// Ignore 0-length commands
+			if(length){
+				state = ST_READING;
+			}
+			break;
+		case ST_READING:
+			if(--length == 0){
+				// Command complete
+				
+				for(i = 0; i < num_commands; i++){
+					if(commands[i].match(command, iter + 1 - command)){
+						chSequentialStreamPut(
+							usbserial1.stream(),
+							commands[i].call(command, *this)
+						);
+						break;
 					}
-					break;
 				}
+				if(i == num_commands){
+					// No matching command
+					chSequentialStreamPut(
+						usbserial1.stream(),
+						0
+					);
+				}
+				// Reset pointer
+				iter = command;
+				state = ST_IDLE;
+			} else {
+				// Increment pointer
+				iter += 1;
 			}
-			if(i == num_commands){
-				// No matching command
-				chprintf(usbserial1.stream(), "NO\r\n");
-			}
-			continue;
+			break;
 		}
-		
-		iter += 1;
-		
-		//chThdSleep(MS2ST(10));
-		//acc1.get_reading(m);
-		//chprintf(usbserial1.stream(),
-		//         "%f -- %f -- %f\r", m.x, m.y, m.z);
 	}
 	usbserial1.stop();
 }
@@ -133,4 +173,34 @@ int32_t USBTerm::cmd_listcmds(const char* cmd){
 	}
 	return 0;
 }
+
+int32_t USBTerm::cmd_listbuffers(const char* cmd){
+	return 0;
+}
+
+int32_t USBTerm::cmd_fetchbuffer(const char* cmd){
+	return 0;
+}
+
+
+int32_t USBTerm::parse_int(const char*& str){
+	int32_t i = *((int32_t const *)str);
+	str += sizeof(int32_t);
+	return i;
+}
+
+char const * USBTerm::parse_string(const char*& str){
+	char const * const ret = str;
+	// This will advance str one beyond the 0-terminator
+	while(str++ != 0);
+	return ret;
+}
+
+uint32_t USBTerm::parse_uint(const char*& str){
+	uint32_t i = *((uint32_t const *)str);
+	str += sizeof(uint32_t);
+	return i;
+}
+
+
 

@@ -3,7 +3,9 @@
 @author: Ben Nahill <bnahill@gmail.com>
 """
 
+import struct
 import serial
+import time
 import glob
 import platform
 
@@ -14,6 +16,33 @@ class LoggerLink:
 		self.connected = False
 		self.s = None
 		self.baud = 115200*2
+		
+	def write_cmd(self, cmd):
+		self.s.write(struct.pack('b',len(cmd)) + cmd)
+	
+	def read_response(self):
+		length = self.s.read(4)
+		if len(length) != 4:
+			return (None, None)
+		length = struct.unpack('>I', length)
+		data = ''
+		while True:
+			newdata = self.s.read(length, timeout=timeout)
+			if len(newdata) == 0:
+				print "Incomplete packet received"
+				time.sleep(1)
+				self.s.flushInput()
+				print "Flushed input buffer"
+				return None
+			length -= len(newdata)
+			data += newdata
+			if length == 0:
+				break
+		
+		retcode = self.s.read(2, timeout=timeout)
+		self.s.flushInput()
+		return (data, retcode)
+		
 
 	def connect(self, port):
 		""" Try to open the port and ping the device there
@@ -21,10 +50,10 @@ class LoggerLink:
 		try:
 			self.s = serial.Serial(str(port), self.baud, timeout=1)
 			self.s.flushInput()
-			self.s.write("ping\r")
-			data = self.s.read(10)
+			self.write_cmd("ping")
+			(data, retcode) = self.read_response()
 			
-			if(data == "pong\r\nOK\r\n"):
+			if(data == "pong" and retcode == "OK"):
 				self.connected = True
 				return True
 			
@@ -39,9 +68,16 @@ class LoggerLink:
 			return []
 		
 		self.s.flushInput()
-		self.s.write("listcmds\r")
-		data = self.s.read(2000).split("\r\n")
-		return data[:-2]
+		self.write_cmd("listcmds")
+		data = self.s.read(2000).split("\r\n")[:-2]
+		commands = []
+		for d in data:
+			c = parse_cmd(d)
+			if c:
+				commands.append(c)
+			else:
+				print "Error parsing %s" % d
+		return commands
 
 	def disconnect(self):
 		if self.connected:
@@ -63,3 +99,7 @@ class LoggerLink:
 		else:
 			return glob.glob("/dev/ttyACM*") + glob.glob("/dev/ttyUSB*")
 	
+	def exec_command(self, cmd):
+		""" Execute a command and return the values
+		"""
+		pass

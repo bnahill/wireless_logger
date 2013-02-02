@@ -4,12 +4,11 @@
 #include "platform.h"
 #include "acquisition.h"
 #include "ui/ui.h"
+#include "ui/usbfile.h"
 
 class USBTerm;
 
-//! @addtogroup UI
-//! @{
-//! @addtogroup USB
+//! @addtogroup USBTerm
 //! @{
 	
 /*!
@@ -29,17 +28,16 @@ public:
 		return (usb.*cb)(cmd);
 	}
 	
-	bool match(uint8_t const * cmd) const {
+	bool match(uint8_t const * cmd, uint8_t length) const {
 		uint8_t const * iter1;
 		uint8_t const * iter2;
 		iter1 = root;
 		iter2 = cmd;
-		while(*iter1 == *iter2){
+		while(length-- && (*iter1 == *iter2)){
+			if(*iter1 == 0) return true;
 			iter1 += 1;
 			iter2 += 1;
 		}
-		if((0 == *iter1) && ((*iter2 == ' ') || (*iter2 == '\r')))
-			return true;
 		return false;
 	}
 	
@@ -51,6 +49,11 @@ private:
 	shell_callback_t const cb;
 };
 
+
+/*!
+ @brief A USB terminal routine to provide a PC access to device configuration
+ and logging information
+ */
 class USBTerm {
 public:
 	USBTerm(){}
@@ -90,10 +93,28 @@ protected:
 	int32_t cmd_settime(char const *cmd);
 	int32_t cmd_ping(char const *cmd);
 	int32_t cmd_listcmds(char const *cmd);
+	int32_t cmd_listbuffers(char const *cmd);
+	int32_t cmd_fetchbuffer(char const *cmd);
 	//! @}
+	
+	//! @name Parsing functions
+	//! @brief Read a value from a string and advance the string pointer
+	//! @{
+	static uint32_t parse_uint(char const * &str);
+	static int32_t parse_int(char const * &str);
+	static char const * parse_string(char const * &str);
+	//! @}
+	
+	
+	static Mutex file_lock;
+	static USBFile * usbfile;
+	/*!
+	 @brief Register a file
+	 */
+	static void reg_file(USBFile * file);
 };
 
 
-//! @} @}
+//! @}
 
 #endif // __USB_TERM_H_

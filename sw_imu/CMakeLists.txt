@@ -205,6 +205,7 @@ set(APP_SOURCES
 	src/ui/sensor_view.cpp
 	src/ui/usbscreen.cpp
 	src/ui/usbterm.cpp
+	src/ui/usbfile.cpp
 )
 
 

@@ -6,12 +6,8 @@
 #include "ui/ui.h"
 #include "ui/usbterm.h"
 
-//! @addtogroup UI
-//! @{
 //! @addtogroup Screens
 //! @{
-
-class USBScreen;
 
 
 /*!
@@ -27,6 +23,6 @@ protected:
 	msg_t terminate();
 };
 
-//! @} @}
+//! @}
 
 #endif // __UI_USB_SCREEN_H_
