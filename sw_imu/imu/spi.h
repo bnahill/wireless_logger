@@ -43,6 +43,12 @@ public:
 			tc_callback(nullptr), starting_callback(nullptr),
 			operation(OP_SEND), tx_buff(tx_buff)
 		{}
+		
+		//! A more generic constructor
+		xfer_t(slave_config_t const * config, size_t n, operation_t op) :
+			config(config), n(n), operation(op),
+			tc_callback(nullptr), starting_callback(nullptr)
+		{}
 
 		//! Slave information
 		slave_config_t const * config;
@@ -152,6 +158,56 @@ public:
 		chSemWait(&done_sem);
 	}
 	
+	/*!
+	 @brief Perform a synchronous transmission
+	 @param config The slave configuration to use
+	 @param addr The address to write to
+	 @param n The number of bytes to send
+	 @param tx_buff The n-length buffer to transmit
+	 @param important Force to front of queue?
+	 @return The value read during address transmission
+	 */
+	uint16_t write_sync(slave_config_t const &config, uint16_t addr, size_t n,
+	                void const * tx_buff, bool important=false){
+		Semaphore done_sem;
+		xfer_t xfer(&config, n, tx_buff);
+		xfer.tc_sem(&done_sem);
+		xfer.operation = OP_WRITE;
+		xfer.addr = addr;
+		chSemInit(&done_sem, 0);
+		
+		transfer(xfer, important);
+		
+		chSemWait(&done_sem);
+		
+		return xfer.addr;
+	}
+	
+	/*!
+	 @brief Perform a synchronous transmission
+	 @param config The slave configuration to use
+	 @param addr The address to write to
+	 @param n The number of bytes to send
+	 @param tx_buff The n-length buffer to transmit
+	 @param important Force to front of queue?
+	 @return The value read during address transmission
+	 */
+	uint16_t read_sync(slave_config_t const &config, uint16_t addr, size_t n,
+	                void * rx_buff, bool important=false){
+		Semaphore done_sem;
+		xfer_t xfer(&config, n, OP_READ);
+		xfer.tc_sem(&done_sem);
+		xfer.addr = addr;
+		xfer.rx_buff = rx_buff;
+		chSemInit(&done_sem, 0);
+		
+		transfer(xfer, important);
+		
+		chSemWait(&done_sem);
+		
+		return xfer.addr;
+	}
+	
 	//void acquire(){spiAcquireBus(&driver);}
 	//void release(){spiReleaseBus(&driver);}
 	
@@ -166,7 +222,7 @@ protected:
 	bool is_init;
 	
 	msg_t run(){
-		xfer_t const * xfer;
+		xfer_t * xfer;
 		is_init = true;
 		while(true){
 			// Receive a new item to send
@@ -181,11 +237,11 @@ protected:
 			spiSelect(&driver);
 			switch(xfer->operation){
 			case OP_WRITE:
-				spiSend(&driver, 1, &xfer->addr);
+				spiExchange(&driver, 1, &xfer->addr, &xfer->addr);
 				spiSend(&driver, xfer->n, xfer->tx_buff);
 				break;
 			case OP_READ:
-				spiSend(&driver, 1, &xfer->addr);
+				spiExchange(&driver, 1, &xfer->addr, &xfer->addr);
 				spiReceive(&driver, xfer->n, xfer->rx_buff);
 				break;
 			case OP_EXCHANGE:

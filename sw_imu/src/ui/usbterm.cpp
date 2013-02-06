@@ -73,8 +73,7 @@ void USBTerm::thread_action(){
 				
 				for(i = 0; i < num_commands; i++){
 					if(commands[i].match(command, iter + 1 - command)){
-						chSequentialStreamPut(
-							usbserial1.stream(),
+						usbserial1.write_byte(
 							commands[i].call(command, *this)
 						);
 						break;
@@ -82,10 +81,7 @@ void USBTerm::thread_action(){
 				}
 				if(i == num_commands){
 					// No matching command
-					chSequentialStreamPut(
-						usbserial1.stream(),
-						0
-					);
+					usbserial1.write_byte(0);
 				}
 				// Reset pointer
 				iter = command;
@@ -101,7 +97,8 @@ void USBTerm::thread_action(){
 }
 
 int32_t USBTerm::cmd_help(const char* cmd){
-	chprintf(usbserial1.stream(), "You did something wrong\r\n");
+	chprintf(usbserial1.stream(), "You did something wrong");
+	usbserial1.write_byte(0);
 	return 0;
 }
 
@@ -117,10 +114,10 @@ int32_t USBTerm::cmd_settime(const char* cmd){
 	
 	if(!is_ascii_num(cmd[0])) goto error;
 	if(!is_ascii_num(cmd[1])) goto error;
-	if(cmd[2] != ':') goto error;
+	if(cmd[2] != ':') return 1;
 	if(!is_ascii_num(cmd[3])) goto error;
 	if(!is_ascii_num(cmd[4])) goto error;
-	if(cmd[5] != ':') goto error;
+	if(cmd[5] != ':') return 1;
 	if(!is_ascii_num(cmd[6])) goto error;
 	if(!is_ascii_num(cmd[7])) goto error;
 	
@@ -137,10 +134,10 @@ int32_t USBTerm::cmd_settime(const char* cmd){
 	
 	if(!is_ascii_num(cmd[0])) goto error;
 	if(!is_ascii_num(cmd[1])) goto error;
-	if(cmd[2] != ':') goto error;
+	if(cmd[2] != ':') return 1;
 	if(!is_ascii_num(cmd[3])) goto error;
 	if(!is_ascii_num(cmd[4])) goto error;
-	if(cmd[2] != ':') goto error;
+	if(cmd[2] != ':') return 1;
 	if(!is_ascii_num(cmd[6])) goto error;
 	if(!is_ascii_num(cmd[7])) goto error;
 	
@@ -156,20 +153,21 @@ int32_t USBTerm::cmd_settime(const char* cmd){
 	return 0;
 	
 error:
-	chprintf(usbserial1.stream(), "Try again...\r\n");
-	chprintf(usbserial1.stream(), "Format: settime YY:MM:DD HH:mm:SS\r\n");
 	return 1;
 }
 
 int32_t USBTerm::cmd_ping(const char* cmd){
-	chprintf(usbserial1.stream(), "pong\r\n");
+	parse_string(cmd);
+	chprintf(usbserial1.stream(), parse_string(cmd));
+	usbserial1.write_byte(0);
 	return 0;
 }
 
 int32_t USBTerm::cmd_listcmds(const char* cmd){
 	uint_fast8_t i;
 	for(i = 0; i < num_commands; i++){
-		chprintf(usbserial1.stream(), "%s %s\r\n", commands[i].get_root(), commands[i].get_args());
+		chprintf(usbserial1.stream(), "%s %s", commands[i].get_root(), commands[i].get_args());
+		usbserial1.write_byte(0);
 	}
 	return 0;
 }

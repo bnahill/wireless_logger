@@ -90,6 +90,14 @@ public:
 		CMD_PATABLE = 0x3E,
 	} reg_t;
 	
+	typedef enum {
+		GDO0 = REG_IOCFG0,
+		GDO1 = REG_IOCFG1,
+		GDO2 = REG_IOCFG2
+	} gdo_t;
+	
+	typedef uint8_t gdo_mode_t;
+	
 	typedef struct {reg_t reg; uint8_t val;} reg_config_t;
 	
 	CC1101(SPI &spi, SPI::slave_config_t slave_config,
@@ -126,8 +134,13 @@ public:
 		strobe(CMD_SPWD);
 	}
 	
+	void set_gdo_mode(gdo_t gdo, gdo_mode_t gdo_mode){
+		write_reg((reg_t)gdo, gdo_mode);
+	}
+	
 	struct status_t {
-		status_t(uint8_t &u){
+		template<typename T>
+		status_t(T u){
 			*this = *(status_t *)(&u);
 		}
 		uint8_t chip_rdy     : 1;
@@ -152,14 +165,28 @@ public:
 		return rx_buffer[0];
 	}
 	
+	status_t get_status(){return strobe(CMD_SNOP);}
+	
+	/*!
+	 @brief Do a single-word command strobe
+	 */
 	status_t strobe(reg_t reg){
 		uint8_t rx_buffer;
 		spi.exchange_sync(slave_config, 2, (uint8_t *)&reg, &rx_buffer);
 		return rx_buffer;
 	}
 	
+	static void cb_rx_data_ready(CC1101 * rf);
 protected:
 
+	status_t transmit_data(uint_fast8_t const * data, uint_fast8_t len){
+		return spi.write_sync(slave_config, REG_TX_FIFO, len, (void const *)data);
+	}
+	
+	status_t receive_data(uint_fast8_t * dst, uint_fast8_t len){
+		return spi.read_sync(slave_config, REG_RX_FIFO, len, dst);
+	}
+	
 	reg_config_t const * const initial_config;
 	uint_fast8_t const init_config_len;
 	SPI &spi;

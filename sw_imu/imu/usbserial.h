@@ -52,6 +52,10 @@ public:
 		return driver.vmt;
 	}
 	
+	void write_byte(uint8_t byte){
+		chSequentialStreamPut(stream(), byte);
+	}
+	
 	size_t read(uint8_t *bp, size_t n, systime_t time){
 		return chIQReadTimeout(&driver.iqueue, bp, n, time);
 	}
