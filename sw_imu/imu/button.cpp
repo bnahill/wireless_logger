@@ -1,12 +1,8 @@
 #include "button.h"
 
 template <EXTDriver &driver>
-Button< driver > *Button< driver >::buttons[num_channels];
-
-template <EXTDriver &driver>
-void Button< driver >::callback(EXTDriver* , expchannel_t channel){
-	if(buttons[channel])
-		buttons[channel]->handle_callback();
+void Button< driver >::static_cb(void * arg){
+	((Button< driver > *)arg)->handle_callback();
 }
 
 template <EXTDriver &driver>

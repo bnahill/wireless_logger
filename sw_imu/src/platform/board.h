@@ -265,6 +265,7 @@
                             PIN_OTYPE_PUSHPULL(GPIOC_POW_SUSP_EN) |         \
                             PIN_OTYPE_PUSHPULL(GPIOC_LED1) |                \
                             PIN_OTYPE_PUSHPULL(GPIOC_GYRO_NCS) |            \
+                            PIN_OTYPE_PUSHPULL(GPIOC_RF_NCS) |              \
                             PIN_OTYPE_PUSHPULL(GPIOC_PRS_NCS))
 #define VAL_GPIOC_OSPEEDR   0xFFFFFFFF
 #define VAL_GPIOC_PUPDR     (PIN_PUDR_PULLUP(0) |                           \

@@ -5,7 +5,7 @@
 MenuItem const MainMenu::items[item_count] = {
 	{"Sensor output\n(numeric)", (MenuItem::item_handler)launch_sensor_view_num},
 	{"Sensor output\n(bar)", (MenuItem::item_handler)launch_sensor_view_bar},
-	{"USB Transfer", (MenuItem::item_handler)launch_usb_mode},
+	//{"USB Transfer", (MenuItem::item_handler)launch_usb_mode},
 };
 
 void MainMenu::exec(){

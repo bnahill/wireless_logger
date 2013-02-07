@@ -36,10 +36,6 @@ L3GD20_SPI Platform::gyro1(Platform::spi1, {NULL, GPIOC, 4, SPI_CR1_BR_2 |
 // Button platform configuration
 ///////////////////////////////////////////
 
-
-//Button Platform::button1(GPIOC, 12, Button::ACTIVE_LOW);
-//Button Platform::button2(GPIOC, 10, Button::ACTIVE_LOW);
-//Button Platform::button3(GPIOC, 11, Button::ACTIVE_LOW);
 button_t Platform::button[3] = {
 	{GPIOC, 12, button_t::ACTIVE_LOW},
 	{GPIOC, 10, button_t::ACTIVE_LOW},
@@ -63,11 +59,11 @@ const EXTConfig Platform::extcfg = {
 		{EXT_CH_MODE_DISABLED, NULL},
 		{EXT_CH_MODE_DISABLED, NULL},
 		{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC,
-			button_t::callback}, // 10
+			Ext1Callback::callback}, // 10
 		{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC,
-			button_t::callback},
+			Ext1Callback::callback},
 		{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC,
-			button_t::callback},
+			Ext1Callback::callback},
 		{EXT_CH_MODE_DISABLED, NULL},
 		{EXT_CH_MODE_DISABLED, NULL},
 		{EXT_CH_MODE_DISABLED, NULL}, // 15
@@ -80,11 +76,6 @@ const EXTConfig Platform::extcfg = {
 		{EXT_CH_MODE_DISABLED, NULL}
 	}
 };
-
-
-void Platform::EXTInit(){
-	extStart(&EXTD1, &extcfg);
-}
 
 ///////////////////////////////////////////
 // LED platform configuration
@@ -159,10 +150,20 @@ static CC1101::reg_config_t const reg_config[] = {
 	{CC1101::REG_TEST0, 0x09},
 };
 
-CC1101 Platform::rf1(spi1,
-                     {NULL, GPIOC, 9, SPI_CR1_BR_2 |
+CC1101 Platform::rf1(Platform::spi1,
+                     {NULL, GPIOC, 9, SPI_CR1_BR_2 | SPI_CR1_BR_1 |
                       SPI_CR1_CPOL | SPI_CR1_CPHA}, reg_config, sizeof(reg_config)/sizeof(*reg_config));
 
+//////////////////////////////////////////////////////////
+// Platform initialization
+//////////////////////////////////////////////////////////
+
+void Platform::early_init(){
+	reg1.high_power(true);
+	rf1.early_init();
+	
+	extStart(&EXTD1, &extcfg);
+}
 
 extern "C" {
 void NMIVector(void){while(1);}

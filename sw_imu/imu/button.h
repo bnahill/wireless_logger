@@ -2,6 +2,7 @@
 #define __BUTTON_H_
 
 #include "imu/imu.h"
+#include "imu/ext.h"
 #include "ch.h"
 #include "hal.h"
 
@@ -29,9 +30,10 @@ public:
 		release_handler(nullptr),
 		gpio(*gpio),
 		mask(BIT(channel)),
-		polarity(polarity)
+		polarity(polarity),
+		callback(static_cb, this)
 	{
-		buttons[channel] = this;
+		ExtCallback<driver>::channels[channel] = &callback;
 		state = check_gpio();
 	}
 	
@@ -71,9 +73,6 @@ public:
 		release_handler = nullptr;
 	}
 	
-	//! The number of channels available for use
-	static const size_t num_channels = EXT_MAX_CHANNELS;
-	
 	//! Read the current state of the GPIO pin
 	state_t check_gpio() const {
 		switch(polarity){
@@ -89,13 +88,9 @@ public:
 	bool is_pressed() const {return state == ST_PRESSED;}
 	
 	
-	/*!
-	 @brief Static callback from EXT driver
-	 */
-	static void callback(EXTDriver *, expchannel_t channel);
-	
 protected:
 	expchannel_t channel;
+	static void static_cb(void * arg);
 	
 	//! @name Event handlers
 	//! @{
@@ -110,12 +105,11 @@ protected:
 	GPIO_TypeDef &gpio;
 	const uint32_t mask;
 	
+	ExtCallback<driver> callback;
+	
 	void handle_callback();
 	
 	const polarity_t polarity;
-	
-	//! Array of all buttons
-	static Button *buttons[num_channels];
 	
 	/*!
 	 @brief EXT driver configuration to apply on initialization

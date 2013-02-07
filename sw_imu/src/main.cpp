@@ -10,17 +10,17 @@ extern "C"{
 	int main(void);
 }
 
-void ui_init();
-
 
 int main(void) {
 	halInit();
 	chSysInit();
 	
-	// Turn the 
-	reg1.high_power(true);
+	Platform::early_init();
 	
-	ui_init();
+	oled.init();
+	
+	if(!rf1.init())
+		while(1);
 	
 	Acquisition::init();
 	
@@ -31,10 +31,4 @@ int main(void) {
 	}
 	
 	chThdSleep(TIME_INFINITE);
-}
-
-void ui_init(){
-	Platform::EXTInit();
-	
-	oled.init();
 }

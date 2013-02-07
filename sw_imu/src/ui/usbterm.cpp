@@ -52,7 +52,7 @@ void USBTerm::thread_action(){
 		ST_READING,
 	} state = ST_IDLE;
 	
-	uint_fast8_t length;
+	uint_fast8_t length = 0;
 	
 	while(!chThdShouldTerminate()){
 		// Try to read a byte

@@ -1,8 +1,6 @@
 #ifndef __MENUSCREEN_H_
 #define __MENUSCREEN_H_
 
-#include "screen.h"
-
 class MenuScreen;
 
 class MenuItem {

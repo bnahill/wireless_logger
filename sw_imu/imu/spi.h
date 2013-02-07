@@ -221,6 +221,8 @@ protected:
 	 */
 	bool is_init;
 	
+	bool do_sleep;
+	
 	msg_t run(){
 		xfer_t * xfer;
 		is_init = true;

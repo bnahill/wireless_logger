@@ -2,6 +2,7 @@
 #define __IMU_CC1101_H_
 
 #include "ch.h"
+#include "imu/imu.h"
 #include "imu/spi.h"
 
 //! @addtogroup RF
@@ -92,7 +93,7 @@ public:
 	
 	typedef enum {
 		GDO0 = REG_IOCFG0,
-		GDO1 = REG_IOCFG1,
+		GDO1 = REG_IOCFG1, // This is used for SPI...
 		GDO2 = REG_IOCFG2
 	} gdo_t;
 	
@@ -112,10 +113,31 @@ public:
 		
 	}
 	
-	void init(){
+	void early_init(){
+		gpio_pin_t ncs(slave_config.ssport, slave_config.sspad);
+		
+		ncs.clear();
+		chThdSleep(1);
+		ncs.set();
+		chThdSleep(1);
+		ncs.clear();
+		chThdSleep(1);
+		ncs.set();
+	}
+	
+	bool init(){
 		reg_config_t const * iter;
 		
+		spi.init();
+		
 		strobe(CMD_SRES);
+		
+		// Configure synchronous data-out pin so we can read data...
+		set_gdo_mode(GDO1, 0x0C);
+		
+		if(read_reg(REG_FSTEST) != 0x59){
+			return false;
+		}
 		
 		if(initial_config != nullptr){
 			for(iter = initial_config;
@@ -127,6 +149,7 @@ public:
 		}
 		
 		sleep();
+		return true;
 	}
 	
 	//! Go to low power mode
@@ -138,31 +161,41 @@ public:
 		write_reg((reg_t)gdo, gdo_mode);
 	}
 	
-	struct status_t {
-		template<typename T>
-		status_t(T u){
-			*this = *(status_t *)(&u);
-		}
-		uint8_t chip_rdy     : 1;
-		enum {
-			ST_IDLE      = 0,
-			ST_RX        = 1,
-			ST_TX        = 2,
-			ST_FSTXON    = 3,
-			ST_CALIBRATE = 4,
-			ST_SETTLING  = 5,
-			ST_RX_OFLOW  = 6,
-			ST_TX_OFLOW  = 7
-		} state              : 3;
-		uint8_t bytes_avail  : 4;
-	};
+	typedef union{
+		struct{
+			uint8_t chip_rdy     : 1;
+			enum {
+				ST_IDLE      = 0,
+				ST_RX        = 1,
+				ST_TX        = 2,
+				ST_FSTXON    = 3,
+				ST_CALIBRATE = 4,
+				ST_SETTLING  = 5,
+				ST_RX_OFLOW  = 6,
+				ST_TX_OFLOW  = 7
+			} state              : 3;
+			uint8_t bytes_avail  : 4;
+		} s;
+		uint8_t u;
+	} status_t;
+	
+	static_assert(sizeof(status_t) == 1, "status_t of incorrect size");
 	
 	status_t write_reg(reg_t reg, uint8_t value){
-		uint8_t tx_buffer[2], rx_buffer[2];
+		uint8_t tx_buffer[2];
+		status_t rx_buffer[2];
 		tx_buffer[0] = reg;
 		tx_buffer[1] = value;
 		spi.exchange_sync(slave_config, 2, tx_buffer, rx_buffer);
 		return rx_buffer[0];
+	}
+	
+	uint8_t read_reg(reg_t reg){
+		uint8_t tx_buffer[2], rx_buffer[2];
+		tx_buffer[0] = reg | MASK_READ;
+		tx_buffer[1] = 0;
+		spi.exchange_sync(slave_config, 2, tx_buffer, rx_buffer);
+		return rx_buffer[1];
 	}
 	
 	status_t get_status(){return strobe(CMD_SNOP);}
@@ -171,20 +204,28 @@ public:
 	 @brief Do a single-word command strobe
 	 */
 	status_t strobe(reg_t reg){
-		uint8_t rx_buffer;
-		spi.exchange_sync(slave_config, 2, (uint8_t *)&reg, &rx_buffer);
+		status_t rx_buffer;
+		uint8_t tx_buffer = reg;
+		spi.exchange_sync(slave_config, 1, &tx_buffer, &rx_buffer);
 		return rx_buffer;
 	}
 	
 	static void cb_rx_data_ready(CC1101 * rf);
+	
+	static constexpr uint8_t MASK_READ  = 0x80;
+	static constexpr uint8_t MASK_BURST = 0x40;
 protected:
 
 	status_t transmit_data(uint_fast8_t const * data, uint_fast8_t len){
-		return spi.write_sync(slave_config, REG_TX_FIFO, len, (void const *)data);
+		status_t ret;
+		ret.u = spi.write_sync(slave_config, REG_TX_FIFO, len, (void const *)data);
+		return ret;
 	}
 	
 	status_t receive_data(uint_fast8_t * dst, uint_fast8_t len){
-		return spi.read_sync(slave_config, REG_RX_FIFO, len, dst);
+		status_t ret;
+		ret.u = spi.read_sync(slave_config, REG_RX_FIFO, len, dst);
+		return ret;
 	}
 	
 	reg_config_t const * const initial_config;

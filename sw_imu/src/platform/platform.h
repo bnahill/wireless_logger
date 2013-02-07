@@ -25,6 +25,7 @@
 
 #include <imu/mma8452q.h>
 #include <imu/mag3110.h>
+#include <imu/ext.h>
 #include <imu/button.h>
 #include <imu/l3gd20.h>
 #include <imu/ltc3559.h>
@@ -49,12 +50,12 @@ namespace Platform {
 	extern SPI spi2;
 	extern L3GD20_SPI gyro1;
 	
+	typedef ExtCallback<EXTD1> Ext1Callback;
 	typedef Button<EXTD1> button_t;
 	extern button_t button[3];
 	
 	extern gpio_pin_t led1;
 	
-	void EXTInit();
 	extern const EXTConfig extcfg;
 	
 	extern LTC3559 reg1;
@@ -67,6 +68,8 @@ namespace Platform {
 	typedef RealTimeClock<RTCD1> rtc1;
 	
 	extern CC1101 rf1;
+	
+	void early_init();
 };
 
 using namespace Platform;
