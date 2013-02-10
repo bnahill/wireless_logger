@@ -33,6 +33,7 @@
 #include <imu/usbserial.h>
 #include <imu/rtc.h>
 #include <imu/cc1101.h>
+#include <imu/guardian.h>
 
 /*!
  @brief Platform-dependent component definitions
@@ -68,6 +69,7 @@ namespace Platform {
 	typedef RealTimeClock<RTCD1> rtc1;
 	
 	extern CC1101 rf1;
+	extern GuardianRF guardian1;
 	
 	void early_init();
 };

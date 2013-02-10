@@ -71,7 +71,7 @@ set(OS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/os)
 # Build Options
 ########################################################
 
-set(OPTIMIZATION "-O0")
+set(OPTIMIZATION "-Os")
 set(LTO )#"-flto")
 
 set(MCU cortex-m4)
@@ -217,6 +217,7 @@ set(IMU_SOURCES
 	${IMU_DIR}/ssd1306.cpp
 	${IMU_DIR}/imu.cpp
 	${IMU_DIR}/cc1101.cpp
+	${IMU_DIR}/guardian_spec.cpp
 	
 	${IMU_DIR}/graphics/smallfont.cpp
 	${IMU_DIR}/graphics/mediumfont.cpp

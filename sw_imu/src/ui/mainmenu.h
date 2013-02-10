@@ -29,8 +29,8 @@ private:
 	
 	bool should_exit;
 	
-	static constexpr uint32_t item_count = 2;
-	static MenuItem const items[item_count];
+	static const uint32_t item_count;
+	static MenuItem const items[];
 };
 
 //! @} @}

@@ -2,11 +2,13 @@
 #include "ui/sensor_view.h"
 #include "ui/usbscreen.h"
 
-MenuItem const MainMenu::items[item_count] = {
+MenuItem const MainMenu::items[] = {
 	{"Sensor output\n(numeric)", (MenuItem::item_handler)launch_sensor_view_num},
 	{"Sensor output\n(bar)", (MenuItem::item_handler)launch_sensor_view_bar},
-	//{"USB Transfer", (MenuItem::item_handler)launch_usb_mode},
+	{"USB Transfer", (MenuItem::item_handler)launch_usb_mode},
 };
+
+uint32_t const MainMenu::item_count = sizeof(items)/sizeof(*items);
 
 void MainMenu::exec(){
 	eventmask_t evt;

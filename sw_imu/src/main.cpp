@@ -19,16 +19,12 @@ int main(void) {
 	
 	oled.init();
 	
-	if(!rf1.init())
+	if(!guardian1.init())
 		while(1);
 	
 	Acquisition::init();
 	
 	UI::ui.start();
-	
-	while(true){
-		chThdSleep(MS2ST(10));
-	}
 	
 	chThdSleep(TIME_INFINITE);
 }

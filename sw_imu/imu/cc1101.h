@@ -101,16 +101,24 @@ public:
 	
 	typedef struct {reg_t reg; uint8_t val;} reg_config_t;
 	
-	CC1101(SPI &spi, SPI::slave_config_t slave_config,
-	       reg_config_t const * initial_config = nullptr,
-		   uint_fast8_t init_config_len = 0
-  		) :
-		initial_config(initial_config),
-		init_config_len(init_config_len),
+	CC1101(SPI &spi, SPI::slave_config_t slave_config) :
 		spi(spi),
 		slave_config(slave_config)
 	{
 		
+	}
+	
+	void config(reg_config_t const * initial_config,
+		        uint_fast8_t init_config_len){
+		reg_config_t const * iter;
+		if(initial_config != nullptr){
+			for(iter = initial_config;
+				iter < initial_config + init_config_len;
+				iter++)
+			{
+				write_reg(iter->reg, iter->val);
+			}
+		}
 	}
 	
 	void early_init(){
@@ -126,8 +134,6 @@ public:
 	}
 	
 	bool init(){
-		reg_config_t const * iter;
-		
 		spi.init();
 		
 		strobe(CMD_SRES);
@@ -139,14 +145,7 @@ public:
 			return false;
 		}
 		
-		if(initial_config != nullptr){
-			for(iter = initial_config;
-				iter < initial_config + init_config_len;
-				iter++)
-			{
-				write_reg(iter->reg, iter->val);
-			}
-		}
+		
 		
 		sleep();
 		return true;
@@ -215,7 +214,6 @@ public:
 	static constexpr uint8_t MASK_READ  = 0x80;
 	static constexpr uint8_t MASK_BURST = 0x40;
 protected:
-
 	status_t transmit_data(uint_fast8_t const * data, uint_fast8_t len){
 		status_t ret;
 		ret.u = spi.write_sync(slave_config, REG_TX_FIFO, len, (void const *)data);
@@ -228,8 +226,6 @@ protected:
 		return ret;
 	}
 	
-	reg_config_t const * const initial_config;
-	uint_fast8_t const init_config_len;
 	SPI &spi;
 	SPI::slave_config_t const slave_config;
 };
