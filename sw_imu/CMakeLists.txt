@@ -197,6 +197,7 @@ set(OS_SOURCES
 set(APP_SOURCES
 	src/main.cpp
 	src/acquisition.cpp
+	src/power_management.cpp
 	src/platform/board.c
 	src/platform/platform.cpp
 	src/ui/ui.cpp
