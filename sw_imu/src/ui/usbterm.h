@@ -91,7 +91,6 @@ protected:
 	//! @{
 	int32_t cmd_help(char const *cmd);
 	int32_t cmd_settime(char const *cmd);
-	int32_t cmd_settime_ts(char const *cmd);
 	int32_t cmd_ping(char const *cmd);
 	int32_t cmd_listcmds(char const *cmd);
 	int32_t cmd_listbuffers(char const *cmd);

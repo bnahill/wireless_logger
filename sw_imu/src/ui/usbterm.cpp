@@ -111,13 +111,6 @@ int32_t USBTerm::cmd_help(const char* cmd){
 	return 0;
 }
 
-int32_t USBTerm::cmd_settime_ts(const char* cmd){
-	uint32_t time;
-	parse_string(cmd);
-	time = parse_uint(cmd);
-	rtc1::set_time(time);
-	return 0;
-}
 
 int32_t USBTerm::cmd_settime(const char* cmd){
 	rtc1::rtc_time_t time;
