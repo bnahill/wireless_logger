@@ -56,6 +56,8 @@ public:
 	msg_t receive(i2caddr_t addr, uint8_t * rxbuf, size_t rxbytes,
 	              systime_t timeout);
 
+	uint8_t read_byte_test(i2caddr_t addr, uint8_t regaddr);
+	
 	uint8_t read_byte(i2caddr_t addr, uint8_t regaddr);
 	
 	msg_t write_byte(i2caddr_t addr, uint8_t regaddr, uint8_t value);

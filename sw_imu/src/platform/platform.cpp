@@ -114,6 +114,7 @@ GuardianRF Platform::guardian1(rf1);
 
 void Platform::early_init(){
 	reg1.high_power(true);
+	reg1.buck_mode(LTC3559::MODE_BURST);
 	rf1.early_init();
 	
 	extStart(&EXTD1, &extcfg);

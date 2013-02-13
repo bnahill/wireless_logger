@@ -31,15 +31,16 @@ marshalling.
 String arguments are 0-terminated
 
 Integers and floating point values are represented in their native
-binary representation in big-endian byte order.
+binary representation in little-endian byte order (default for STM32).
 
-Array types are dealt with by first passing a single byte containing the
+Array types are dealt with by first passing a 4-byte integer containing the
 number of array elements present.
 
 @par Return Codes:
 
 Return values come in a similar format but with a 1-byte unsigned return code
 at the end. By convention, this return code is 0 in the case of no error.
+Also by convention, a value of 255 indicates that more data exists.
 
 @defgroup USBFile USB File Access
 @brief Virtual file management for USB access

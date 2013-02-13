@@ -20,7 +20,7 @@ void RealTimeClock< driver >::get_time_text(char * text){
 	text[7] = '0' + time.seconds_u;
 	text[8] = 0;
 	
-	text[0] = 0;
+	
 	return;
 }
 

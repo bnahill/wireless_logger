@@ -91,6 +91,7 @@ protected:
 	//! @{
 	int32_t cmd_help(char const *cmd);
 	int32_t cmd_settime(char const *cmd);
+	int32_t cmd_settime_ts(char const *cmd);
 	int32_t cmd_ping(char const *cmd);
 	int32_t cmd_listcmds(char const *cmd);
 	int32_t cmd_listbuffers(char const *cmd);
@@ -105,6 +106,10 @@ protected:
 	static char const * parse_string(char const * &str);
 	//! @}
 	
+	template <typename T>
+	void write_value(T i){
+		usbserial1.write_buffer((uint8_t const *)&i, sizeof(T));
+	}
 	
 	static Mutex file_lock;
 	static USBFile * usbfile;

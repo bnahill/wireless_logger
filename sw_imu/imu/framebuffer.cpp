@@ -54,6 +54,10 @@ uint32_t FrameBuffer< pages, columns >::write_text(char const * text,
 	  uint8_t page, uint8_t column, uint32_t max_end_column){
 	uint32_t i = 0;
 	uint32_t n_cols = 0;
+	
+	if(*text == 0)
+		return n_cols;
+	
 	lock();
 	
 	limits.y_min = min(page, limits.y_min);

@@ -16,13 +16,13 @@ bool MMA8452Q::init(){
 	// Initialize I2C -- don't care about return value
 	i2c.init();
 	
-	reset();
-	
-	i2c.read_byte(devaddr, REG_WHO_AM_I);
+	i2c.read_byte_test(devaddr, REG_WHO_AM_I);
 	if(i2c.read_byte(devaddr, REG_WHO_AM_I) != 0x2A){
 		while(1);
 		return false;
 	}
+	
+	reset();
 	
 	//i2c.write_byte(devaddr, REG_CTRL_REG2, 0x40);
 	

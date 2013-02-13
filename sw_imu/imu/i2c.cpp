@@ -47,6 +47,27 @@ msg_t I2C::receive(i2caddr_t addr, uint8_t* rxbuf, size_t rxbytes,
 	return msg;
 }
 
+uint8_t I2C::read_byte_test(i2caddr_t addr, uint8_t regaddr){
+	msg_t msg;
+	uint8_t ret;
+	msg = transmit(addr, &regaddr, 1, &ret, 1, MS2ST(4));
+	if(msg == RDY_TIMEOUT){
+		ret = 0;
+		i2cAcquireBus(&driver);
+		driver.i2c->CR1 |= I2C_CR1_START;
+		while(0 == (driver.i2c->SR2 & I2C_SR2_MSL));
+		driver.i2c->DR = 0xFF;
+		while(driver.i2c->SR1 & I2C_SR1_TXE);
+		i2cReleaseBus(&driver);
+		msg = transmit(addr, &regaddr, 1, &ret, 1, MS2ST(4));
+		if(msg == RDY_TIMEOUT){
+			ret = 0;
+		}
+	}
+	return ret;
+	
+}
+
 uint8_t I2C::read_byte(i2caddr_t addr, uint8_t regaddr){
 	uint8_t ret;
 	msg_t msg;

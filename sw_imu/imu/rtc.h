@@ -55,6 +55,12 @@ public:
 	static void set_time(rtc_time_t &time){
 		rtcSetTime(&driver, (RTCTime *)&time);
 	}
+	
+	static void set_time(uint32_t timestamp){
+		time_t t;
+		t = timestamp;
+		rtcSetTimeUnixSec(&driver, t);
+	}
 };
 
 #include <rtc.cpp>

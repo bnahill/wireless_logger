@@ -19,7 +19,7 @@ void USBTerm::reg_file(USBFile* file){
 
 
 ShellCommand const USBTerm::commands[] = {
-	{"listcmds", "s()", (ShellCommand::shell_callback_t)&USBTerm::cmd_listcmds},
+	{"listcmds", "[s]()", (ShellCommand::shell_callback_t)&USBTerm::cmd_listcmds},
 	{"help", "s()", (ShellCommand::shell_callback_t)&USBTerm::cmd_help},
 	{"settime", "(datetime:date)", (ShellCommand::shell_callback_t)&USBTerm::cmd_settime},
 	{"ping", "s(s:ping)", (ShellCommand::shell_callback_t)&USBTerm::cmd_ping},
@@ -53,11 +53,20 @@ void USBTerm::thread_action(){
 	} state = ST_IDLE;
 	
 	uint_fast8_t length = 0;
+	uint8_t silent_count = 0;
 	
 	while(!chThdShouldTerminate()){
 		// Try to read a byte
-		if(!usbserial1.read(iter, 1, MS2ST(50)))
+		if(!usbserial1.read(iter, 1, MS2ST(50))){
+			if(++silent_count > 10){
+				state = ST_IDLE;
+				iter = command;
+				length = 0;
+			}
 			continue;
+		}
+		// Reset silence counter
+		silent_count = 0;
 		
 		switch(state){
 		case ST_IDLE:
@@ -102,15 +111,18 @@ int32_t USBTerm::cmd_help(const char* cmd){
 	return 0;
 }
 
+int32_t USBTerm::cmd_settime_ts(const char* cmd){
+	uint32_t time;
+	parse_string(cmd);
+	time = parse_uint(cmd);
+	rtc1::set_time(time);
+	return 0;
+}
+
 int32_t USBTerm::cmd_settime(const char* cmd){
 	rtc1::rtc_time_t time;
 	
-	while((*cmd != ' ') && (*cmd != '\r')) cmd++;
-	if(*cmd == '\r'){
-		return 1;
-	}
-	// Go to the first character of the date/time
-	while(*cmd == ' ') cmd++;
+	parse_string(cmd);
 	
 	if(!is_ascii_num(cmd[0])) goto error;
 	if(!is_ascii_num(cmd[1])) goto error;
@@ -143,8 +155,8 @@ int32_t USBTerm::cmd_settime(const char* cmd){
 	
 	time.hours_ten = cmd[0] - '0';
 	time.hours_u = cmd[1] - '0';
-	time.minutes_ten = cmd[3] - '0';
-	time.minutes_u = cmd[4] - '0';
+	time.minutes_ten = 5;//cmd[3] - '0';
+	time.minutes_u = 5;//cmd[4] - '0';
 	time.seconds_ten = cmd[6] - '0';
 	time.seconds_u = cmd[7] - '0';
 	
@@ -165,6 +177,7 @@ int32_t USBTerm::cmd_ping(const char* cmd){
 
 int32_t USBTerm::cmd_listcmds(const char* cmd){
 	uint_fast8_t i;
+	write_value< uint32_t >(num_commands);
 	for(i = 0; i < num_commands; i++){
 		chprintf(usbserial1.stream(), "%s %s", commands[i].get_root(), commands[i].get_args());
 		usbserial1.write_byte(0);
@@ -190,7 +203,7 @@ int32_t USBTerm::parse_int(const char*& str){
 char const * USBTerm::parse_string(const char*& str){
 	char const * const ret = str;
 	// This will advance str one beyond the 0-terminator
-	while(str++ != 0);
+	while(*(str++) != 0);
 	return ret;
 }
 

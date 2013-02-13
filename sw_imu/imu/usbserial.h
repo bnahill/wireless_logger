@@ -56,6 +56,12 @@ public:
 		chSequentialStreamPut(stream(), byte);
 	}
 	
+	void write_buffer(uint8_t const * buf, uint32_t len){
+		while(len--){
+			chSequentialStreamPut(stream(), *(buf++));
+		}
+	}
+	
 	size_t read(uint8_t *bp, size_t n, systime_t time){
 		return chIQReadTimeout(&driver.iqueue, bp, n, time);
 	}

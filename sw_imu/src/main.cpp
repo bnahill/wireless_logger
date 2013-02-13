@@ -5,6 +5,7 @@
 #include "acquisition.h"
 
 #include "ui/ui.h"
+#include "power_management.h"
 
 extern "C"{
 	int main(void);
