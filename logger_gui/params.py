@@ -10,6 +10,7 @@ from PySide.QtGui import *
 
 import re
 import datetime
+import time
 import struct
 
 cmd_pattern = re.compile(r"\A(?P<name>[a-zA-Z0-9_]*)\s*" +
@@ -19,6 +20,8 @@ def parse_cmd(cmd):
 	""" Takes the full command definition string and parses to a tuple of the
 	command name, input arguments, and return type
 	"""
+
+	print "Matching %s" % cmd
 	m = cmd_pattern.match(cmd)
 	if not m:
 		print "Error " + cmd
@@ -76,18 +79,29 @@ def mk_param(string):
 	
 	return cmd
 
+class Cmd:
+	def __init__(self, cmd, params=[]):
+		self.cmd = cmd
+		self.params = []
+
 class CmdParam:
 	def __init__(self, name, doc=""):
 		self.name = name
 		self.doc = doc
 		self.widget = None
+		
+class CmdArray:
+	def __init__(self, fields=[]):
+		pass
+	def from_buffer(self, buff):
+		pass
 
 class CmdParamReal(CmdParam):
 	def __init__(self, name, doc="", initial=0.0, params=None):
 		CmdParam.__init__(self, name, doc)
-		self.initial = initial
+		self.value = initial
 	def make_widget(self, parent=None):
-		self.widget = QLineEdit(unicode(self.initial), parent)
+		self.widget = QLineEdit(unicode(self.value), parent)
 		self.widget.setValidator(QDoubleValidator())
 		return self.widget
 	def validate(self):
@@ -97,10 +111,10 @@ class CmdParamReal(CmdParam):
 class CmdParamInt(CmdParam):
 	def __init__(self, name, doc="", initial=0.0, signed=True, params=None):
 		CmdParam.__init__(self, name, doc)
-		self.initial = initial
+		self.value = initial
 		self.signed = signed
 	def make_widget(self, parent=None):
-		self.widget = QLineEdit(unicode(self.initial),parent)
+		self.widget = QLineEdit(unicode(self.value),parent)
 		self.widget.setValidator(QIntValidator())
 		return self.widget
 	def validate(self):
@@ -108,16 +122,17 @@ class CmdParamInt(CmdParam):
 			return False
 		return True
 	def to_buffer(self):
-		i = int(self.widget.text())
+		if self.widget:
+			self.value = int(self.widget.text())
 		if self.signed:
-			return struct.pack(">i",i)
-		return struct.pack(">I",i)
+			return struct.pack("<i",self.value)
+		return struct.pack("<I",self.value)
 		
 
 class CmdParamString(CmdParam):
-	def __init__(self, name, doc="", initial="", params=None):
+	def __init__(self, name, doc="", initial="", params=[]):
 		CmdParam.__init__(self, name, doc)
-		self.initial = initial
+		self.value = initial
 		self.minlength = 0
 		self.maxlength = None
 		if len(params) > 1:
@@ -125,7 +140,7 @@ class CmdParamString(CmdParam):
 		if len(params) > 2:
 			self.maxlength = params[2]
 	def make_widget(self, parent=None):
-		self.widget = QLineEdit(unicode(self.initial),parent)
+		self.widget = QLineEdit(unicode(self.value),parent)
 		if self.maxlength	:
 			self.widget.setMaxLength(maxlength)
 		return self.widget
@@ -139,21 +154,40 @@ class CmdParamString(CmdParam):
 		return True
 	
 	def to_buffer(self):
-		text = str(self.widget.text())
-		return struct.pack('%ss' % (len(text)+1), text)
+		if self.widget:
+			self.value = str(self.widget.text())
+		return struct.pack('%ds' % (len(self.value)+1), self.value)
 
 class CmdParamDateTime(CmdParam):
-	def __init__(self, name, doc="", timestamp=None, params=None):
+	def __init__(self, name, doc="", timestamp=None, params=[]):
 		CmdParam.__init__(self, name, doc)
 		if timestamp:
 			self.timestamp = timestamp
 		else:
-			self.timestamp = datetime.datetime.now()
+			t = datetime.datetime.now()
+			self.timestamp = t.strftime("%y:%m:%d %H:%M:%S")
 	def make_widget(self, parent=None):
-		return None
+		self.widget = QLineEdit(unicode(self.timestamp),parent)
+		self.widget.setMaxLength(17)
+		return self.widget
 		
 	def validate(self):
-		return False
+		if self.widget.text().strip() == "":
+			return True
+		if not self.widget.hasAcceptableInput():
+			return False
+		if len(self.widget.text()) != 17:
+			return False
+		return True
+	
+	def to_buffer(self):
+		if self.widget:
+			if self.widget.text().strip() == "":
+				t = datetime.datetime.now()
+				self.timestamp = t.strftime("%y:%m:%d %H:%M:%S")
+			else:
+				self.timestamp = self.widget.text()
+		return struct.pack("<%dsb" % len(self.timestamp), self.timestamp, 0)
 
 class CmdParamLogBuffer(CmdParam):
 	def __init__(self, name, doc="", params=None):

@@ -17,14 +17,29 @@ class LoggerLink:
 		self.s = None
 		self.baud = 115200*2
 		
-	def write_cmd(self, cmd):
-		self.s.write(struct.pack('b',len(cmd)) + cmd)
+	def write_cmd(self, cmd, params=[]):
+		self.s.flushInput()
+		print "Sending command:"
+		print cmd
+		print params
+		c = CmdParamString('', initial=str(cmd))
+		buf = c.to_buffer()
+		for p in params:
+			buf += p.to_buffer()
+		buf = struct.pack("B%ss" % len(buf), len(buf), buf)
+		print buf
+		self.s.write(buf)
+		
+	def ping(self, s):
+		c = struct.pack('b5s%ds' % (len(s)+1), 6+len(s), "ping", s)
+		print c
+		self.s.write(c)
 	
 	def read_response(self):
 		length = self.s.read(4)
 		if len(length) != 4:
 			return (None, None)
-		length = struct.unpack('>I', length)
+		length = struct.unpack('<I', length)
 		data = ''
 		while True:
 			newdata = self.s.read(length, timeout=timeout)
@@ -42,7 +57,6 @@ class LoggerLink:
 		retcode = self.s.read(2, timeout=timeout)
 		self.s.flushInput()
 		return (data, retcode)
-		
 
 	def connect(self, port):
 		""" Try to open the port and ping the device there
@@ -50,16 +64,34 @@ class LoggerLink:
 		try:
 			self.s = serial.Serial(str(port), self.baud, timeout=1)
 			self.s.flushInput()
-			self.write_cmd("ping")
-			(data, retcode) = self.read_response()
+			self.ping("pong")
+			data = self.read_string_response()
+			print data
 			
-			if(data == "pong" and retcode == "OK"):
+			if(data == "pong"):
 				self.connected = True
 				return True
 			
 		except serial.SerialException:
 			return False
 		return False
+
+	def set_current_time(self):
+		param = CmdParamDateTime('')
+		self.write_cmd("settime", [param])
+		return self.read_return_code() == 0
+	
+	def read_string_response(self):
+		s = ""
+		while True:
+			c = self.s.read(1)
+			if ord(c[0]) == 0:
+				return s
+			s += c[0]
+	def read_return_code(self):
+		response = self.s.read(1)
+		return response[0]
+			
 		
 	def get_command_list(self):
 		""" Query the device for available commands
@@ -67,16 +99,18 @@ class LoggerLink:
 		if not self.connected:
 			return []
 		
-		self.s.flushInput()
 		self.write_cmd("listcmds")
-		data = self.s.read(2000).split("\r\n")[:-2]
-		commands = []
-		for d in data:
-			c = parse_cmd(d)
-			if c:
-				commands.append(c)
+		num_commands = struct.unpack("<I",self.s.read(4))[0]
+		print "%d commands available" % num_commands
+		commands = []		
+		for i in range(num_commands):
+			r = self.read_string_response()
+			cmd = parse_cmd(r)
+			if cmd:
+				commands.append(cmd)
 			else:
-				print "Error parsing %s" % d
+				print "Error parsing %s" % r
+		
 		return commands
 
 	def disconnect(self):

@@ -37,6 +37,9 @@ class LoggerUI(QMainWindow):
 			'&Connect', self
 		)
 		self.connectAction.triggered.connect(self.connect_disconnect)
+				
+		self.set_time_flag = QCheckBox("Set clock on connect?", self)
+		self.set_time_flag.setCheckState(Qt.CheckState.Checked)				
 		
 		self.port_list = PortList(self)
 		self.port_list.click.connect(self.update_port_list)
@@ -45,6 +48,7 @@ class LoggerUI(QMainWindow):
 		self.toolbar.addAction(exitAction)
 		self.toolbar.addAction(self.connectAction)
 		self.toolbar.addWidget(self.port_list)
+		self.toolbar.addWidget(self.set_time_flag)
 		self.update_port_list()
 	
 	def setup_layout(self):
@@ -93,7 +97,6 @@ class LoggerUI(QMainWindow):
 
 			if ll.connect(port):
 				self.on_connect(port)
-
 			else:
 				self.on_disconnect()
 				self.status("Error connecting to port %s" % port)
@@ -103,6 +106,8 @@ class LoggerUI(QMainWindow):
 			QIcon('icons/network-connect-3.png')
 		)
 		self.status("Connected to port %s" % port)
+		if self.set_time_flag.checkState() == Qt.CheckState.Checked:
+			ll.set_current_time()
 		self.action_list.enable()
 		self.action_list.update()
 	
@@ -177,7 +182,7 @@ class ActionList(QListWidget):
 					"<br />" +	"<br/>".join(error_fields))
 				msg.setVisible(True)
 				return
-			print item
+			ll.write_cmd(item[0], item[2])
 			dialog.done(0)
 		
 		cancelbutton.pressed.connect(cancel)
