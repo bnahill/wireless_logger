@@ -1,8 +1,6 @@
 /*!
  @file mma8452q.cpp
- 
- @brief 
- 
+ @brief Body for Freescale \ref MMA8452Q accelerometer class
  @author Ben Nahill <bnahill@gmail.com>
  */
 

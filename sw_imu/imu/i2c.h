@@ -1,14 +1,22 @@
+/*!
+ @file i2c.h
+ @brief Declaration for \ref I2C class
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #ifndef __IMU_I2C_H_
 #define __IMU_I2C_H_
 
 #include "ch.h"
 #include "hal.h"
+#include "imu.h"
 
 //! @addtogroup IMU
 //! @{
 //! @addtogroup I2C
 //! @{
 
+//class I2C : public Lockable {
 class I2C {
 public:
 	/*!
@@ -37,12 +45,14 @@ public:
 	/*!
 	 @brief Lock the mutex for the driver
 	 */
-	void acquire(){i2cAcquireBus(&driver);}
+	void lock(){i2cAcquireBus(&driver);}
 	
 	/*!
 	 @brief Release the mutex for the driver
 	 */
-	void release(){i2cReleaseBus(&driver);}
+	void unlock(){i2cReleaseBus(&driver);}
+	
+	void reconfig_clock();
 	
 	/*!
 	 @brief Get the errors that were encountered

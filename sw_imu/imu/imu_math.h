@@ -1,3 +1,9 @@
+/*!
+ @file imu_math.h
+ @brief A (currently small) library of basic IMU math-related types and functions
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #ifndef __IMU_MATH_H_
 #define __IMU_MATH_H_
 

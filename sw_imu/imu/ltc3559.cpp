@@ -1,3 +1,9 @@
+/*!
+ @file ltc3559.cpp
+ @brief Body for \ref LTC3559 class
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #include "imu/ltc3559.h"
 
 void LTC3559::buck_mode(buck_mode_t new_mode) const{

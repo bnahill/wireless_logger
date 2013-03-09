@@ -1,3 +1,9 @@
+/*!
+ @file ltc3559.h
+ @brief Class declaration for \ref LTC3559 PM module
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #ifndef __IMU_LTC3559_H_
 #define __IMU_LTC3559_H_
 

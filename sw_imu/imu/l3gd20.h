@@ -1,3 +1,9 @@
+/*!
+ @file l3gd20.h
+ @brief Class declaration for \ref L3GD20 gyroscope
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #ifndef __IMU_L3GD20_H_
 #define __IMU_L3GD20_H_
 

@@ -89,6 +89,11 @@ class CmdParam:
 		self.name = name
 		self.doc = doc
 		self.widget = None
+	def update_value(self):
+		pass
+	def __str__(self):
+		self.update_value()
+		return str(self.value)
 		
 class CmdArray:
 	def __init__(self, fields=[]):
@@ -106,6 +111,11 @@ class CmdParamReal(CmdParam):
 		return self.widget
 	def validate(self):
 		return self.widget.hasAcceptableInput()
+	def update_value(self):
+		pass
+	def __str__(self):
+		self.update_value()
+		return str(self.value)
 
 
 class CmdParamInt(CmdParam):
@@ -122,11 +132,18 @@ class CmdParamInt(CmdParam):
 			return False
 		return True
 	def to_buffer(self):
+		self.update_value()
+		return struct.pack("<I",self.value)
+		
+	def update_value(self):
 		if self.widget:
 			self.value = int(self.widget.text())
 		if self.signed:
 			return struct.pack("<i",self.value)
-		return struct.pack("<I",self.value)
+
+	def __str__(self):
+		self.update_value()
+		return str(self.value)
 		
 
 class CmdParamString(CmdParam):
@@ -154,9 +171,16 @@ class CmdParamString(CmdParam):
 		return True
 	
 	def to_buffer(self):
+		self.update_value()
+		return struct.pack('%ds' % (len(self.value)+1), self.value)
+		
+	def update_value(self):
 		if self.widget:
 			self.value = str(self.widget.text())
-		return struct.pack('%ds' % (len(self.value)+1), self.value)
+
+	def __str__(self):
+		self.update_value()
+		return str(self.value)
 
 class CmdParamDateTime(CmdParam):
 	def __init__(self, name, doc="", timestamp=None, params=[]):
@@ -166,6 +190,7 @@ class CmdParamDateTime(CmdParam):
 		else:
 			t = datetime.datetime.now()
 			self.timestamp = t.strftime("%y:%m:%d %H:%M:%S")
+
 	def make_widget(self, parent=None):
 		self.widget = QLineEdit(unicode(self.timestamp),parent)
 		self.widget.setMaxLength(17)
@@ -181,22 +206,35 @@ class CmdParamDateTime(CmdParam):
 		return True
 	
 	def to_buffer(self):
+		self.update_value()
+		return struct.pack("<%dsb" % len(self.timestamp), self.timestamp, 0)
+
+	def update_value(self):
 		if self.widget:
 			if self.widget.text().strip() == "":
 				t = datetime.datetime.now()
 				self.timestamp = t.strftime("%y:%m:%d %H:%M:%S")
 			else:
 				self.timestamp = self.widget.text()
-		return struct.pack("<%dsb" % len(self.timestamp), self.timestamp, 0)
+				
+	def __str__(self):
+		self.update_value()
+		return str(self.value)
+
 
 class CmdParamLogBuffer(CmdParam):
 	def __init__(self, name, doc="", params=None):
 		CmdParam.__init__(self, name, doc)
-		
+		self.value = None
 	def make_widget(self, parent=None):
 		pass
 	def validate(self):
 		return False
+	def update_value(self):
+		pass
+	def __str__(self):
+		self.update_value()
+		return str(self.value)
 
 class CmdParamOptions(CmdParam):
 	pass

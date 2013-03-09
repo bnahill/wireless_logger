@@ -1,8 +1,6 @@
 /*!
- @file 
- 
- @brief 
- 
+ @file mma8452q.h
+ @brief Class declaration for Freescale \ref MMA8452Q accelerometer
  @author Ben Nahill <bnahill@gmail.com>
  */
 

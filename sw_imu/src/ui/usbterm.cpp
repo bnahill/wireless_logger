@@ -148,8 +148,8 @@ int32_t USBTerm::cmd_settime(const char* cmd){
 	
 	time.hours_ten = cmd[0] - '0';
 	time.hours_u = cmd[1] - '0';
-	time.minutes_ten = 5;//cmd[3] - '0';
-	time.minutes_u = 5;//cmd[4] - '0';
+	time.minutes_ten = cmd[3] - '0';
+	time.minutes_u = cmd[4] - '0';
 	time.seconds_ten = cmd[6] - '0';
 	time.seconds_u = cmd[7] - '0';
 	

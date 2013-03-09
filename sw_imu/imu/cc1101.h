@@ -1,9 +1,16 @@
+/*!
+ @file cc1101.h
+ @brief Declaration of \ref CC1101 class
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #ifndef __IMU_CC1101_H_
 #define __IMU_CC1101_H_
 
 #include "ch.h"
 #include "imu/imu.h"
 #include "imu/spi.h"
+#include "array"
 
 //! @addtogroup RF
 //! @{
@@ -108,16 +115,18 @@ public:
 		
 	}
 	
-	void config(reg_config_t const * initial_config,
-		        uint_fast8_t init_config_len){
+	
+	void config(reg_config_t const * const initial_config,
+		        uint_fast8_t const init_config_len){
 		reg_config_t const * iter;
-		if(initial_config != nullptr){
-			for(iter = initial_config;
-				iter < initial_config + init_config_len;
-				iter++)
-			{
-				write_reg(iter->reg, iter->val);
-			}
+		if(initial_config == nullptr)
+			return;
+		
+		for(iter = initial_config;
+			iter < initial_config + init_config_len;
+			iter++)
+		{
+			write_reg(iter->reg, iter->val);
 		}
 	}
 	
@@ -160,23 +169,26 @@ public:
 		write_reg((reg_t)gdo, gdo_mode);
 	}
 	
-	typedef union{
-		struct{
-			uint8_t chip_rdy     : 1;
-			enum {
-				ST_IDLE      = 0,
-				ST_RX        = 1,
-				ST_TX        = 2,
-				ST_FSTXON    = 3,
-				ST_CALIBRATE = 4,
-				ST_SETTLING  = 5,
-				ST_RX_OFLOW  = 6,
-				ST_TX_OFLOW  = 7
-			} state              : 3;
-			uint8_t bytes_avail  : 4;
-		} s;
-		uint8_t u;
-	} status_t;
+	typedef enum {
+		ST_IDLE      = 0,
+		ST_RX        = 1,
+		ST_TX        = 2,
+		ST_FSTXON    = 3,
+		ST_CALIBRATE = 4,
+		ST_SETTLING  = 5,
+		ST_RX_OFLOW  = 6,
+		ST_TX_OFLOW  = 7
+	} state_t;
+	
+	struct status_t {
+		status_t(uint8_t u){
+			*this = (status_t)u;
+		}
+		status_t(){}
+		uint8_t chip_rdy     : 1;
+		state_t state        : 3;
+		uint8_t bytes_avail  : 4;
+	};
 	
 	static_assert(sizeof(status_t) == 1, "status_t of incorrect size");
 	
@@ -216,13 +228,13 @@ public:
 protected:
 	status_t transmit_data(uint_fast8_t const * data, uint_fast8_t len){
 		status_t ret;
-		ret.u = spi.write_sync(slave_config, REG_TX_FIFO, len, (void const *)data);
+		ret = spi.write_sync(slave_config, REG_TX_FIFO, len, (void const *)data);
 		return ret;
 	}
 	
 	status_t receive_data(uint_fast8_t * dst, uint_fast8_t len){
 		status_t ret;
-		ret.u = spi.read_sync(slave_config, REG_RX_FIFO, len, dst);
+		ret = spi.read_sync(slave_config, REG_RX_FIFO, len, dst);
 		return ret;
 	}
 	

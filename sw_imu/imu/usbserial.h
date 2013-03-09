@@ -1,3 +1,11 @@
+/*!
+ @file 
+ 
+ @brief 
+ 
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #ifndef __IMU_USB_SERIAL_H_
 #define __IMU_USB_SERIAL_H_
 

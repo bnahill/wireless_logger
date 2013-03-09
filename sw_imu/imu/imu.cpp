@@ -1,3 +1,9 @@
+/*!
+ @file imu.cpp
+ @brief Bodies for IMU utilities
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #include "imu.h"
 
 char *uint_to_string(uint32_t i, char * s, bool ignore_leading){

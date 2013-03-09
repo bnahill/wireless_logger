@@ -1,3 +1,9 @@
+/*!
+ @file l3gd20.cpp
+ @brief Templated body for \ref L3GD20 gyroscope class
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #ifndef __IMU_L3GD20_H_
 #error "This file must be included by l3gd20.h"
 #endif

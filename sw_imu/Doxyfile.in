@@ -151,6 +151,7 @@ EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = ${CMAKE_CURRENT_SOURCE_DIR}/os/* \
                          ${CMAKE_CURRENT_SOURCE_DIR}/doc/* \
                          ${CMAKE_CURRENT_SOURCE_DIR}/CMSIS/* \
+                         ${CMAKE_CURRENT_SOURCE_DIR}/yaffs/* \
                          ${CMAKE_CURRENT_SOURCE_DIR}/build/*
 EXCLUDE_SYMBOLS        = 
 EXAMPLE_PATH           = 

@@ -1,3 +1,12 @@
+/*!
+ @file ext.h
+ @brief Declarations and body for \ref ExtCallback class
+ 
+ Body is here too becuase all of this should be inlined.
+ 
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #ifndef __IMU_EXT_H_
 #define __IMU_EXT_H_
 

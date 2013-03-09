@@ -51,11 +51,12 @@ cmake_minimum_required(VERSION 2.8)
 # Source locations
 ########################################################
 
-set(IMU_DIR imu)
+set(IMU_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imu)
 # Path to CMSIS
-set(CMSIS_DIR CMSIS)
+set(CMSIS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMSIS)
 set(DSP_SRC ${CMSIS_DIR}/DSP_Lib/Source)
 set(OS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/os)
+set(FS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/yaffs/direct)
 
 
 
@@ -76,7 +77,9 @@ set(LTO )#"-flto")
 
 set(MCU cortex-m4)
 
-set(MCFLAGS "-mcpu=${MCU} -g -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -D__NEWLIB__ -fomit-frame-pointer")
+
+set(FSFLAGS "-DCONFIG_YAFFS_DEFINES_TYPES -DCONFIG_YAFFS_DIRECT -DCONFIG_YAFFS_PROVIDE_DEFS -DY_LOFF_T=int")
+set(MCFLAGS "-mcpu=${MCU} -g -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fsingle-precision-constant -D__NEWLIB__ ${FSFLAGS}")# -fomit-frame-pointer")
 
 add_definitions(${MCFLAGS})
 add_definitions(-DHSE_VALUE=8000000 -DARM_MATH_CM4 -D__FPU_PRESENT)
@@ -123,6 +126,8 @@ include_directories(
 	${OS_DIR}/hal/platforms/STM32/RTCv2
 	
 	${IMU_DIR}
+	
+	${FS_DIR}
 	
 	src/platform
 )
@@ -194,6 +199,19 @@ set(OS_SOURCES
 	${OS_DIR}/various/chrtclib.c
 )
 
+set(FS_SOURCES
+	${FS_DIR}/yaffs_allocator.c
+	${FS_DIR}/yaffs_checkptrw.c
+	${FS_DIR}/yaffs_ecc.c
+	${FS_DIR}/yaffs_guts.c
+	${FS_DIR}/yaffs_nand.c
+	${FS_DIR}/yaffs_packedtags1.c
+	${FS_DIR}/yaffs_packedtags2.c
+	${FS_DIR}/yaffs_qsort.c
+	${FS_DIR}/yaffs_tagscompat.c
+	${FS_DIR}/yaffs_tagsmarshall.c
+)
+
 set(APP_SOURCES
 	src/main.cpp
 	src/acquisition.cpp
@@ -207,6 +225,7 @@ set(APP_SOURCES
 	src/ui/usbscreen.cpp
 	src/ui/usbterm.cpp
 	src/ui/usbfile.cpp
+	src/ui/rngscreen.cpp
 )
 
 
@@ -215,7 +234,9 @@ set(IMU_SOURCES
 	${IMU_DIR}/mma8452q.cpp
 	${IMU_DIR}/mag3110.cpp
 	${IMU_DIR}/i2c.cpp
-	${IMU_DIR}/ssd1306.cpp
+	${IMU_DIR}/spi.cpp
+	${IMU_DIR}/ssd1306_spec.cpp
+	${IMU_DIR}/framebuffer_spec.cpp
 	${IMU_DIR}/imu.cpp
 	${IMU_DIR}/cc1101.cpp
 	${IMU_DIR}/guardian_spec.cpp
@@ -238,7 +259,8 @@ set(DSP_SOURCES
 #add_library(chibios STATIC ${OS_SOURCES})
 add_library(dsp_lib STATIC ${DSP_SOURCES})
 add_library(imu_lib STATIC ${IMU_SOURCES})
-add_executable(${OUTFILE} ${APP_SOURCES} ${OS_SOURCES})
+add_library(fs_lib STATIC ${FS_SOURCES})
+add_executable(${OUTFILE} ${APP_SOURCES} ${OS_SOURCES} ${FS_SOURCES})
 target_link_libraries(${OUTFILE} imu_lib dsp_lib gcc c)
 
 
@@ -250,6 +272,39 @@ set_target_properties(${OUTFILE} PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 #set_target_properties(imu_lib PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 #set_target_properties(cmsis_dsp PROPERTIES COMPILE_FLAGS "-w -O2")
 
+
+##############################################################
+# Assembly output
+##############################################################
+
+add_custom_command(OUTPUT ${TARGET}.lst COMMAND ${CMAKE_OBJDUMP} -S --disassemble ${OUTFILE} > ${TARGET}.lst DEPENDS ${OUTFILE})
+add_custom_target(assembly_output ALL DEPENDS ${TARGET}.lst)
+
+
+
+##############################################################
+# Configuration for OpenOCD
+##############################################################
+
+set(OPENOCD openocd)
+set(OPENOCD_SCRIPTS board/stm32f4discovery.cfg)
+
+set(OPENOCD_ARGS "")
+foreach(s ${OPENOCD_SCRIPTS})
+	set(OPENOCD_ARGS "${OPENOCD_ARGS} -f ${s}")
+endforeach(s)
+
+add_custom_target(openocd COMMAND ${OPENOCD} ${OPENOCD_ARGS} -c "stm32f4x.cpu configure -rtos auto"
+	COMMENT "Launching OpenOCD..."
+)
+
+add_custom_target(openocd_no_os COMMAND ${OPENOCD} ${OPENOCD_ARGS}
+	COMMENT "Launching OpenOCD..."
+)
+
+configure_file(${CMAKE_SOURCE_DIR}/start.gdb.in ${CMAKE_CURRENT_BINARY_DIR}/start.gdb)
+set(GDB_ARGS -x start.gdb)
+
 ##############################################################
 # Configuration for GDB
 ##############################################################
@@ -257,8 +312,6 @@ set_target_properties(${OUTFILE} PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
 set(GDB    ${TC_PREFIX}gdb)
 set(GDBTUI ${TC_PREFIX}gdbtui)
 
-configure_file(${CMAKE_SOURCE_DIR}/start.gdb.in ${CMAKE_CURRENT_BINARY_DIR}/start.gdb)
-set(GDB_ARGS -x start.gdb)
 if(${DETECTED_HOST} STREQUAL "Windows")
 endif(${DETECTED_HOST} STREQUAL "Windows")
 
@@ -277,32 +330,12 @@ add_dependencies(gdbtui gdb_script)
 add_dependencies(ddd gdb_script)
 
 
-
-##############################################################
-# Assembly output
-##############################################################
-
-add_custom_command(OUTPUT ${TARGET}.lst COMMAND ${CMAKE_OBJDUMP} -S --disassemble ${OUTFILE} > ${TARGET}.lst DEPENDS ${OUTFILE})
-add_custom_target(assembly_output ALL DEPENDS ${TARGET}.lst)
-
-##############################################################
-# Configuration for OpenOCD
-##############################################################
-
-set(OPENOCD openocd)
-set(OPENOCD_SCRIPTS
-	board/stm32f4discovery.cfg
+add_custom_command(
+	OUTPUT ${TARGET}_size DEPENDS ${OUTFILE}
+	COMMAND arm-none-eabi-size --format=berkeley ${OUTFILE}
 )
-foreach(s ${OPENOCD_SCRIPTS})
-	set(OPENOCD_ARGS ${OPENOCD_ARGS} -f ${s})
-endforeach(s)
-
-add_custom_target(openocd COMMAND ${OPENOCD} ${OPENOCD_ARGS} -c "stm32f4x.cpu configure -rtos auto"
-	COMMENT "Launching OpenOCD..."
-)
-
-add_custom_target(openocd_no_os COMMAND ${OPENOCD} ${OPENOCD_ARGS}
-	COMMENT "Launching OpenOCD..."
+add_custom_target(
+	${TARGET}_outputs ALL DEPENDS ${TARGET}_size #${name}.map ${name}.bin ${name}.ihx ${name}.dump ${name}.rom
 )
 
 ##############################################################

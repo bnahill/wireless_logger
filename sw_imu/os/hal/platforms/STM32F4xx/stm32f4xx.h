@@ -262,9 +262,12 @@ typedef __I int32_t vsc32;  /*!< Read Only */
 typedef __I int16_t vsc16;  /*!< Read Only */
 typedef __I int8_t vsc8;   /*!< Read Only */
 
-typedef uint32_t  u32;
-typedef uint16_t u16;
-typedef uint8_t  u8;
+//
+// YAFFS wants to define these
+//
+// typedef uint32_t  u32;
+// typedef uint16_t u16;
+// typedef uint8_t  u8;
 
 typedef const uint32_t uc32;  /*!< Read Only */
 typedef const uint16_t uc16;  /*!< Read Only */

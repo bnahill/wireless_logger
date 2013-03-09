@@ -13,9 +13,12 @@ msg_t UI::run(){
 	button[1].clear_callbacks();
 	button[2].clear_callbacks();
 	
-	button[0].set_press_handler((button_t::button_handler)handle_right, (uint32_t*)this);
-	button[1].set_press_handler((button_t::button_handler)handle_select, (uint32_t*)this);
-	button[2].set_press_handler((button_t::button_handler)handle_left, (uint32_t*)this);
+	button[0].set_press_handler((button_t::button_handler)handle_right,
+	                            reinterpret_cast<uint32_t *>(this));
+	button[1].set_press_handler((button_t::button_handler)handle_select,
+	                            reinterpret_cast<uint32_t *>(this));
+	button[2].set_press_handler((button_t::button_handler)handle_left,
+	                            reinterpret_cast<uint32_t *>(this));
 	start_suspend_timer();
 	menu.exec();
 	return 0;
@@ -34,6 +37,19 @@ msg_t UI::run_monitor(){
 	return 0;
 }
 
+eventmask_t UI::handle_evt(eventmask_t evt){
+	switch(evt){
+	case MASK_RESUME:
+		resume();
+		break;
+	case MASK_SUSPEND:
+		suspend();
+		break;
+	default:
+		break;
+	}
+	return evt;
+}
 
 void UI::start(){
 	if(thread){
@@ -46,3 +62,4 @@ void UI::start(){
 	                                   NORMALPRIO - 2,
 	                                   (tfunc_t)start_monitor_thread, this);
 }
+

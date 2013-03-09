@@ -1,3 +1,11 @@
+/*!
+ @file 
+ 
+ @brief 
+ 
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #include "imu/rtc.h"
 
 template <RTCDriver &driver>

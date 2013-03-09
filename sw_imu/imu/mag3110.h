@@ -1,7 +1,7 @@
 /*!
- @file 
+ @file mag3110.h
  
- @brief 
+ @brief Class definition for Freescale \ref MAG3110 magnetometer
  
  @author Ben Nahill <bnahill@gmail.com>
  */

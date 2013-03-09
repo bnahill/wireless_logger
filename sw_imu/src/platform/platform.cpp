@@ -10,6 +10,8 @@
 #include "platform.h"
 #include "platform_usbserial.h"
 
+#include "imu/ssd1306.cpp"
+
 
 I2C Platform::i2c1(I2CD1, OPMODE_I2C, FAST_DUTY_CYCLE_2, 100000);
 MMA8452Q Platform::acc1(Platform::i2c1, 0x1C);
@@ -90,6 +92,11 @@ LTC3559 Platform::reg1({GPIOC, 2}, {GPIOC, 1}, {GPIOA, 4}, {GPIOA, 1});
 // OLED display platform configuration
 ///////////////////////////////////////////
 
+
+template class SSD1306<4,128>;
+template class FrameBuffer<4, 128>;
+
+
 LY091WG15 Platform::oled(spi2,
                         {NULL, GPIOB, 11, SPI_CR1_BR_1 |
                          SPI_CR1_CPOL | SPI_CR1_CPHA},
@@ -120,6 +127,13 @@ void Platform::early_init(){
 	extStart(&EXTD1, &extcfg);
 }
 
+
+// Lockable * const Platform::buses[] = {
+// 	&i2c1,
+// 	&spi1,
+// 	&spi2,
+// 	nullptr
+// };
 
 extern "C" {
 void NMIVector(void){while(1);}

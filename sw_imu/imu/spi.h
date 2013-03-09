@@ -1,16 +1,34 @@
+/*!
+ @file 
+ 
+ @brief 
+ 
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #ifndef __IMU_SPI_H_
 #define __IMU_SPI_H_
 
 #include "ch.h"
 #include "hal.h"
+#include "imu/imu.h"
 
 //! @addtogroup IMU
 //! @{
 //! @addtogroup SPI
 //! @{
 
+//class SPI : public LockableSem {
 class SPI {
 public:
+	/*
+	typedef struct {
+		gpio_pin_t nss;
+		uint32_t max_freq;
+		uint32_t cr1_flags;
+	} slave_config_t;
+	*/
+	
 	typedef SPIConfig slave_config_t;
 	
 	/*
@@ -82,41 +100,15 @@ public:
 		}
 	};
 	
-	SPI(SPIDriver &driver) :
-		driver(driver),
-		is_init(false)
-	{
-		spiObjectInit(&driver);
-		chMBInit(&mb, mb_buffer, mb_size);
-	}
+	SPI(SPIDriver &driver);
 	
-	void init(){
-		//! Check to make sure this is only initialized once
-		chSysLock();
-		if(!is_init)
-			is_init = true;
-		else {
-			chSysUnlock();
-			return;
-		}
-		chSysUnlock();
-		
-		thread = chThdCreateStatic(waSPIThread, stack_size, priority, (tfunc_t) start_thread, this);
-	}
+	void init();
 	
-	void transfer(xfer_t &xfer, bool important=false){
-		if(important)
-			chMBPostAhead(&mb, (msg_t) &xfer, TIME_INFINITE);
-		else
-			chMBPost(&mb, (msg_t) &xfer, TIME_INFINITE);
-	}
+	void transfer(xfer_t &xfer, bool important=false);
 	
-	void transferI(xfer_t &xfer, bool important=false){
-		if(important)
-			chMBPostAheadI(&mb, (msg_t) &xfer);
-		else
-			chMBPostI(&mb, (msg_t) &xfer);
-	}
+	void transferI(xfer_t &xfer, bool important=false);
+	
+	void reconfig_clock();
 	
 	/*!
 	 @brief Perform a synchronous exchange with a peripheral
@@ -128,16 +120,7 @@ public:
 	 */
 	void exchange_sync(slave_config_t const &config, size_t n,
 	                   void const * tx_buff, void * rx_buff,
-	                   bool important=false){
-		Semaphore done_sem;
-		xfer_t xfer(&config, n, tx_buff, rx_buff);
-		xfer.tc_sem(&done_sem);
-		chSemInit(&done_sem, 0);
-		
-		transfer(xfer, important);
-		
-		chSemWait(&done_sem);
-	}
+	                   bool important=false);
 	
 	/*!
 	 @brief Perform a synchronous transmission
@@ -147,16 +130,7 @@ public:
 	 @param important Force to front of queue?
 	 */
 	void send_sync(slave_config_t const &config, size_t n,
-	               void const * tx_buff, bool important=false){
-		Semaphore done_sem;
-		xfer_t xfer(&config, n, tx_buff);
-		xfer.tc_sem(&done_sem);
-		chSemInit(&done_sem, 0);
-		
-		transfer(xfer, important);
-		
-		chSemWait(&done_sem);
-	}
+	               void const * tx_buff, bool important=false);
 	
 	/*!
 	 @brief Perform a synchronous transmission
@@ -168,20 +142,7 @@ public:
 	 @return The value read during address transmission
 	 */
 	uint16_t write_sync(slave_config_t const &config, uint16_t addr, size_t n,
-	                void const * tx_buff, bool important=false){
-		Semaphore done_sem;
-		xfer_t xfer(&config, n, tx_buff);
-		xfer.tc_sem(&done_sem);
-		xfer.operation = OP_WRITE;
-		xfer.addr = addr;
-		chSemInit(&done_sem, 0);
-		
-		transfer(xfer, important);
-		
-		chSemWait(&done_sem);
-		
-		return xfer.addr;
-	}
+	                void const * tx_buff, bool important=false);
 	
 	/*!
 	 @brief Perform a synchronous transmission
@@ -193,20 +154,7 @@ public:
 	 @return The value read during address transmission
 	 */
 	uint16_t read_sync(slave_config_t const &config, uint16_t addr, size_t n,
-	                void * rx_buff, bool important=false){
-		Semaphore done_sem;
-		xfer_t xfer(&config, n, OP_READ);
-		xfer.tc_sem(&done_sem);
-		xfer.addr = addr;
-		xfer.rx_buff = rx_buff;
-		chSemInit(&done_sem, 0);
-		
-		transfer(xfer, important);
-		
-		chSemWait(&done_sem);
-		
-		return xfer.addr;
-	}
+	                void * rx_buff, bool important=false);
 	
 	//void acquire(){spiAcquireBus(&driver);}
 	//void release(){spiReleaseBus(&driver);}
@@ -223,44 +171,7 @@ protected:
 	
 	bool do_sleep;
 	
-	msg_t run(){
-		xfer_t * xfer;
-		is_init = true;
-		while(true){
-			// Receive a new item to send
-			if(RDY_OK != chMBFetch(&mb, (msg_t *) &xfer, TIME_INFINITE))
-				continue;
-			
-			spiStart(&driver, xfer->config);
-			// Run callback if available
-			if(xfer->starting_callback){
-				xfer->starting_callback(xfer->starting_param);
-			}
-			spiSelect(&driver);
-			switch(xfer->operation){
-			case OP_WRITE:
-				spiExchange(&driver, 1, &xfer->addr, &xfer->addr);
-				spiSend(&driver, xfer->n, xfer->tx_buff);
-				break;
-			case OP_READ:
-				spiExchange(&driver, 1, &xfer->addr, &xfer->addr);
-				spiReceive(&driver, xfer->n, xfer->rx_buff);
-				break;
-			case OP_EXCHANGE:
-				spiExchange(&driver, xfer->n, xfer->tx_buff, xfer->rx_buff);
-				break;
-			case OP_SEND:
-				spiSend(&driver, xfer->n, xfer->tx_buff);
-				break;
-			}
-			spiUnselect(&driver);
-			if(xfer->tc_callback){
-				xfer->tc_callback(xfer->tc_param);
-			}
-			spiStop(&driver);
-		}
-		return 0;
-	}
+	msg_t run();
 	
 	static constexpr uint32_t stack_size = 1024;
 	static constexpr tprio_t priority = HIGHPRIO;
@@ -271,7 +182,7 @@ protected:
 	Mailbox mb;
 	msg_t mb_buffer[mb_size];
 	
-	static msg_t start_thread(SPI *spi){
+	static msg_t start_thread(SPI * spi){
 		spi->run();
 		return 0;
 	}

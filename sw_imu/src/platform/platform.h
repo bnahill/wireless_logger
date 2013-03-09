@@ -34,6 +34,7 @@
 #include <imu/rtc.h>
 #include <imu/cc1101.h>
 #include <imu/guardian.h>
+#include "rng.h"
 
 /*!
  @brief Platform-dependent component definitions
@@ -70,6 +71,8 @@ namespace Platform {
 	
 	extern CC1101 rf1;
 	extern GuardianRF guardian1;
+	
+	//extern Lockable * const buses[];
 	
 	void early_init();
 };

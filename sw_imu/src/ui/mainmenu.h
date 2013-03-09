@@ -24,6 +24,7 @@ private:
 	static void launch_sensor_view_bar();
 	static void launch_sensor_view_num();
 	static void launch_usb_mode();
+	static void launch_rng();
 	
 	Menu menu;
 	

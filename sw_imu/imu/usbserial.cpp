@@ -1,3 +1,11 @@
+/*!
+ @file 
+ 
+ @brief 
+ 
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #include "usbserial.h"
 #include "platform.h"
 

@@ -1,8 +1,6 @@
 /*!
  @file mag3110.cpp
- 
- @brief 
- 
+ @brief Body for \ref MAG3110 class
  @author Ben Nahill <bnahill@gmail.com>
  */
 

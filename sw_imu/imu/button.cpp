@@ -1,3 +1,9 @@
+/*!
+ @file button.cpp
+ @brief Body for \ref Button class
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #include "button.h"
 
 template <EXTDriver &driver>

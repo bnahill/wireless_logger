@@ -43,19 +43,7 @@ public:
 	 @param evt New event mask
 	 @return Mask still to handle
 	 */
-	eventmask_t handle_evt(eventmask_t evt){
-		switch(evt){
-		case MASK_RESUME:
-			resume();
-			break;
-		case MASK_SUSPEND:
-			suspend();
-			break;
-		default:
-			break;
-		}
-		return evt;
-	}
+	eventmask_t handle_evt(eventmask_t evt);
 	
 	//! A singe static instance
 	static UI ui;

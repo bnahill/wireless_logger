@@ -1,3 +1,9 @@
+/*!
+ @file button.h
+ @brief Class definition for \ref Button class
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #ifndef __BUTTON_H_
 #define __BUTTON_H_
 

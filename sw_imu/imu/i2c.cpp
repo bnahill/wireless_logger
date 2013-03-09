@@ -1,3 +1,9 @@
+/*!
+ @file i2c.cpp
+ @brief Body for \ref I2C class
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #include "imu/i2c.h"
 
 I2C::I2C(I2CDriver& driver, i2copmode_t opmode,
@@ -19,17 +25,23 @@ void I2C::close(){
 	}
 }
 
+void I2C::reconfig_clock(){
+	i2cStop(&driver);
+	i2cStart(&driver, &config);
+}
+
+
 msg_t I2C::transmit(i2caddr_t addr, const uint8_t* txbuf, size_t txbytes,
                     uint8_t* rxbuf, size_t rxbytes, systime_t timeout){
 	msg_t msg;
-	acquire();
+	lock();
 	msg = i2cMasterTransmitTimeout(&driver, addr, txbuf, txbytes, rxbuf,
 	                               rxbytes, timeout);
 	if(msg == RDY_TIMEOUT){
 		i2cStop(&driver);
 		i2cStart(&driver, &config);
 	}
-	release();
+	unlock();
 	return msg;
 }
 
@@ -37,13 +49,13 @@ msg_t I2C::transmit(i2caddr_t addr, const uint8_t* txbuf, size_t txbytes,
 msg_t I2C::receive(i2caddr_t addr, uint8_t* rxbuf, size_t rxbytes,
                    systime_t timeout){
 	msg_t msg;
-	acquire();
+	lock();
 	msg = i2cMasterReceiveTimeout(&driver, addr, rxbuf, rxbytes, timeout);
 	if(msg == RDY_TIMEOUT){
 		i2cStop(&driver);
 		i2cStart(&driver, &config);
 	}
-	release();
+	unlock();
 	return msg;
 }
 

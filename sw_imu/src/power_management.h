@@ -3,6 +3,7 @@
 
 #include "ch.h"
 #include "hal.h"
+#include "platform/platform.h"
 
 class PowerManagement {
 public:
@@ -14,9 +15,11 @@ public:
 	} speed_t;
 	
 	static void set_speed(speed_t speed){
+		lock_buses();
 		chSysLock();
 		if(speed == current_speed) {
 			chSysUnlock();
+			unlock_buses();
 			return;
 		}
 		
@@ -37,6 +40,7 @@ public:
 		
 		current_speed = speed;
 		chSysUnlock();
+		unlock_buses();
 	}
 
 protected:
@@ -65,6 +69,20 @@ protected:
 	
 	static bool pll_ready(){
 		return RCC->CR | RCC_CR_PLLRDY;
+	}
+	
+	static void lock_buses(){
+// 		Lockable * const * iter;
+// 		for(iter = Platform::buses; *iter; iter++){
+// 			(*iter)->lock();
+// 		}
+	}
+	
+	static void unlock_buses(){
+// 		Lockable * const * iter;
+// 		for(iter = Platform::buses; *iter; iter++){
+// 			(*iter)->unlock();
+// 		}
 	}
 };
 

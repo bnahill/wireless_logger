@@ -1,10 +1,20 @@
+/*!
+ @file imu.h
+ @brief Declarations for common IMU functions and types
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #ifndef __IMU_H_
 #define __IMU_H_
+
+//! @addtogroup IMU
+//! @{
+//! @addtogroup Util
+//! @{
 
 #ifndef BIT
 #define BIT(x) (1 << x)
 #endif
-
 
 #include "imu/imu_math.h"
 
@@ -64,5 +74,32 @@ struct gpio_pin_t {
 char *uint_to_string(uint32_t i, char * s, bool ignore_leading=true);
 
 void float_to_string(float f, char * s);
+
+//! @} @}
+
+// A class which must be locked to use
+// class Lockable {
+// public:
+// 	virtual void lock() = 0;
+// 	virtual void unlock() = 0;
+// 	virtual void reconfig_clock() = 0;
+// };
+// 
+// class LockableSem : public Lockable {
+// public:
+// 	void lock(){
+// 		chSemWait(&sem);
+// 	}
+// 	
+// 	void unlock(){
+// 		chSemSignal(&sem);
+// 	}
+// protected:
+// 	LockableSem(){
+// 		chSemInit(&sem, 1);
+// 	}
+// 	
+// 	Semaphore sem;
+// };
 
 #endif // __IMU_H_

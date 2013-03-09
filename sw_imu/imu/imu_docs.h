@@ -1,6 +1,14 @@
 /*!
-@defgroup IMU IMU Support
+ @file imu_docs.h
+ @brief Doxygen-compatible high-level documentation
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
+/*!
+@defgroup IMU IMU Support Library
+@brief Library of reusable and parameterized blocks for an IMU and more
 @{
+
 A set of general purpose drivers buit around ChibiOS for various sensors and
 peripherals commonly used in an IMU. They are designed for the STM32F4 but 
 are intended to be as generic as possible and should work unaltered for any
@@ -13,7 +21,18 @@ These devices must be instantiated for your specific configuration in the
 platform configuration.
 
 
+@defgroup Util Utilies
+@{
+	
+@}
+
 @defgroup RF RF Drivers
+@{
+
+@}
+
+
+@defgroup CGM Continuous Glucose Monitor Interface
 @{
 
 @}

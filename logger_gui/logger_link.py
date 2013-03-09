@@ -85,6 +85,8 @@ class LoggerLink:
 		s = ""
 		while True:
 			c = self.s.read(1)
+			if not c:
+				return None
 			if ord(c[0]) == 0:
 				return s
 			s += c[0]

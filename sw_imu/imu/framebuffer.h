@@ -1,3 +1,9 @@
+/*!
+ @file framebuffer.h
+ @brief Class declaration for \ref Framebuffer class
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #ifndef __IMU_FRAMEBUFFER_H_
 #define __IMU_FRAMEBUFFER_H_
 
@@ -59,7 +65,10 @@ public:
 	 */
 	template<class font_class>
 	uint32_t write_text(char const * text, uint8_t page, uint8_t column,
-	                uint32_t max_end_column = columns);
+	                uint32_t max_end_column = columns){
+		return write_text_generic(font_class::write_text, text, page,
+		                          column, max_end_column);
+	}
 	
 	/*!
 	 @brief Write text on the framebuffer centered at a given point
@@ -75,9 +84,16 @@ public:
 	 */
 	template<class font_class>
 	uint32_t write_text_centered(char const * text, uint8_t page,
-	                             uint8_t center_column, uint32_t max_width);
+	                             uint8_t center_column, uint32_t max_width){
+		uint32_t width = font_class::get_num_cols(text);
+		uint32_t start = max((int)(center_column - (width / 2)), (int)0);
+		return write_text_generic(font_class::write_text, text, page, start,
+		                          max(start + max_width, columns));
+	}
 	
 	
+// 	bool write_text(uint8_t * buff, uint8_t line, char const * text,
+// 	                       uint32_t &n_cols, uint32_t max_cols = 0 - 1);
 	
 	/*!
 	 @brief Draw a horizontally with a bit mask
@@ -149,9 +165,23 @@ protected:
 	
 	//! A lock to serialize access to the update bounds of the framebuffer
 	Mutex mutex;
+	
+	typedef bool (write_text_func_t(uint8_t *, uint8_t, char const *, uint32_t &, uint32_t));
+	
+	/*!
+	 @brief Write text on the framebuffer
+	 @tparam font_class The class of font to write with
+	 @param text The text to write
+	 @param page The page to start on
+	 @param column The column to start on
+	
+	 The height of the result depends on the font. It is the responsibility of
+	 the caller to make sure that this doesn't overflow the buffer.
+	*/
+	uint32_t write_text_generic(write_text_func_t f, char const * text,
+	                            uint8_t page, uint8_t column,
+	                            uint32_t max_end_column = columns);
 };
-
-#include "framebuffer.cpp"
 
 //! @} @}
 

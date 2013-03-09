@@ -1,3 +1,14 @@
+/*!
+ @file framebuffer.cpp
+ 
+ @brief Templated body for \ref Framebuffer class
+ 
+ @note This file is not compiled directly; It should be included by your
+ platform.
+ 
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #include "imu/framebuffer.h"
 
 //! @addtogroup IMU
@@ -38,20 +49,11 @@ void FrameBuffer< pages, columns >::clear(){
 	clear_area();
 }
 
-/*!
-	@brief Write text on the framebuffer
-	@tparam font_class The class of font to write with
-	@param text The text to write
-	@param page The page to start on
-	@param column The column to start on
-	
-	The height of the result depends on the font. It is the responsibility of
-	the caller to make sure that this doesn't overflow the buffer.
-	*/
+
 template <uint32_t pages, uint32_t columns>
-template<class font_class>
-uint32_t FrameBuffer< pages, columns >::write_text(char const * text,
-	  uint8_t page, uint8_t column, uint32_t max_end_column){
+uint32_t FrameBuffer< pages, columns >::write_text_generic(
+      write_text_func_t f, char const * text, uint8_t page,
+	  uint8_t column, uint32_t max_end_column){
 	uint32_t i = 0;
 	uint32_t n_cols = 0;
 	
@@ -64,31 +66,24 @@ uint32_t FrameBuffer< pages, columns >::write_text(char const * text,
 	limits.x_min = min(column, limits.x_min);
 	while(page < pages){
 		// Take take the i-th row of the printed text
-		if(!font_class::write_text(fb[page] + column, i, text, n_cols,
+		if(!f(fb[page] + column, i, text, n_cols,
 			                       max_end_column - column)){
 			limits.x_max = max(min(n_cols + column, columns), limits.x_max);
 			limits.y_max = max(min(page, pages), limits.y_max);
 			break;
 		}
+		
 		page += 1;
 		i += 1;
+	} if (pages == page){
+		limits.y_max = pages;
+		limits.x_max = max(min(n_cols + column, columns), limits.x_max);
 	}
 	
 	unlock();
 	
 	return n_cols + column;
 }
-
-template <uint32_t pages, uint32_t columns>
-template<class font_class>
-uint32_t FrameBuffer< pages, columns >::write_text_centered(char const * text,
-	  uint8_t page, uint8_t center_column, uint32_t max_width) {
-	uint32_t width = font_class::get_num_cols(text);
-	uint32_t start = max((int)(center_column - (width / 2)), (int)0);
-	
-	return write_text<font_class>(text, page, start, max(start + max_width, columns));
-}
-
 
 template <uint32_t pages, uint32_t columns>
 void FrameBuffer< pages, columns >::draw_horizontal_mask(uint8_t page,

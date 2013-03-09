@@ -1,3 +1,11 @@
+/*!
+ @file 
+ 
+ @brief 
+ 
+ @author Ben Nahill <bnahill@gmail.com>
+ */
+
 #ifndef __IMU_RTC_H_
 #define __IMU_RTC_H_
 
