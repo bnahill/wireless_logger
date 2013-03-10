@@ -1,7 +1,9 @@
 /*!
- @file 
+ @file usbserial.cpp
+ @brief Templated body for \ref USBSerial driver
  
- @brief 
+ @note This file is not to be directly compiled; it must be included by
+ whoever instantiates it.
  
  @author Ben Nahill <bnahill@gmail.com>
  */

@@ -8,6 +8,7 @@
 
 #include "acquisition.h"
 
+
 EventSource Acquisition::tick_source;
 EventSource Acquisition::tick_source2;
 EventSource Acquisition::tick_source4;
@@ -18,6 +19,9 @@ EventSource Acquisition::sensor_source;
 
 
 GPTDriver &Acquisition::timer = GPTD8;
+
+
+using namespace Platform;
 
 static uint32_t mag_count = 0, acc_count = 0;
 

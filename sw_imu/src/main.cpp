@@ -13,12 +13,12 @@ extern "C"{
 	int main(void);
 }
 
+using namespace Platform;
+
 int main(void) {
 	halInit();
 	chSysInit();
 
-	yaffs_StartUp();
-	
 	Platform::early_init();
 
 	oled.init();

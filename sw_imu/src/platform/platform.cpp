@@ -13,6 +13,9 @@
 #include "imu/ssd1306.cpp"
 
 
+using namespace Platform;
+
+
 I2C Platform::i2c1(I2CD1, OPMODE_I2C, FAST_DUTY_CYCLE_2, 100000);
 MMA8452Q Platform::acc1(Platform::i2c1, 0x1C);
 MAG3110 Platform::mag1(Platform::i2c1, 0x0E);

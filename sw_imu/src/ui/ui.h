@@ -73,12 +73,12 @@ private:
 		}
 		if(is_suspended){
 			is_suspended = false;
-			oled.resume();
+			Platform::oled.resume();
 		}
 	}
 	
 	void suspend(){
-		oled.sleep();
+		Platform::oled.sleep();
 		is_suspended = true;
 	}
 	

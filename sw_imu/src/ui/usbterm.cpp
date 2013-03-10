@@ -1,5 +1,7 @@
 #include "usbterm.h"
 
+using namespace Platform;
+
 USBFile * USBTerm::usbfile = nullptr;
 
 void USBTerm::reg_file(USBFile* file){

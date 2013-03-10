@@ -1,8 +1,6 @@
 /*!
- @file 
- 
- @brief 
- 
+ @file yaffs.h 
+ @brief Declaration for \ref YAFFS driver
  @author Ben Nahill <bnahill@gmail.com>
  */
 

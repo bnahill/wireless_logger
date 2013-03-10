@@ -1,8 +1,6 @@
 /*!
- @file 
- 
- @brief 
- 
+ @file usbserial.h
+ @brief Declaration for \ref USBSerial driver
  @author Ben Nahill <bnahill@gmail.com>
  */
 
@@ -24,6 +22,9 @@
 /*!
  @brief An abstracted USB CDC device driver
  @tparam usb_driver The ChibiOS USB driver object to use
+ 
+ @note Some of components are declared as generic templated functions but
+ some (descriptor info) has to be specialized in the platform
  */
 template <USBDriver &usb_driver>
 class USBSerial {

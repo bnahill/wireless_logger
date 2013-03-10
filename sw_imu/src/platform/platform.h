@@ -77,6 +77,6 @@ namespace Platform {
 	void early_init();
 };
 
-using namespace Platform;
+//using namespace Platform;
 
 #endif // __IMU_PLATFORM_H_

@@ -1,8 +1,6 @@
 /*!
- @file 
- 
- @brief 
- 
+ @file rtc.h
+ @brief Declaration for \ref RealTimeClock driver class
  @author Ben Nahill <bnahill@gmail.com>
  */
 

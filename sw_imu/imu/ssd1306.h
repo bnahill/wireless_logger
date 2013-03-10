@@ -1,8 +1,6 @@
 /*!
- @file 
- 
- @brief 
- 
+ @file ssd1306.h
+ @brief Declaration for \ref SSD1306 driver
  @author Ben Nahill <bnahill@gmail.com>
  */
 
@@ -18,6 +16,13 @@
 //! @addtogroup Display
 //! @{
 
+/*!
+ @brief Driver for SSD1306 OLED controllers
+ @tparam pages The number of pages in the panel it drives
+ @tparam columns The number of columns in the panel
+ 
+ This can drive different pixel arrangements and is templated accordingly
+ */
 template <uint32_t pages, uint32_t columns>
 class SSD1306 {
 public:

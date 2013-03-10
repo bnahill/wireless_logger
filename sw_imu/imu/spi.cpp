@@ -1,8 +1,6 @@
 /*!
- @file 
- 
- @brief 
- 
+ @file spi.cpp
+ @brief Body for \ref SPI driver
  @author Ben Nahill <bnahill@gmail.com>
  */
 

@@ -1,5 +1,7 @@
 #include "ui/sensor_view.h"
-	
+
+using namespace Platform;
+
 void SensorView::exec(){
 	eventmask_t evt;
 	

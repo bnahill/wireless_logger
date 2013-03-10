@@ -1,5 +1,7 @@
 #include "ui/menu.h"
 
+using namespace Platform;
+
 void Menu::draw(bool update){
 	uint32_t i;
 	char row_buffer[32];

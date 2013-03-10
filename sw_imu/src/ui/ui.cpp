@@ -3,6 +3,8 @@
 
 UI UI::ui;
 
+using namespace Platform;
+
 msg_t UI::run(){
 	MainMenu menu;
 	button[0].enable();

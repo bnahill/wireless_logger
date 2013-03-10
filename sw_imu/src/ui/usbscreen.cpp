@@ -1,5 +1,7 @@
 #include "ui/usbscreen.h"
 
+using namespace Platform;
+
 void USBScreen::exec(){
 	eventmask_t evt;
 	

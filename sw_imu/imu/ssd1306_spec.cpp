@@ -1,8 +1,6 @@
 /*!
- @file 
- 
- @brief 
- 
+ @file ssd1306_spec.cpp
+ @brief Template specializations for \ref SSD1306 driver
  @author Ben Nahill <bnahill@gmail.com>
  */
 

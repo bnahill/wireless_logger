@@ -107,7 +107,7 @@ protected:
 	
 	template <typename T>
 	void write_value(T i){
-		usbserial1.write_buffer((uint8_t const *)&i, sizeof(T));
+		Platform::usbserial1.write_buffer((uint8_t const *)&i, sizeof(T));
 	}
 	
 	static Mutex file_lock;

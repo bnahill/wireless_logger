@@ -1,8 +1,6 @@
 /*!
- @file 
- 
- @brief 
- 
+ @file spi.h
+ @brief Declaration for \ref SPI driver
  @author Ben Nahill <bnahill@gmail.com>
  */
 
@@ -19,6 +17,9 @@
 //! @{
 
 //class SPI : public LockableSem {
+/*!
+ @brief A 4-wire SPI driver
+ */
 class SPI {
 public:
 	/*
@@ -104,8 +105,18 @@ public:
 	
 	void init();
 	
+	/*!
+	 @brief Add a transfer to the transfer queue
+	 @param xfer The transfer to add
+	 @param important Push to front of queue?
+	 */
 	void transfer(xfer_t &xfer, bool important=false);
 	
+	/*!
+	 @brief Add a transfer to the transfer queue (from lock context)
+	 @param xfer The transfer to add
+	 @param important Push to front of queue?
+	 */
 	void transferI(xfer_t &xfer, bool important=false);
 	
 	void reconfig_clock();

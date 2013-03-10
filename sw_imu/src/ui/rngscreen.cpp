@@ -1,6 +1,8 @@
 #include "ui/rngscreen.h"
 #include "platform/platform.h"
 
+using namespace Platform;
+
 RNGScreen::RNGScreen() :
 	num_choices(1)
 {
