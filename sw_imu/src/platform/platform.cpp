@@ -119,6 +119,14 @@ CC1101 Platform::rf1(Platform::spi1,
 GuardianRF Platform::guardian1(rf1);
 
 //////////////////////////////////////////////////////////
+// Flash platform configuration
+//////////////////////////////////////////////////////////
+
+MT29FxG01 Platform::flash(spi2, MT29FxG01::SIZE_1G,
+                         {GPIOB, 12}, {GPIOA, 8}, {GPIOC, 6}, 
+                         (uint32_t)(SPI_CR1_CPOL | SPI_CR1_CPHA));
+
+//////////////////////////////////////////////////////////
 // Platform initialization
 //////////////////////////////////////////////////////////
 

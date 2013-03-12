@@ -32,17 +32,18 @@ public:
 	
 	typedef SPIConfig slave_config_t;
 	
-	/*
-	 * These additions are for a potential move to asynchronous operations
-	 * where a gatekeepter thread would exist for each SPI device and a FIFO
-	 * would be used to serialize operations. At the moment this is
-	 * unnecessary.
-	 */
+	
 	typedef enum {
-		OP_READ,
-		OP_WRITE,
-		OP_EXCHANGE,
-		OP_SEND
+		OP_READ,     //!< A single-word write followed by an arbitrary length
+		             //!< read
+		OP_WRITE,    //!< A single-word write followed by an arbitrary length
+		             //!< write
+		OP_EXCHANGE, //!< A simple exchange of two buffers
+		OP_SEND,     //!< Just transmit an arbitrary number of bytes
+		OP_WR_SEQ,   //!< Write an arbitrary amount of data, then read an
+		             //!< arbitrary amount of data
+		OP_WW_SEQ,   //!< Write an arbitrary amount of data, then write
+		             //!< another arbitrary amount of data
 	} operation_t;
 	
 	typedef void (*callback)(void *);
@@ -50,22 +51,23 @@ public:
 
 	struct xfer_t {
 		//! Constructor for synchronous exchange
-		xfer_t(slave_config_t const * config, size_t n, void const * tx_buff, void * rx_buff) :
-			config(config), n(n),
+		xfer_t(slave_config_t const * config, size_t n,
+		       void const * tx_buff, void * rx_buff) :
+			config(config), n_tx(n),
 			tc_callback(nullptr), starting_callback(nullptr),
 			operation(OP_EXCHANGE), rx_buff(rx_buff), tx_buff(tx_buff)
 		{}
 		
 		//! Constructor for send
 		xfer_t(slave_config_t const * config, size_t n, void const * tx_buff) :
-			config(config), n(n),
+			config(config), n_tx(n),
 			tc_callback(nullptr), starting_callback(nullptr),
 			operation(OP_SEND), tx_buff(tx_buff)
 		{}
 		
 		//! A more generic constructor
 		xfer_t(slave_config_t const * config, size_t n, operation_t op) :
-			config(config), n(n), operation(op),
+			config(config), n_tx(n), operation(op),
 			tc_callback(nullptr), starting_callback(nullptr)
 		{}
 
@@ -85,8 +87,10 @@ public:
 		//! @{
 		//! The operation to perform
 		operation_t operation;
-		//! Number of bytes to send, receive, or exchange
-		size_t n;
+		//! Number of bytes to send or exchange
+		size_t n_tx;
+		//! Number of bytes to receive (if not exchanging)
+		size_t n_rx;
 		//! Buffer to write
 		void const * tx_buff;
 		//! Buffer to store received information
@@ -166,6 +170,14 @@ public:
 	 */
 	uint16_t read_sync(slave_config_t const &config, uint16_t addr, size_t n,
 	                void * rx_buff, bool important=false);
+	
+	void wr_sequence_sync(slave_config_t const &config, uint8_t const * tx,
+	                      uint16_t n_tx, uint8_t * rx, uint16_t n_rx,
+	                      bool important = false);
+	
+	void ww_sequence_sync(slave_config_t const &config, uint8_t const * tx0,
+	                      uint16_t n_tx0, uint8_t const * tx1, uint16_t n_tx1,
+	                      bool important = false);
 	
 	//void acquire(){spiAcquireBus(&driver);}
 	//void release(){spiReleaseBus(&driver);}

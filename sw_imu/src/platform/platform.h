@@ -34,6 +34,7 @@
 #include <imu/rtc.h>
 #include <imu/cc1101.h>
 #include <imu/guardian.h>
+#include <imu/mt29fxg01.h>
 #include "rng.h"
 
 /*!
@@ -71,6 +72,8 @@ namespace Platform {
 	
 	extern CC1101 rf1;
 	extern GuardianRF guardian1;
+	
+	extern MT29FxG01 flash;
 	
 	//extern Lockable * const buses[];
 	

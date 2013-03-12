@@ -240,6 +240,7 @@ set(IMU_SOURCES
 	${IMU_DIR}/imu.cpp
 	${IMU_DIR}/cc1101.cpp
 	${IMU_DIR}/guardian_spec.cpp
+	${IMU_DIR}/mt29fxg01.cpp
 	
 	${IMU_DIR}/graphics/smallfont.cpp
 	${IMU_DIR}/graphics/mediumfont.cpp

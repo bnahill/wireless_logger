@@ -23,7 +23,7 @@
  */
 struct gpio_pin_t {
 	gpio_pin_t(GPIO_TypeDef *gpio, uint16_t index) :
-		gpio(*gpio), mask(1 << index)
+		gpio(*gpio), index(index), mask(1 << index)
 	{}
 	
 	/*!
@@ -69,6 +69,7 @@ struct gpio_pin_t {
 	}
 	GPIO_TypeDef &gpio;
 	uint16_t mask;
+	uint16_t index;
 };
 
 char *uint_to_string(uint32_t i, char * s, bool ignore_leading=true);

@@ -69,6 +69,7 @@
 #define GPIOA_SPI1_SCK          5
 #define GPIOA_SPI1_MISO         6
 #define GPIOA_SPI1_MOSI         7
+#define GPIOA_FLASH_NWP         8
 #define GPIOA_VBUS_FS           9
 #define GPIOA_OTG_FS_ID         10
 #define GPIOA_OTG_FS_DM         11
@@ -143,14 +144,14 @@
  * PA14 - GPIOA_SWCLK           (alternate 0).
  */
 #define VAL_GPIOA_MODER     (PIN_MODE_INPUT(0) |                            \
-                             PIN_MODE_INPUT(GPIOA_POW_NCHRG) |             \
+                             PIN_MODE_INPUT(GPIOA_POW_NCHRG) |              \
                              PIN_MODE_INPUT(2) |                            \
                              PIN_MODE_INPUT(3) |                            \
                              PIN_MODE_OUTPUT(GPIOA_POW_MODE) |              \
                              PIN_MODE_ALTERNATE(GPIOA_SPI1_SCK) |           \
                              PIN_MODE_ALTERNATE(GPIOA_SPI1_MISO) |          \
                              PIN_MODE_ALTERNATE(GPIOA_SPI1_MOSI) |          \
-                             PIN_MODE_INPUT(8) |                            \
+                             PIN_MODE_OUTPUT(GPIOA_FLASH_NWP) |             \
                              PIN_MODE_INPUT(GPIOA_VBUS_FS) |                \
                              PIN_MODE_ALTERNATE(GPIOA_OTG_FS_ID) |          \
                              PIN_MODE_ALTERNATE(GPIOA_OTG_FS_DM) |          \

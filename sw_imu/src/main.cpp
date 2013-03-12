@@ -22,6 +22,8 @@ int main(void) {
 	Platform::early_init();
 
 	oled.init();
+	
+	flash.init();
 
 	if(!guardian1.init())
 		while(1);
