@@ -105,11 +105,11 @@ void SSD1306< pages, columns >::write_cmd(uint8_t cmd1, uint8_t cmd2){
 }
 
 template <uint32_t pages, uint32_t columns>
-void SSD1306< pages, columns >::write_cmd(uint8_t cmd1, uint8_t cmd2,
-	                                      uint8_t cmd3){
-	uint8_t cmd[3] = {cmd1,cmd2,cmd3};
-	transmit_cmd_sync(cmd, 3);
+template<std::size_t N>
+void SSD1306< pages, columns >::write_cmd(std::array<const uint8_t,N> &a){
+	transmit_cmd_sync(&a[0], N);
 }
+
 
 template <uint32_t pages, uint32_t columns>
 void SSD1306< pages, columns >::transmit_cmd_sync(uint8_t const * buf,
@@ -126,6 +126,13 @@ void SSD1306< pages, columns >::transmit_cmd_sync(uint8_t const * buf,
 	spi.transfer(xfer);
 	
 	chSemWait(&done_sem);
+}
+
+template <uint32_t pages, uint32_t columns>
+void SSD1306< pages, columns >::write_cmd(uint8_t cmd1, uint8_t cmd2,
+	                                      uint8_t cmd3){
+	uint8_t const cmd[3] = {cmd1,cmd2,cmd3};
+	transmit_cmd_sync(cmd, 3);
 }
 
 template <uint32_t pages, uint32_t columns>

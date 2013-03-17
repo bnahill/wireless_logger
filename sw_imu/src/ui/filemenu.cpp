@@ -5,6 +5,7 @@
 MenuItem const FileMenu::items[] = {
 	{"File List", static_cast<MenuItem::item_handler>(launch_file_list)},
 	{"Flash Format", static_cast<MenuItem::item_handler>(launch_flash_format)},
+	{"Exit", static_cast<MenuItem::item_handler>(UI::exit_current)},
 };
 
 uint32_t const FileMenu::item_count = sizeof(items)/sizeof(*items);
@@ -13,10 +14,6 @@ using namespace Platform;
 
 void FileMenu::exec(){
 	menu.run();
-}
-
-void FileMenu::exit(){
-	chEvtSignal(UI::ui.thread, UI::MASK_ABORT);
 }
 
 void FileMenu::launch_flash_format(){

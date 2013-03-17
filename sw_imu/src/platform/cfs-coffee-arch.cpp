@@ -18,7 +18,7 @@ void fs_flash_read ( coffee_addr_t addr, char * buf, size_t size ){
 		page = (addr >> MT29FxG01_OFFSET_BITS) & (flash.pages_per_block - 1);
 		block = addr >> (MT29FxG01_OFFSET_BITS + MT29FxG01_PAGE_BITS);
 		offset = addr & (MT29FxG01_OFFSET_BITS - 1);
-		bytes = flash.page_size - offset;
+		bytes = min(size, flash.page_size - offset);
 		
 		flash.read_page(reinterpret_cast<uint8_t *>(buf), block, page, offset, bytes);
 		

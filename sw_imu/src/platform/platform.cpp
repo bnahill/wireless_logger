@@ -148,7 +148,12 @@ void Platform::early_init(){
 
 extern "C" {
 void NMIVector(void){while(1);}
-void HardFaultVector(void){while(1);}
+void HardFaultVector(void){
+	asm volatile ("MRS R0,PSP");
+	asm volatile ("LDR R1,[R0,#24]");
+
+	while(1);
+}
 void MemManageVector(void){while(1);}
 void BusFaultVector(void){while(1);}
 void UsageFaultVector(void){while(1);}

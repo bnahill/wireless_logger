@@ -10,6 +10,7 @@
 #include "imu/imu.h"
 #include "imu/spi.h"
 #include "imu/framebuffer.h"
+#include "array"
 
 //! @addtogroup IMU
 //! @{
@@ -84,6 +85,9 @@ protected:
 	void write_cmd(uint8_t command);
 	void write_cmd(uint8_t cmd1, uint8_t cmd2);
 	void write_cmd(uint8_t cmd1, uint8_t cmd2, uint8_t cmd3);
+	
+	template<std::size_t N >
+	void write_cmd(std::array<const uint8_t,N> &a);
 	
 	void transmit_cmd_sync(uint8_t const * buf, uint8_t n);
 	

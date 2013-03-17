@@ -64,7 +64,7 @@ bool Menu::handle(eventmask_t evt){
 	}
 }
 
-void Menu::run(){
+void Menu::run(bool enable_exit){
 	bool get_out = false;
 	eventmask_t evt;
 	draw();
@@ -72,13 +72,14 @@ void Menu::run(){
 	chEvtGetAndClearEvents(UI::MASK_BUTTONS);
 	
 	while(!get_out){
-		evt = chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(5));
+		//evt = chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(50));
+		evt = chEvtWaitOne(ALL_EVENTS);
 		if(!evt) continue;
 		
 		evt = UI::ui.handle_evt(evt);
 		switch(evt){
 		case UI::MASK_ABORT:
-			get_out = true;
+			get_out = enable_exit;
 			break;
 		case UI::MASK_SUSPEND:
 			

@@ -2,22 +2,48 @@
 #include "platform/platform.h"
 #include "ui/ui.h"
 #include "stdlib.h"
-#include <unistd.h>
+#include "string.h"
 #include "coffee/cfs-coffee.h"
 
 using namespace Platform;
 
-bool Tests::flash_format(){
+bool Tests::flash_create_test_file(){
+	int fd;
+	constexpr auto size = 512;
+	char testbuffer[size], readbuffer[size];
 	oled.fb.clear_area(1);
-	oled.fb.write_text<SmallFont>("Formatting...",1,0);
+	fd = cfs_open("testfile", CFS_WRITE);
+	if(-1 == fd){
+		oled.fb.write_text<SmallFont>("Error opening file", 1, 0);
+		goto error;
+	}
+	for(uint32_t i = 0; i < size; i++){
+		testbuffer[i] = i;
+	}
+	if(cfs_write(fd, testbuffer, size) != size){
+		oled.fb.write_text<SmallFont>("Error writing file", 1, 0);
+		goto error;
+	}
+	if(cfs_seek(fd, 0, CFS_SEEK_SET) != 0){
+		oled.fb.write_text<SmallFont>("Error seeking file", 1, 0);
+		goto error;
+	}
+	if(cfs_read(fd, readbuffer, size) != size){
+		oled.fb.write_text<SmallFont>("Error reading file", 1, 0);
+		goto error;
+	}
+	cfs_close(fd);
+	if(memcmp(testbuffer, readbuffer, size) != 0){
+		oled.fb.write_text<SmallFont>("RW data doesn't match", 1, 0);
+		goto error;
+	}
+	oled.fb.write_text<SmallFont>("Tests passed!", 1, 0);
 	oled.update();
-	
-	cfs_coffee_format();
-	
-	oled.fb.write_text<SmallFont>("Done",2,0);
+	return true;
+error:
 	oled.update();
 	UI::wait_for_button(UI::MASK_SELECT);
-	return true;
+	return false;
 }
 
 bool Tests::flash_bad_block_check(){

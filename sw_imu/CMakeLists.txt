@@ -90,13 +90,13 @@ set(LINKER_SCRIPT ${OS_DIR}/ports/GCC/ARMCMx/STM32F4xx/ld/STM32F405xG.ld)
 ###################################################
 set(CXX_WARNINGS "-Waddress -Warray-bounds -Wc++11-compat -Wchar-subscripts ")
 set(CXX_WARNINGS "${CXX_WARNINGS} -Wcomment -Wformat -Wmaybe-uninitialized -Wnonnull -Wparentheses -Wreturn-type ")
-set(CXX_WARNINGS "${CXX_WARNINGS} -Wsequence-point -Wsign-compare -Wstrict-aliasing -Wstrict-overflow=1 -Wswitch -Wtrigraphs ")
+set(CXX_WARNINGS "${CXX_WARNINGS} -Wsequence-point -Wstrict-aliasing -Wstrict-overflow=1 -Wswitch -Wtrigraphs ") #-Wsign-compare
 set(CXX_WARNINGS "${CXX_WARNINGS} -Wuninitialized -Wunknown-pragmas -Wunused-function -Wunused-label -Wunused-value -Wunused-variable -Wvolatile-register-var")
 
 set(C_WARNINGS "-Wall")
 
 # Flags for both C and C++ compilers
-set(COMMON_FLAGS "${LTO} ${OPTIMIZATION} -ffunction-sections -fdata-sections ${MCFLAGS}")
+set(COMMON_FLAGS "${LTO} ${OPTIMIZATION} -ffunction-sections -ffreestanding -fdata-sections ${MCFLAGS}")
 # Eliminate the need for a bunch of extra support code that may not work on the chip anyways
 set(CMAKE_CXX_FLAGS "--std=gnu++11 -fno-rtti -fno-exceptions ${CXX_WARNINGS} ${COMMON_FLAGS}")
 # Use the new C11 standard
@@ -257,11 +257,11 @@ set(DSP_SOURCES
 ##############################################################
 
 #add_library(chibios STATIC ${OS_SOURCES})
-add_library(dsp_lib STATIC ${DSP_SOURCES})
-add_library(imu_lib STATIC ${IMU_SOURCES})
+# add_library(dsp_lib STATIC ${DSP_SOURCES})
+# add_library(imu_lib STATIC ${IMU_SOURCES})
 #add_library(fs_lib STATIC ${FS_SOURCES})
-add_executable(${OUTFILE} ${APP_SOURCES} ${OS_SOURCES} ${FS_SOURCES})
-target_link_libraries(${OUTFILE} imu_lib dsp_lib gcc c)
+add_executable(${OUTFILE} ${APP_SOURCES} ${OS_SOURCES} ${FS_SOURCES} ${IMU_SOURCES} ${DSP_SOURCES})
+target_link_libraries(${OUTFILE}  gcc c)
 
 
 # Warnings only for application code -- Optimizations only on ST/ARM code

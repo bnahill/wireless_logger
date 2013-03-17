@@ -2,8 +2,7 @@
 #define __UI_TESTS_H_
 
 namespace Tests {
-
-bool flash_format();
+bool flash_create_test_file();
 /*!
  @brief A basic erase/write/read test for flash memory
  */

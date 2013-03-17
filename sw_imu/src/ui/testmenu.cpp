@@ -2,8 +2,8 @@
 #include "ui/tests.h"
 
 MenuItem const TestMenu::items[] = {
+	{"FS RW Test", (MenuItem::item_handler)Tests::flash_create_test_file},
 	{"Flash Bad Blocks", (MenuItem::item_handler)Tests::flash_bad_block_check},
-	{"Flash Format", (MenuItem::item_handler)Tests::flash_format()},
 	{"Flash RW Test\n(will corrupt mem)", (MenuItem::item_handler)Tests::flash_test},
 	{"Exit", (MenuItem::item_handler)TestMenu::exit},
 };

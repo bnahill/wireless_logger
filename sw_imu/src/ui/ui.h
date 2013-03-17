@@ -62,8 +62,18 @@ public:
 		chEvtSignal(ui.thread, UI::MASK_ABORT);	
 	}
 	
+	/*!
+	 @brief A launcher for screens defined as a class with an 'exec' method
+	 @tparam screenclass The class name of the screen
+	 */
+	template<class screenclass>
+	static void launch_screen(){
+		screenclass s;
+		s.exec();
+	}
+	
 	//! The thread stack size to use
-	static constexpr uint32_t stack_size = 8192;
+	static constexpr uint32_t stack_size = 8192*2;
 	
 	static constexpr uint32_t monitor_stack_size = 1024;
 	

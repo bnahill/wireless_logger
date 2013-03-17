@@ -140,11 +140,11 @@ void SPI::ww_sequence_sync(const slave_config_t & config,
 
 
 msg_t SPI::run(){
-	xfer_t * xfer;
+	xfer_t * xfer = nullptr;
 	is_init = true;
 	while(true){
 		// Receive a new item to send
-		if(RDY_OK != chMBFetch(&mb, (msg_t *) &xfer, TIME_INFINITE))
+		if(RDY_OK != chMBFetch(&mb, reinterpret_cast<msg_t *>(&xfer), TIME_INFINITE))
 			continue;
 		
 		//lock();

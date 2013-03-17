@@ -66,7 +66,7 @@ public:
 	/*!
 	 @brief Run the menu in a very simple loop for "normal" behavior
 	 */
-	void run();
+	void run(bool enable_exit = true);
 	
 protected:	
 	//! A list of menu items

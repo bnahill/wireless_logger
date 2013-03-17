@@ -36,4 +36,5 @@ int main(void) {
 	UI::ui.start();
 
 	chThdSleep(TIME_INFINITE);
+	return 1;
 }
