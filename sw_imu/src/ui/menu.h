@@ -19,6 +19,8 @@ public:
 	//! A callback function for a given item
 	typedef void (*item_handler)();
 	
+	MenuItem(){}
+	
 	MenuItem(char const * label, item_handler handler) :
 		handler(handler), label(label)
 	{}
@@ -60,6 +62,11 @@ public:
 	 @param update Whether or not the panel should be written
 	 */
 	void draw(bool update=true);
+	
+	/*!
+	 @brief Run the menu in a very simple loop for "normal" behavior
+	 */
+	void run();
 	
 protected:	
 	//! A list of menu items

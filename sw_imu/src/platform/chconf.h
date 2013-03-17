@@ -307,7 +307,7 @@
  * @note    Mutexes are recommended.
  */
 #if !defined(CH_USE_HEAP) || defined(__DOXYGEN__)
-#define CH_USE_HEAP                     TRUE
+#define CH_USE_HEAP                     FALSE
 #endif
 
 /**
@@ -332,7 +332,7 @@
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_USE_MEMPOOLS) || defined(__DOXYGEN__)
-#define CH_USE_MEMPOOLS                 FALSE
+#define CH_USE_MEMPOOLS                 TRUE
 #endif
 
 /**
@@ -376,7 +376,7 @@
  * @note    The default is @p FALSE.
  */
 #if !defined(CH_DBG_ENABLE_CHECKS) || defined(__DOXYGEN__)
-#define CH_DBG_ENABLE_CHECKS            TRUE
+#define CH_DBG_ENABLE_CHECKS            FALSE
 #endif
 
 /**
@@ -399,7 +399,7 @@
  * @note    The default is @p FALSE.
  */
 #if !defined(CH_DBG_ENABLE_TRACE) || defined(__DOXYGEN__)
-#define CH_DBG_ENABLE_TRACE             TRUE
+#define CH_DBG_ENABLE_TRACE             FALSE
 #endif
 
 /**
@@ -438,7 +438,7 @@
  *          some test cases into the test suite.
  */
 #if !defined(CH_DBG_THREADS_PROFILING) || defined(__DOXYGEN__)
-#define CH_DBG_THREADS_PROFILING        TRUE
+#define CH_DBG_THREADS_PROFILING        FALSE
 #endif
 
 /** @} */

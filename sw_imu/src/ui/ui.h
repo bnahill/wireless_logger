@@ -21,7 +21,7 @@ public:
 	/*!
 	 @brief Mask for common UI events to handle
 	 */
-	enum {
+	typedef enum {
 		MASK_ABORT   = 0x80000000,
 		MASK_SUSPEND = 0x40000000,
 		MASK_RESUME  = 0x20000000,
@@ -29,6 +29,7 @@ public:
 		MASK_SELECT  = 0x04000000,
 		MASK_LEFT    = 0x02000000,
 		MASK_RIGHT   = 0x01000000,
+		MASK_BUTTONS = MASK_LEFT | MASK_SELECT | MASK_RIGHT,
 	} ui_event_t;
 	
 	//! The main UI thread
@@ -45,8 +46,21 @@ public:
 	 */
 	eventmask_t handle_evt(eventmask_t evt);
 	
+	static void wait_for_button(ui_event_t evt){
+		chEvtGetAndClearEvents(MASK_LEFT | MASK_RIGHT | MASK_SELECT);
+		chEvtWaitAny(evt);
+		chEvtGetAndClearEvents(MASK_LEFT | MASK_RIGHT | MASK_SELECT);
+	}
+	
 	//! A singe static instance
 	static UI ui;
+	
+	/*!
+	 @brief A very simple function to kill the current UI operation
+	 */
+	static void exit_current(){
+		chEvtSignal(ui.thread, UI::MASK_ABORT);	
+	}
 	
 	//! The thread stack size to use
 	static constexpr uint32_t stack_size = 8192;
@@ -65,7 +79,6 @@ private:
 	
 	bool is_suspended;
 	bool suspend_enabled;
-	
 	
 	void resume(){
 		if(suspend_enabled){
@@ -93,6 +106,7 @@ private:
 	WORKING_AREA(MonitorThread, monitor_stack_size);
 	//! Stack area for the thread
 	WORKING_AREA(UIThread, stack_size);
+
 	
 	static msg_t start_thread(UI * the_ui){
 		return the_ui->run();

@@ -105,6 +105,32 @@ public:
 		}
 	};
 	
+	struct new_xfer_t {
+		enum {
+			XOP_EXCHANGE, //!< A simple exchange of two buffers
+			XOP_SEND,     //!< Just transmit an arbitrary number of bytes
+			XOP_RECV,     //!< Just receive an arbitrary number of bytes
+		} op;
+		uint8_t * rx_buff;
+		uint8_t const * tx_buff;
+		uint32_t n;
+		union {
+			uint32_t word;
+			uint8_t bytes[4];
+		};
+	};
+	
+	struct message_t {
+		uint32_t num_xfers;
+		new_xfer_t * xfer;
+		callback tc_callback;
+		void *tc_param;
+		void tc_sem(Semaphore *sem){
+			tc_callback = (callback) callback_semaphore;
+			tc_param = sem;
+		}
+	};
+	
 	SPI(SPIDriver &driver);
 	
 	void init();

@@ -2,11 +2,15 @@
 #include "ui/sensor_view.h"
 #include "ui/usbscreen.h"
 #include "ui/rngscreen.h"
+#include "ui/testmenu.h"
+#include "ui/filemenu.h"
 
 MenuItem const MainMenu::items[] = {
 	{"Sensor output\n(numeric)", (MenuItem::item_handler)launch_sensor_view_num},
 	{"Sensor output\n(bar)", (MenuItem::item_handler)launch_sensor_view_bar},
 	{"USB Transfer", (MenuItem::item_handler)launch_usb_mode},
+	{"Files", (MenuItem::item_handler)launch_files},
+	{"Tests", (MenuItem::item_handler)launch_tests},
 	{"Random numbers", (MenuItem::item_handler)launch_rng},
 };
 
@@ -53,6 +57,16 @@ void MainMenu::launch_sensor_view_num(){
 void MainMenu::launch_usb_mode(){
 	USBScreen us;
 	us.exec();
+}
+
+void MainMenu::launch_tests(){
+	TestMenu tm;
+	tm.exec();
+}
+
+void MainMenu::launch_files(){
+	FileMenu fm;
+	fm.exec();
 }
 
 void MainMenu::launch_rng(){

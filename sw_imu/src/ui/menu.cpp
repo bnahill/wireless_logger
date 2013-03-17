@@ -63,3 +63,34 @@ bool Menu::handle(eventmask_t evt){
 		return false;
 	}
 }
+
+void Menu::run(){
+	bool get_out = false;
+	eventmask_t evt;
+	draw();
+	
+	chEvtGetAndClearEvents(UI::MASK_BUTTONS);
+	
+	while(!get_out){
+		evt = chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(5));
+		if(!evt) continue;
+		
+		evt = UI::ui.handle_evt(evt);
+		switch(evt){
+		case UI::MASK_ABORT:
+			get_out = true;
+			break;
+		case UI::MASK_SUSPEND:
+			
+			// BLOCK HERE
+			evt = chEvtWaitOne(UI::MASK_RESUME);
+			chEvtGetAndClearEvents(ALL_EVENTS);
+			UI::ui.handle_evt(UI::MASK_RESUME);
+			break;
+		case UI::MASK_RESUME:
+			break;
+		default:
+			handle(evt);
+		}
+	}
+}

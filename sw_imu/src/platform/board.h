@@ -91,6 +91,7 @@
 #define GPIOC_POW_HPWR          1
 #define GPIOC_POW_SUSP_EN       2
 #define GPIOC_LED1              3
+#define GPIOC_FLASH_NHOLD       6
 #define GPIOC_BUTTON2           10
 #define GPIOC_BUTTON3           11
 #define GPIOC_BUTTON1           12
@@ -162,7 +163,8 @@
 #define VAL_GPIOA_OTYPER    (PIN_OTYPE_PUSHPULL(GPIOA_POW_MODE) |           \
                              PIN_OTYPE_PUSHPULL(GPIOA_SPI1_SCK) |           \
                              PIN_OTYPE_PUSHPULL(GPIOA_SPI1_MISO) |          \
-                             PIN_OTYPE_PUSHPULL(GPIOA_SPI1_MOSI))
+                             PIN_OTYPE_PUSHPULL(GPIOA_SPI1_MOSI) |          \
+                             PIN_OTYPE_PUSHPULL(GPIOA_FLASH_NWP))
 #define VAL_GPIOA_OSPEEDR   0xFFFFFFFF
 #define VAL_GPIOA_PUPDR     (PIN_PUDR_PULLUP(0) |                           \
                              PIN_PUDR_PULLUP(GPIOA_POW_NCHRG) |             \
@@ -252,7 +254,7 @@
                              PIN_MODE_OUTPUT(GPIOC_LED1) |                  \
                              PIN_MODE_OUTPUT(GPIOC_GYRO_NCS) |              \
                              PIN_MODE_OUTPUT(GPIOC_PRS_NCS) |               \
-                             PIN_MODE_INPUT(6) |                            \
+                             PIN_MODE_OUTPUT(GPIOC_FLASH_NHOLD) |           \
                              PIN_MODE_INPUT(7) |                            \
                              PIN_MODE_INPUT(8) |                            \
                              PIN_MODE_OUTPUT(GPIOC_RF_NCS) |                \
@@ -267,7 +269,8 @@
                             PIN_OTYPE_PUSHPULL(GPIOC_LED1) |                \
                             PIN_OTYPE_PUSHPULL(GPIOC_GYRO_NCS) |            \
                             PIN_OTYPE_PUSHPULL(GPIOC_RF_NCS) |              \
-                            PIN_OTYPE_PUSHPULL(GPIOC_PRS_NCS))
+                            PIN_OTYPE_PUSHPULL(GPIOC_PRS_NCS) |             \
+                            PIN_OTYPE_PUSHPULL(GPIOC_FLASH_NHOLD))
 #define VAL_GPIOC_OSPEEDR   0xFFFFFFFF
 #define VAL_GPIOC_PUPDR     (PIN_PUDR_PULLUP(0) |                           \
                              PIN_PUDR_PULLUP(1) |                           \
@@ -288,6 +291,7 @@
 #define VAL_GPIOC_ODR       (0xFFFFFFFF &                                   \
                            ~(PIN(GPIOC_POW_HPWR) |                          \
                              PIN(GPIOC_LED1) |                              \
+                             PIN(GPIOC_FLASH_NHOLD) |                       \
                              PIN(GPIOC_POW_SUSP_EN)))
 #define VAL_GPIOC_AFRL      0
 #define VAL_GPIOC_AFRH      0

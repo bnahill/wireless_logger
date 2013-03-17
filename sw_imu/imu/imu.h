@@ -72,35 +72,23 @@ struct gpio_pin_t {
 	uint16_t index;
 };
 
-char *uint_to_string(uint32_t i, char * s, bool ignore_leading=true);
+/*!
+ @brief Write an unsigned integer ('\0'-terminated) into a string
+ @param i The integer
+ @param s The string to start writing
+ @param ignore_leading Do you want some arbitrary number of leading zeros?
+ @return Pointer to new '\0' termination
+ */
+char * uint_to_string(uint32_t i, char * s, bool ignore_leading=true);
 
-void float_to_string(float f, char * s);
+/*!
+ @brief Write a float ('\0'-terminated) to a string
+ @param f The float
+ @param s Where to write it
+ @return Pointer to new '\0' termination
+ */
+char * float_to_string(float f, char * s);
 
 //! @} @}
-
-// A class which must be locked to use
-// class Lockable {
-// public:
-// 	virtual void lock() = 0;
-// 	virtual void unlock() = 0;
-// 	virtual void reconfig_clock() = 0;
-// };
-// 
-// class LockableSem : public Lockable {
-// public:
-// 	void lock(){
-// 		chSemWait(&sem);
-// 	}
-// 	
-// 	void unlock(){
-// 		chSemSignal(&sem);
-// 	}
-// protected:
-// 	LockableSem(){
-// 		chSemInit(&sem, 1);
-// 	}
-// 	
-// 	Semaphore sem;
-// };
 
 #endif // __IMU_H_

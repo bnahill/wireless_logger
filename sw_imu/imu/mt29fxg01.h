@@ -7,39 +7,83 @@
 #ifndef __IMU_MT29FXG01_H_
 #define __IMU_MT29FXG01_H_
 
+#define MT29FxG01_PAGE_BITS       (6)
+#define MT29FxG01_OFFSET_BITS     (11)
+
+#define MT29FxG01_PAGE_SIZE            (1 << MT29FxG01_OFFSET_BITS)
+#define MT29FxG01_PAGE_SPARE           (64)
+#define MT29FxG01_PAGE_TOTAL_PAGE_SIZE (MT29FxG01_PAGE_SIZE + MT29FxG01_PAGE_SPARE)
+#define MT29FxG01_PAGES_PER_BLOCK      (1 << MT29FxG01_PAGE_BITS)
+
+
+#ifdef __cplusplus
+
 #include "imu/imu.h"
 #include "imu/spi.h"
+#include "ch.h"
+#include "hal.h"
 
+/*!
+ @brief A driver for Micron MT29FxG01 @ref SPI flash memory
+ */
 class MT29FxG01 {
 public:
+	//! The number of blocks in each variant of the chip
 	typedef enum {
 		SIZE_1G = 1024,
 		SIZE_2G = 2048,
 		SIZE_4G = 4096
 	} numblocks_t;
 
+	//! Supported commands
 	typedef enum {
-		CMD_BLOCK_ERASE            = 0xD8,
-		CMD_GET_FEATURE            = 0x0F,
-		CMD_PAGE_READ              = 0x13,
-		CMD_PROGRAM_EXECUTE        = 0x10,
-		CMD_PROGRAM_LOAD           = 0x02,
-		CMD_PROGRAM_LOAD_RANDOM    = 0x84,
-		CMD_READ_CACHE             = 0x03, // 0x0B
+		CMD_BLOCK_ERASE            = 0xD8, //!< Write a block
+		CMD_GET_FEATURE            = 0x0F, //!< Read a feature register
+		CMD_PAGE_READ              = 0x13, //!< Read a page to cache
+		CMD_PROGRAM_EXECUTE        = 0x10, //!< Execute a write
+		CMD_PROGRAM_LOAD           = 0x02, //!< Clear then load a page to cache
+		CMD_PROGRAM_LOAD_RANDOM    = 0x84, //!< Load a page to cache
+		CMD_READ_CACHE             = 0x03, //!< Read a page from cache
 		CMD_READ_CACHE_X2          = 0x3B,
 		CMD_READ_CACHE_X4          = 0x6B,
-		CMD_READ_ID                = 0x9F,
-		CMD_RESET                  = 0xFF,
-		CMD_SET_FEATURE            = 0x1F,
-		CMD_WRITE_DISABLE          = 0x04,
-		CMD_WRITE_ENABLE           = 0x06
-	} mt29fxg01_cmd_t;
+		CMD_READ_ID                = 0x9F, //!< Read the device ID
+		CMD_RESET                  = 0xFF, //!< Reset device configuration
+		CMD_SET_FEATURE            = 0x1F, //!< Set a feature register
+		CMD_WRITE_DISABLE          = 0x04, //!< Disable writes
+		CMD_WRITE_ENABLE           = 0x06  //!< Enable writes
+	} cmd_t;
 	
 	MT29FxG01(SPI &spi, numblocks_t num_blocks,
 	          gpio_pin_t const &ncs,
 	          gpio_pin_t const &nwp,
 	          gpio_pin_t const &nhold,
 	          uint16_t spi_flags);
+	
+	/*!
+	 @name Datasheet parameters
+	 @brief Parameters from the datasheet --  should hold for many different
+	 flash sizes
+	 @{
+	 */
+	//! Number of bytes in page
+	static constexpr uint32_t page_size = MT29FxG01_PAGE_SIZE;
+	 //! Number of spare bytes in a page
+	static constexpr uint32_t page_spare = MT29FxG01_PAGE_SPARE;
+	static constexpr uint32_t total_page_size = page_size + page_spare;
+	//! Number of pages in a block
+	static constexpr uint32_t pages_per_block = MT29FxG01_PAGES_PER_BLOCK;
+	//! @}
+	
+	//! This deterimines what size device it is
+	uint32_t const num_blocks;
+	
+	//! A buffer for a single page
+	typedef uint8_t page_t[total_page_size];
+	
+	/*!
+	 @brief Reset device and set basic configuration
+	 */
+	void reset();
 	
 	/*!
 	 @brief Initialize the device
@@ -50,9 +94,15 @@ public:
 	
 	bool read_page(uint8_t * dst, uint16_t block, uint8_t page,
 	               uint16_t offset, uint16_t bytes);
-	bool write_page(uint8_t const * src, uint16_t block, uint8_t page,
-	                uint16_t offset, uint16_t bytes);
+	bool write_page(uint8_t const * src, uint16_t block, uint8_t page);
+	bool inline write_page(page_t const &src, uint16_t block, uint8_t page){
+		return write_page(static_cast<uint8_t const *>(src), block, page);
+	}
 	bool erase_block(uint16_t block);
+	bool check_block_bad(uint16_t block);
+	
+	
+	MemoryPool pool;
 protected:
 	typedef enum {
 		FADDR_BLOCK_LOCK = 0xA0,
@@ -85,35 +135,82 @@ protected:
 	void set_feature(feature_addr_t feature, uint8_t value);
 	uint8_t get_feature(feature_addr_t feature);
 	
-	void reset();
+
 	
+	/*!
+	 @brief Set required configuration (following reset)
+	 */
+	void set_defaults();
+	
+	/*!
+	 @brief Set the WEL bit in the device to allow writes and erases
+	 */
 	void write_enable();
 	
+	//! The SPI device to use
 	SPI &spi;
+	//! The SPI configuration to use
 	SPI::slave_config_t const spi_slave;
+	
+	//! GPIO pins required
 	gpio_pin_t nwp, ncs, nhold;
 	
-	uint8_t inline col_addr_high(uint16_t block, uint16_t offset){
-		return (offset >> 8) | ((block & 1) << 4);
-	}
+	//! An address in flash
+	struct address_t {
+		/*
+		 * 10-bit block address
+		 * 6-bit in-block page address
+		 * 11-bit in-page address
+		 */
+		address_t(uint16_t block, uint16_t page, uint16_t offset) :
+			block(block), page(page & (pages_per_block - 1)),
+			offset(offset)
+		{}
+		
+		uint16_t block;
+		uint16_t page;
+		uint16_t offset;
+		void get_column_address(uint8_t * dst) const {
+			dst[0] = ((block & 1) << 4) | (offset >> 8);
+			dst[1] = offset & 0xFF;
+		}
+		
+		void get_row_address(uint8_t * dst) const {
+			dst[0] = block >> 10;
+			dst[1] = block >> 2;
+			dst[2] = (block << 6) | page;
+		}
+	};
 	
-	uint8_t inline col_addr_low(uint16_t block, uint16_t offset){
-		return offset;
-	}
+	/*!
+	 @brief Load a page of data into the cache
+	 @param addr The page address
+	 @param src The data to write
+	 */
+	void program_load(address_t const &addr, uint8_t const * src);
 	
+	/*!
+	 @brief Execute a write based on data loaded with @ref program_load
+	 @param addr The address to write to
+	 @note This doesn't wait for the operation to finish
+	 */
+	void program_execute(address_t const &addr);
+	
+	//! Lock (in mutual exclusion sense) the device
 	void lock(){chMtxLock(&mutex);}
+	//! Unlock (in mutual exclusion sense) the device
 	void unlock(){chMtxUnlock();}
+	
 	
 	Mutex mutex;
 	
-	// Parameters from the datasheet --  should hold for many different flash
-	// sizes
-	static constexpr uint32_t page_size = 2048; //!< Number of bytes in page
-	static constexpr uint32_t page_spare = 64; //!< Number of spare bytes in a page
-	static constexpr uint32_t pages_per_block = 64; //!< Number of pages in a block
+	//! Number of page buffers available for allocation
+	static constexpr uint32_t num_page_buffers = 2;
 	
-	// This deterimines what size device it is
-	uint32_t const num_blocks;
+	//! A buffer pool for readers and writers
+	page_t pool_buffer[num_page_buffers];
 };
+
+#endif // __cplusplus
 
 #endif // __IMU_MT29FXX_H_

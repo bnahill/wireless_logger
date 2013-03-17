@@ -21,7 +21,7 @@ These devices must be instantiated for your specific configuration in the
 platform configuration.
 
 
-@defgroup Util Utilies
+@defgroup Util Utilities
 @{
 	
 @}

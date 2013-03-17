@@ -16,6 +16,7 @@
 #ifndef __IMU_PLATFORM_H_
 #define __IMU_PLATFORM_H_
 
+#include <ch.h>
 #include <hal.h>
 
 #include "imu/imu.h"

@@ -1,5 +1,5 @@
-#ifndef __MAINMENU_H_
-#define __MAINMENU_H_
+#ifndef __TESTMENU_H_
+#define __TESTMENU_H_
 
 #include "ui/ui.h"
 #include "ui/menu.h"
@@ -9,9 +9,12 @@
 //! @addtogroup Screens
 //! @{
 
-class MainMenu {
+/*!
+ @brief A menu containing a bunch of tests that can be executed
+ */
+class TestMenu {
 public:
-	MainMenu() : 
+	TestMenu() : 
 		menu(items, item_count), should_exit(false)
 	{}
 	
@@ -21,12 +24,9 @@ private:
 		chEvtSignal(UI::ui.thread, UI::MASK_ABORT);
 	}
 	
-	static void launch_sensor_view_bar();
-	static void launch_sensor_view_num();
-	static void launch_usb_mode();
-	static void launch_rng();
-	static void launch_tests();
-	static void launch_files();
+	static void exit();
+	
+	static void launch_flash_test();
 	
 	Menu menu;
 	
@@ -38,4 +38,4 @@ private:
 
 //! @} @}
 
-#endif // __MAINMENU_H_
+#endif // __TESTMENU_H_

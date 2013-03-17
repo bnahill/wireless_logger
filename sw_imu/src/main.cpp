@@ -7,7 +7,7 @@
 #include "ui/ui.h"
 #include "power_management.h"
 
-#include "yaffsfs.h"
+#include "coffee/cfs-coffee.h"
 
 extern "C"{
 	int main(void);
@@ -23,11 +23,14 @@ int main(void) {
 
 	oled.init();
 	
-	flash.init();
+	if(!flash.init())
+		while(1);
 
 	if(!guardian1.init())
 		while(1);
-
+	
+	cfs_coffee_format();
+	
 	Acquisition::init();
 
 	UI::ui.start();

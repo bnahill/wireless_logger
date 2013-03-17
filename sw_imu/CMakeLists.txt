@@ -56,7 +56,7 @@ set(IMU_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imu)
 set(CMSIS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMSIS)
 set(DSP_SRC ${CMSIS_DIR}/DSP_Lib/Source)
 set(OS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/os)
-set(FS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/yaffs/direct)
+set(FS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/coffee)
 
 
 
@@ -78,8 +78,7 @@ set(LTO )#"-flto")
 set(MCU cortex-m4)
 
 
-set(FSFLAGS "-DCONFIG_YAFFS_DEFINES_TYPES -DCONFIG_YAFFS_DIRECT -DCONFIG_YAFFS_PROVIDE_DEFS -DY_LOFF_T=int")
-set(MCFLAGS "-mcpu=${MCU} -g -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fsingle-precision-constant -D__NEWLIB__ ${FSFLAGS}")# -fomit-frame-pointer")
+set(MCFLAGS "-mcpu=${MCU} -g -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fsingle-precision-constant -D__NEWLIB__")# -fomit-frame-pointer")
 
 add_definitions(${MCFLAGS})
 add_definitions(-DHSE_VALUE=8000000 -DARM_MATH_CM4 -D__FPU_PRESENT)
@@ -200,16 +199,12 @@ set(OS_SOURCES
 )
 
 set(FS_SOURCES
-	${FS_DIR}/yaffs_allocator.c
-	${FS_DIR}/yaffs_checkptrw.c
-	${FS_DIR}/yaffs_ecc.c
-	${FS_DIR}/yaffs_guts.c
-	${FS_DIR}/yaffs_nand.c
-	${FS_DIR}/yaffs_packedtags1.c
-	${FS_DIR}/yaffs_packedtags2.c
-	${FS_DIR}/yaffs_qsort.c
-	${FS_DIR}/yaffs_tagscompat.c
-	${FS_DIR}/yaffs_tagsmarshall.c
+	${FS_DIR}/cfs-coffee.c
+# 	${FS_DIR}/cfs-eeprom.c
+# 	${FS_DIR}/cfs-posix.c
+# 	${FS_DIR}/cfs-posix-dir.c
+# 	${FS_DIR}/cfs-ram.c
+# 	${FS_DIR}/cfs-xmem.c
 )
 
 set(APP_SOURCES
@@ -218,6 +213,7 @@ set(APP_SOURCES
 	src/power_management.cpp
 	src/platform/board.c
 	src/platform/platform.cpp
+	src/platform/cfs-coffee-arch.cpp
 	src/ui/ui.cpp
 	src/ui/menu.cpp
 	src/ui/mainmenu.cpp
@@ -226,6 +222,9 @@ set(APP_SOURCES
 	src/ui/usbterm.cpp
 	src/ui/usbfile.cpp
 	src/ui/rngscreen.cpp
+	src/ui/testmenu.cpp
+	src/ui/filemenu.cpp
+	src/ui/tests.cpp
 )
 
 
@@ -260,18 +259,18 @@ set(DSP_SOURCES
 #add_library(chibios STATIC ${OS_SOURCES})
 add_library(dsp_lib STATIC ${DSP_SOURCES})
 add_library(imu_lib STATIC ${IMU_SOURCES})
-add_library(fs_lib STATIC ${FS_SOURCES})
+#add_library(fs_lib STATIC ${FS_SOURCES})
 add_executable(${OUTFILE} ${APP_SOURCES} ${OS_SOURCES} ${FS_SOURCES})
 target_link_libraries(${OUTFILE} imu_lib dsp_lib gcc c)
 
 
 # Warnings only for application code -- Optimizations only on ST/ARM code
-#set_target_properties(chibios PROPERTIES COMPILE_FLAGS "${OPTIMIZATION}")
-set_target_properties(imu_lib PROPERTIES COMPILE_FLAGS "${OPTIMIZATION}")
-set_target_properties(dsp_lib PROPERTIES COMPILE_FLAGS "-O2 ${LTO}")
-set_target_properties(${OUTFILE} PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
-#set_target_properties(imu_lib PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
-#set_target_properties(cmsis_dsp PROPERTIES COMPILE_FLAGS "-w -O2")
+# #set_target_properties(chibios PROPERTIES COMPILE_FLAGS "${OPTIMIZATION}")
+# set_target_properties(imu_lib PROPERTIES COMPILE_FLAGS "${OPTIMIZATION} ${LTO}")
+# set_target_properties(dsp_lib PROPERTIES COMPILE_FLAGS "-O2 ${LTO}")
+# set_target_properties(${OUTFILE} PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION} ${LTO}")
+# #set_target_properties(imu_lib PROPERTIES COMPILE_FLAGS "-W ${OPTIMIZATION}")
+# #set_target_properties(cmsis_dsp PROPERTIES COMPILE_FLAGS "-w -O2")
 
 
 ##############################################################

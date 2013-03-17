@@ -6,7 +6,7 @@
 
 #include "imu.h"
 
-char *uint_to_string(uint32_t i, char * s, bool ignore_leading){
+char * uint_to_string(uint32_t i, char * s, bool ignore_leading){
 	uint32_t div;
 	uint32_t place = 1000000;
 	
@@ -27,7 +27,7 @@ char *uint_to_string(uint32_t i, char * s, bool ignore_leading){
 	return s;
 }
 
-void float_to_string(float f, char * s){
+char * float_to_string(float f, char * s){
 	uint32_t frac = (int32_t)(f * (1 << 10));
 	if(frac & 0x80000000){
 		*(s++) = '-';
@@ -39,4 +39,5 @@ void float_to_string(float f, char * s){
 	*(s++) = '.';
 	s = uint_to_string((uint32_t) f, s, false);
 	*s = 0;
+	return s;
 }
