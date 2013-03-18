@@ -7,7 +7,7 @@
 //! The block index
 typedef uint16_t coffee_block_t;
 //! The address of a single page
-typedef uint16_t coffee_page_t;
+typedef uint32_t coffee_page_t;
 //! A complete byte address
 typedef uint32_t coffee_addr_t;
 

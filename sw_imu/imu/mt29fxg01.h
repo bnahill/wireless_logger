@@ -78,7 +78,7 @@ public:
 	uint32_t const num_blocks;
 	
 	//! A buffer for a single page
-	typedef uint8_t page_t[total_page_size];
+	typedef uint8_t page_t[page_size];
 	
 	/*!
 	 @brief Reset device and set basic configuration

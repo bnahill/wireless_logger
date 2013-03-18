@@ -72,7 +72,7 @@ set(FS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/coffee)
 # Build Options
 ########################################################
 
-set(OPTIMIZATION "-Os")
+set(OPTIMIZATION "-O0")
 set(LTO )#"-flto")
 
 set(MCU cortex-m4)

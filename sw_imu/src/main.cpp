@@ -26,10 +26,8 @@ int main(void) {
 	if(!flash.init())
 		while(1);
 
-	if(!guardian1.init())
-		while(1);
-	
-	cfs_coffee_format();
+// 	if(!guardian1.init())
+// 		while(1);
 	
 	Acquisition::init();
 
