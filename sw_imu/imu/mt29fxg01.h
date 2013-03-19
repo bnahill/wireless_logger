@@ -95,11 +95,20 @@ public:
 	bool read_page(uint8_t * dst, uint16_t block, uint8_t page,
 	               uint16_t offset, uint16_t bytes);
 	bool write_page(uint8_t const * src, uint16_t block, uint8_t page);
+	bool write(uint8_t const * src, uint16_t block, uint8_t page,
+	           uint16_t offset, uint16_t n);
 	bool inline write_page(page_t const &src, uint16_t block, uint8_t page){
 		return write_page(static_cast<uint8_t const *>(src), block, page);
 	}
 	bool erase_block(uint16_t block);
 	bool check_block_bad(uint16_t block);
+	
+	/*!
+	 @brief Go read all blocks and rewrite them completely to refresh the data
+	 
+	 Occasional use of this function should reduce the frequency of bit errors
+	 */
+	void cleanup();
 	
 	
 	MemoryPool pool;
@@ -182,12 +191,17 @@ protected:
 		}
 	};
 	
+	void page_read_to_cache(address_t const &addr);
+	
 	/*!
 	 @brief Load a page of data into the cache
 	 @param addr The page address
 	 @param src The data to write
+	 @param n The number of bytes to program
+	 @param random Is there existing data to preserve?
 	 */
-	void program_load(address_t const &addr, uint8_t const * src);
+	void program_load(address_t const &addr, uint8_t const * src,
+	                  uint16_t n, bool random = false);
 	
 	/*!
 	 @brief Execute a write based on data loaded with @ref program_load

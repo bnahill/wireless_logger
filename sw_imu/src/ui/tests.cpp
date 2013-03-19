@@ -9,36 +9,48 @@ using namespace Platform;
 
 bool Tests::flash_create_test_file(){
 	int fd;
-	constexpr auto size = 512;
+	constexpr auto size = 2048;
 	char testbuffer[size], readbuffer[size];
 	oled.fb.clear_area(1);
+	oled.fb.write_text<SmallFont>("Writing...", 1, 0);
+	oled.update();
 	fd = cfs_open("testfile", CFS_WRITE);
 	if(-1 == fd){
-		oled.fb.write_text<SmallFont>("Error opening file", 1, 0);
+		oled.fb.write_text<SmallFont>("Error opening file", 2, 0);
 		goto error;
 	}
 	for(uint32_t i = 0; i < size; i++){
-		testbuffer[i] = i;
+		testbuffer[i] = i & 77;
 	}
 	if(cfs_write(fd, testbuffer, size) != size){
-		oled.fb.write_text<SmallFont>("Error writing file", 1, 0);
+		oled.fb.write_text<SmallFont>("Error writing file", 2, 0);
 		goto error;
 	}
-	if(cfs_seek(fd, 0, CFS_SEEK_SET) != 0){
-		oled.fb.write_text<SmallFont>("Error seeking file", 1, 0);
+	
+	cfs_close(fd);
+	
+	
+	
+	oled.fb.clear_area(1);
+	oled.fb.write_text<SmallFont>("Reading...", 1, 0);
+	oled.update();
+	fd = cfs_open("testfile", CFS_READ);
+	if(-1 == fd){
+		oled.fb.write_text<SmallFont>("Error opening file", 2, 0);
 		goto error;
 	}
 	if(cfs_read(fd, readbuffer, size) != size){
-		oled.fb.write_text<SmallFont>("Error reading file", 1, 0);
+		oled.fb.write_text<SmallFont>("Error reading file", 2, 0);
 		goto error;
 	}
 	cfs_close(fd);
 	if(memcmp(testbuffer, readbuffer, size) != 0){
-		oled.fb.write_text<SmallFont>("RW data doesn't match", 1, 0);
+		oled.fb.write_text<SmallFont>("RW data doesn't match", 2, 0);
 		goto error;
 	}
-	oled.fb.write_text<SmallFont>("Tests passed!", 1, 0);
+	oled.fb.write_text<SmallFont>("Tests passed!", 2, 0);
 	oled.update();
+	UI::wait_for_button(UI::MASK_SELECT);
 	return true;
 error:
 	oled.update();

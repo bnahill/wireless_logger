@@ -18,7 +18,7 @@
 template <typename datatype>
 class Euclidean3 {
 public:
-	Euclidean3(){}
+	Euclidean3() : x(0),y(0),z(0) {}
 	
 	//! Constructor from 3 data values
 	template <typename typex, typename typey, typename typez>
