@@ -9,6 +9,7 @@
 template <>
 bool Guardian<CC1101>::init(){
 	CC1101::status_t status;
+	CC1101::state_t state;
 	
 	// Sync word qualifier mode = 30/32 sync word bits detected 
 	// CRC autoflush = false 
@@ -36,6 +37,7 @@ bool Guardian<CC1101>::init(){
 		//{CC1101::REG_PKTCTRL0, 0x05},
 		{CC1101::REG_PKTCTRL1, 0x00},
 		// Use direct mode, just output data as it comes
+		// This commented out to avoid overvlow potential
 		{CC1101::REG_PKTCTRL0, 0x12},
 		{CC1101::REG_FSCTRL1, 0x06},
 		{CC1101::REG_FSCTRL0, 0x00},
@@ -76,9 +78,6 @@ bool Guardian<CC1101>::init(){
 	if(!iface.init())
 		return false;
 	
-	// Flush RX FIFO
-	iface.strobe(CC1101::CMD_SFRX);
-	
 	// Load configuration from the TI RF config utility
 	iface.config(reg_config, sizeof(reg_config)/sizeof(*reg_config));
 	
@@ -86,17 +85,31 @@ bool Guardian<CC1101>::init(){
 	iface.set_gdo_mode(CC1101::GDO0, 0x0C); // Data out
 	iface.set_gdo_mode(CC1101::GDO2, 0x0B); // Clock out
 	
-	iface.strobe(CC1101::CMD_SRX);
-	status = iface.get_status();
-	if(status.state != CC1101::ST_RX){
-		while(1);
+	iface.strobe(CC1101::CMD_SIDLE);
+	
+	// Clear FIFOs
+	iface.strobe(CC1101::CMD_SFRX);
+	iface.strobe(CC1101::CMD_SFTX);
+	
+// 	for(i = 0; i < 50; i++){
+// 		iface.strobe(CC1101::CMD_SRX);
+// 		status = iface.get_status();
+// 		state = iface.get_state(status);
+// 		if(state == CC1101::ST_RX)
+// 			break;
+// 		chThdSleep(1);
+// 	} if(i == 50){
+// 		return false;
+// 	}
+
+	iface.write_reg(CC1101::REG_PKTCTRL0, 0x12);
+	if(iface.read_reg(CC1101::REG_PKTCTRL0) != 0x12){
 		return false;
 	}
 	
-	if(iface.read_reg(CC1101::REG_PKTCTRL0) != 0x12){
-		while(1);
-		return false;
-	}
+	iface.strobe(CC1101::CMD_SRX);
+
+
 	return true;
 }
 
@@ -106,4 +119,3 @@ GuardianRF::GuardianRF(CC1101 &iface, gpio_pin_t * gdo0, gpio_pin_t * gdo2) :
 {
 	
 }
-	

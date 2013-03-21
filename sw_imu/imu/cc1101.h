@@ -108,66 +108,19 @@ public:
 	
 	typedef struct {reg_t reg; uint8_t val;} reg_config_t;
 	
-	CC1101(SPI &spi, SPI::slave_config_t slave_config) :
-		spi(spi),
-		slave_config(slave_config)
-	{
-		
-	}
-	
+	CC1101(SPI &spi, SPI::slave_config_t slave_config);
 	
 	void config(reg_config_t const * const initial_config,
-		        uint_fast8_t const init_config_len){
-		reg_config_t const * iter;
-		if(initial_config == nullptr)
-			return;
-		
-		for(iter = initial_config;
-			iter < initial_config + init_config_len;
-			iter++)
-		{
-			write_reg(iter->reg, iter->val);
-		}
-	}
+	            uint_fast8_t const init_config_len);
 	
-	void early_init(){
-		gpio_pin_t ncs(slave_config.ssport, slave_config.sspad);
-		
-		ncs.clear();
-		chThdSleep(1);
-		ncs.set();
-		chThdSleep(1);
-		ncs.clear();
-		chThdSleep(1);
-		ncs.set();
-	}
+	void early_init();
 	
-	bool init(){
-		spi.init();
-		
-		strobe(CMD_SRES);
-		
-		// Configure synchronous data-out pin so we can read data...
-		set_gdo_mode(GDO1, 0x0C);
-		
-		if(read_reg(REG_FSTEST) != 0x59){
-			return false;
-		}
-		
-		
-		
-		sleep();
-		return true;
-	}
+	bool init();
 	
 	//! Go to low power mode
-	void sleep(){
-		strobe(CMD_SPWD);
-	}
+	void sleep();
 	
-	void set_gdo_mode(gdo_t gdo, gdo_mode_t gdo_mode){
-		write_reg((reg_t)gdo, gdo_mode);
-	}
+	void set_gdo_mode(gdo_t gdo, gdo_mode_t gdo_mode);
 	
 	typedef enum {
 		ST_IDLE      = 0,
@@ -180,63 +133,39 @@ public:
 		ST_TX_OFLOW  = 7
 	} state_t;
 	
-	struct status_t {
-		status_t(uint8_t u){
-			*this = (status_t)u;
-		}
-		status_t(){}
-		uint8_t chip_rdy     : 1;
-		state_t state        : 3;
-		uint8_t bytes_avail  : 4;
-	};
+	typedef uint8_t status_t;
 	
-	static_assert(sizeof(status_t) == 1, "status_t of incorrect size");
-	
-	status_t write_reg(reg_t reg, uint8_t value){
-		uint8_t tx_buffer[2];
-		status_t rx_buffer[2];
-		tx_buffer[0] = reg;
-		tx_buffer[1] = value;
-		spi.exchange_sync(slave_config, 2, tx_buffer, rx_buffer);
-		return rx_buffer[0];
+	static state_t inline get_state(status_t stat){
+		return static_cast<state_t>((stat & 0x70) >> 4);
 	}
 	
-	uint8_t read_reg(reg_t reg){
-		uint8_t tx_buffer[2], rx_buffer[2];
-		tx_buffer[0] = reg | MASK_READ;
-		tx_buffer[1] = 0;
-		spi.exchange_sync(slave_config, 2, tx_buffer, rx_buffer);
-		return rx_buffer[1];
+	static bool inline chip_rdy(status_t stat){
+		return (stat & 0x80) != 0;
 	}
+	
+	static uint8_t inline bytes_avail(status_t stat){
+		return (stat & 0x0F);
+	}
+	
+	status_t write_reg(reg_t reg, uint8_t value);
+	
+	uint8_t read_reg(reg_t reg);
 	
 	status_t get_status(){return strobe(CMD_SNOP);}
 	
 	/*!
 	 @brief Do a single-word command strobe
 	 */
-	status_t strobe(reg_t reg){
-		status_t rx_buffer;
-		uint8_t tx_buffer = reg;
-		spi.exchange_sync(slave_config, 1, &tx_buffer, &rx_buffer);
-		return rx_buffer;
-	}
+	status_t strobe(reg_t reg);
 	
 	static void cb_rx_data_ready(CC1101 * rf);
 	
 	static constexpr uint8_t MASK_READ  = 0x80;
 	static constexpr uint8_t MASK_BURST = 0x40;
 protected:
-	status_t transmit_data(uint_fast8_t const * data, uint_fast8_t len){
-		status_t ret;
-		ret = spi.write_sync(slave_config, REG_TX_FIFO, len, (void const *)data);
-		return ret;
-	}
+	status_t transmit_data(uint_fast8_t const * data, uint_fast8_t len);
 	
-	status_t receive_data(uint_fast8_t * dst, uint_fast8_t len){
-		status_t ret;
-		ret = spi.read_sync(slave_config, REG_RX_FIFO, len, dst);
-		return ret;
-	}
+	status_t receive_data(uint_fast8_t * dst, uint_fast8_t len);
 	
 	SPI &spi;
 	SPI::slave_config_t const slave_config;

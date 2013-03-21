@@ -28,11 +28,7 @@ public:
 		
 	}
 	
-	bool init(){
-		if(!iface.init())
-			return false;
-		return true;
-	}
+	bool init();
 	
 	void sleep();
 	
