@@ -37,7 +37,7 @@ public:
 		gpio(*gpio),
 		mask(BIT(channel)),
 		polarity(polarity),
-		callback(static_cb, this)
+		callback(reinterpret_cast<vtfunc_t>(static_cb), this)
 	{
 		ExtCallback<driver>::channels[channel] = &callback;
 		state = check_gpio();
@@ -95,8 +95,11 @@ public:
 	
 	
 protected:
-	expchannel_t channel;
-	static void static_cb(void * arg);
+	expchannel_t const channel;
+	static void static_cb(Button< driver > * arg);
+	static void debounce_cb(Button< driver > * arg);
+	
+	VirtualTimer timer;
 	
 	//! @name Event handlers
 	//! @{
@@ -114,14 +117,17 @@ protected:
 	ExtCallback<driver> callback;
 	
 	void handle_callback();
+	void handle_debounce();
 	
-	const polarity_t polarity;
+	polarity_t const polarity;
 	
 	/*!
 	 @brief EXT driver configuration to apply on initialization
 	 @note Platform configuration
 	 */
 	static const EXTConfig extcfg;
+	
+	static constexpr uint32_t debounce_ms = 20;
 };
 
 //! @} // Button
