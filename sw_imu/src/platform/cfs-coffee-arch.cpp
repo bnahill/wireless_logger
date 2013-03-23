@@ -18,30 +18,59 @@ void fs_flash_erase (coffee_block_t sector){
  @param count The number of bytes to invert
  */
 static void invert_vect(uint8_t const * src, uint8_t * dst, uint32_t count){
-	register union p {
-		uint8_t * ptr8;
-		uint32_t * ptr32;
-		p(uint8_t * val) : ptr8(val){}
-	} p1 = const_cast<uint8_t *>(src), p2 = dst;
-
-	while(count >= 32){
-		*(p2.ptr32++) = ~*(p1.ptr32++);
-		*(p2.ptr32++) = ~*(p1.ptr32++);
-		*(p2.ptr32++) = ~*(p1.ptr32++);
-		*(p2.ptr32++) = ~*(p1.ptr32++);
-		*(p2.ptr32++) = ~*(p1.ptr32++);
-		*(p2.ptr32++) = ~*(p1.ptr32++);
-		*(p2.ptr32++) = ~*(p1.ptr32++);
-		*(p2.ptr32++) = ~*(p1.ptr32++);
-		count -= 32;
-	}
-	while(count >= 4){
-		*(p2.ptr32++) = ~*(p1.ptr32++);
-		count -= 4;
-	}
-	while(count--){
-		*(p2.ptr8++) = ~*(p1.ptr8++);
-	}
+	asm volatile (
+		"\tcmp %[count], #32\n" // Compare with 32
+		"\tblt lessthanthirtytwo\n"
+	"stillgreaterthanthirtytwo:\n"
+		"\tldmia %[src]!, {R3-R10}\n"
+		"\tmvn R3, R3\n"
+		"\tmvn R4, R4\n"
+		"\tmvn R5, R5\n"
+		"\tmvn R6, R6\n"
+		"\tmvn R7, R7\n"
+		"\tmvn R8, R8\n"
+		"\tmvn R9, R9\n"
+		"\tmvn R10, R10\n"
+		"\tstmia %[dst]!, {R3-R10}\n"
+		"\tsub %[count], #32\n"
+		"\tcmp %[count], #32\n" // Compare with 32
+		"\tbge stillgreaterthanthirtytwo\n"
+	"lessthanthirtytwo:\n"
+		"\tcmp %[count], #4\n"
+		"\tblt lessthanfour\n"
+	"stillgreaterthanfour:\n"
+		"\tldmia %[src]!, {R3}\n"
+		"\tmvn R3, R3\n"
+		"\tstmia %[dst]!, {R3}\n"
+		"\tsub %[count], #4\n"
+		"\tcmp %[count], #4\n"
+		"\tbge stillgreaterthanfour\n"
+	"lessthanfour:\n"
+		"\tcmp %[count], #0\n"
+		"\tbeq doneinverting\n"
+		"\tldr r3, [%[src]]\n"                // Load 4 bytes for laughs
+		"\tmvn R3, R3\n"                      // Invert that whole word
+		"\tcmp %[count], #2\n"
+		"\tbeq twoleft\n"
+		"\tcmp %[count], #1\n"
+		"\tbeq oneleft\n"
+		"\tsub %[dst], #1\n"                  // Decrement to allow more
+		                                      // efficient addressing
+		"\tlsr R4, R3, #8\n"                  // R4 now has 3rd byte LSB
+		"\tstrb R4, [%[dst], #1]!\n"
+	"twoleft:\n"
+		"\tlsr R4, R3, #16\n"                 // R4 now has 2nd byte LSB
+		"\tstrb R4, [%[dst], #1]!\n"
+	"oneleft:\n"
+		"\tlsr R4, R3, #24\n"                 // R4 now has 1st byte LSB
+		"\tstrb R4, [%[dst], #1]!\n"
+	"doneinverting:\n"
+		: 
+		: [src] "r" (src),
+		  [dst] "r" (dst),
+		  [count] "r" (count)
+		: "memory", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10"
+	);
 }
 
 void fs_flash_read ( coffee_addr_t addr, char * buf, size_t const size ){
