@@ -26,7 +26,9 @@ ShellCommand const USBTerm::commands[] = {
 	{"settime", "(datetime:date)", (ShellCommand::shell_callback_t)&USBTerm::cmd_settime},
 	{"ping", "s(s:ping)", (ShellCommand::shell_callback_t)&USBTerm::cmd_ping},
 	{"listbuffers", "[s:name,u:length,s:format]()", (ShellCommand::shell_callback_t)&USBTerm::cmd_listbuffers},
-	{"fetchbuffer", "u,logbuffer(s:buffer_name)", (ShellCommand::shell_callback_t)&USBTerm::cmd_fetchbuffer}
+	{"fetchbuffer", "u,logbuffer(s:buffer_name)", (ShellCommand::shell_callback_t)&USBTerm::cmd_fetchbuffer},
+	{"liststreams", "[s:name,s:format]()", (ShellCommand::shell_callback_t)&USBTerm::cmd_liststreams},
+	{"startstream", "stream(s:stream_name)", (ShellCommand::shell_callback_t)&USBTerm::cmd_startstream},
 };
 
 uint32_t const USBTerm::num_commands = sizeof(commands)/sizeof(*commands);
@@ -164,8 +166,11 @@ error:
 }
 
 int32_t USBTerm::cmd_ping(const char* cmd){
+	// Advance beyond "ping"
 	parse_string(cmd);
+	// Send back that string
 	chprintf(usbserial1.stream(), parse_string(cmd));
+	// Seal it
 	usbserial1.write_byte(0);
 	return 0;
 }
@@ -187,6 +192,15 @@ int32_t USBTerm::cmd_listbuffers(const char* cmd){
 int32_t USBTerm::cmd_fetchbuffer(const char* cmd){
 	return 0;
 }
+
+int32_t USBTerm::cmd_liststreams ( const char* cmd ) {
+	return 0;
+}
+
+int32_t USBTerm::cmd_startstream ( const char* cmd ) {
+	return 0;
+}
+
 
 
 int32_t USBTerm::parse_int(const char*& str){

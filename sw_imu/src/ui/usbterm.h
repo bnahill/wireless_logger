@@ -95,6 +95,8 @@ protected:
 	int32_t cmd_listcmds(char const *cmd);
 	int32_t cmd_listbuffers(char const *cmd);
 	int32_t cmd_fetchbuffer(char const *cmd);
+	int32_t cmd_liststreams(char const *cmd);
+	int32_t cmd_startstream(char const *cmd);
 	//! @}
 	
 	//! @name Parsing functions
