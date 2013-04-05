@@ -17,14 +17,13 @@ class LoggerLink:
 		self.s = None
 		self.baud = 115200*2
 		
-	def write_cmd(self, cmd, params=[]):
+	def write_cmd(self, command):
 		self.s.flushInput()
 		print "Sending command:"
-		print cmd
-		print params
-		c = CmdParamString('', initial=str(cmd))
+		print command
+		c = CmdParamString('', initial=str(command.name))
 		buf = c.to_buffer()
-		for p in params:
+		for p in command.params:
 			buf += p.to_buffer()
 		buf = struct.pack("B%ss" % len(buf), len(buf), buf)
 		print buf
@@ -77,8 +76,8 @@ class LoggerLink:
 		return False
 
 	def set_current_time(self):
-		param = CmdParamDateTime('')
-		self.write_cmd("settime", [param])
+		cmd = Cmd("settime", [CmdParamDateTime('')])
+		self.write_cmd(cmd)
 		return self.read_return_code() == 0
 	
 	def read_string_response(self):
@@ -101,13 +100,14 @@ class LoggerLink:
 		if not self.connected:
 			return []
 		
-		self.write_cmd("listcmds")
+		self.write_cmd(Cmd("listcmds",[],[]))
 		num_commands = struct.unpack("<I",self.s.read(4))[0]
 		print "%d commands available" % num_commands
 		commands = []		
 		for i in range(num_commands):
 			r = self.read_string_response()
-			cmd = parse_cmd(r)
+			cmd = Cmd()
+			cmd.from_cmd_string(r)
 			if cmd:
 				commands.append(cmd)
 			else:

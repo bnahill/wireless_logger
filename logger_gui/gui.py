@@ -10,7 +10,7 @@ from PySide.QtGui import *
 from logger_link import LoggerLink
 from params import *
 
-ll = LoggerLink()
+LL = LoggerLink()
 
 class LoggerUI(QMainWindow):
 	def __init__(self):
@@ -75,7 +75,7 @@ class LoggerUI(QMainWindow):
 		
 			
 	def update_port_list(self):
-		l = ll.list_ports()
+		l = LL.list_ports()
 		self.port_list.clear()
 		self.port_list.addItems(l)
 		
@@ -83,8 +83,8 @@ class LoggerUI(QMainWindow):
 	def connect_disconnect(self):
 		""" Either connect or disconnect using the port specified
 		"""
-		if ll.connected:
-			ll.disconnect()
+		if LL.connected:
+			LL.disconnect()
 			self.on_disconnect()
 			self.status("Disconnected")
 		else:
@@ -95,7 +95,7 @@ class LoggerUI(QMainWindow):
 
 			self.status("Connecting to port %s..." % port)
 
-			if ll.connect(port):
+			if LL.connect(port):
 				self.on_connect(port)
 			else:
 				self.on_disconnect()
@@ -107,7 +107,7 @@ class LoggerUI(QMainWindow):
 		)
 		self.status("Connected to port %s" % port)
 		if self.set_time_flag.checkState() == Qt.CheckState.Checked:
-			ll.set_current_time()
+			LL.set_current_time()
 		self.action_list.enable()
 		self.action_list.update()
 	
@@ -139,24 +139,23 @@ class ActionList(QListWidget):
 		self.setDisabled(False)
 	
 	def update(self):
-		self.items = ll.get_command_list()
+		self.items = LL.get_command_list()
 		self.clear()
 		
 		for i in self.items:
-			item = QListWidgetItem(i[0], self)
-			item.setData(1, i)
+			item = ActionListItem(i, self)
 	
 	def select_item(self, item):
-		item = item.data(1)
-		dialog = ParamDialog(item)
+		command = item.command
+		dialog = ParamDialog(command)
 		layout = QGridLayout(dialog)
 
-		cmdlabel = QLabel("<b>Command: %s</b>" % item[0], parent=dialog)
+		cmdlabel = QLabel("<b>Command: %s</b>" % command.name, parent=dialog)
 		cmdlabel.setAlignment(Qt.AlignHCenter)
 		layout.addWidget(cmdlabel,0,0,1,2)		
 		
 		i = 1
-		for param in item[2]:
+		for param in command.params:
 			w = param.make_widget(dialog)
 			if not w:
 				continue
@@ -172,6 +171,7 @@ class ActionList(QListWidget):
 			dialog.done(1)
 		
 		def execute():
+			print item
 			error_fields = []
 			for param in item[2]:
 				if not param.validate():
@@ -182,7 +182,7 @@ class ActionList(QListWidget):
 					"<br />" +	"<br/>".join(error_fields))
 				msg.setVisible(True)
 				return
-			ll.write_cmd(item[0], item[2])
+			LL.write_cmd(item[0], item[2])
 			dialog.done(0)
 		
 		cancelbutton.pressed.connect(cancel)
@@ -196,6 +196,11 @@ class ActionList(QListWidget):
 		layout.addWidget(cancelbutton, i, 0)
 		dialog.setLayout(layout)
 		dialog.exec_()
+
+class ActionListItem(QListWidgetItem):
+	def __init__(self, command, parent=None):
+		self.command = command
+		QListWidgetItem.__init__(self, command.name, parent)
 
 
 class ParamDialog(QDialog):

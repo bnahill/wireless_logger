@@ -31,22 +31,19 @@ def parse_cmd(cmd):
 	outparams = m.group("out").split(',')
 	inparams = m.group("in").split(',')
 	
-	params = []
+	returns = []
 	for p in outparams:
 		param = mk_param(p)
 		if param:
-			params.append(param)
-	outparams = params		
+			returns.append(param)
 	
 	params = []
 	for p in inparams:
 		param = mk_param(p)
 		if param:
 			params.append(param)
-	inparams = params
 	
-	return (name, outparams, inparams)
-	
+	return (name, params, returns)
 	
 	
 def mk_param(string):
@@ -68,6 +65,8 @@ def mk_param(string):
 		cmd = CmdParamString(name, params=split[1:])
 	elif t == "logbuffer":
 		pass
+	elif t == "stream":
+		pass
 	elif t == "u":
 		cmd = CmdParamInt(name, signed=False, params=split[1:])
 	elif t == "i":
@@ -80,9 +79,20 @@ def mk_param(string):
 	return cmd
 
 class Cmd:
-	def __init__(self, cmd, params=[]):
-		self.cmd = cmd
-		self.params = []
+	def __init__(self, name="", params=[], returns=[]):
+		self.name = name
+		self.params = params
+		self.returns = returns
+
+	def from_cmd_string(self, cmd_string):
+		(name, params, returns) = parse_cmd(cmd_string)
+		self.name = name
+		self.params = params
+		self.returns = returns
+		
+		print name
+		print params
+		print returns
 
 class CmdParam:
 	def __init__(self, name, doc=""):
