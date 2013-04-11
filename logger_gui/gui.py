@@ -64,7 +64,7 @@ class LoggerUI(QMainWindow):
 		
 		self.hbox.addWidget(self.action_list)
 		
-		self.console = QTextEdit(self)
+		self.console = Console(self)
 		self.console.setReadOnly(True)
 		self.hbox.addWidget(self.console)
 		
@@ -122,6 +122,16 @@ class LoggerUI(QMainWindow):
 		self.statusBar().showMessage(msg)
 
 
+class Console(QTextEdit):
+	def __init__(self, parent=None):
+		QTextEdit.__init__(self, parent)
+		
+	def clear(self):
+		self.setPlainText("")
+	
+	def write_text(self, text):
+		self.setPlainText(self.toPlainText() + text + "\n")
+
 class ActionList(QListWidget):
 	""" This is that left column listing available actions
 	"""
@@ -152,7 +162,7 @@ class ActionList(QListWidget):
 
 		cmdlabel = QLabel("<b>Command: %s</b>" % command.name, parent=dialog)
 		cmdlabel.setAlignment(Qt.AlignHCenter)
-		layout.addWidget(cmdlabel,0,0,1,2)		
+		layout.addWidget(cmdlabel,0,0,1,2)
 		
 		i = 1
 		for param in command.params:
@@ -164,15 +174,15 @@ class ActionList(QListWidget):
 			layout.addWidget(w, i, 1)
 			i += 1
 
-		cancelbutton = QPushButton("Cancel", dialog)		
 		execbutton = QPushButton("Execute", dialog)
+		cancelbutton = QPushButton("Cancel", dialog)		
 		
 		def cancel():
 			dialog.done(1)
 		
 		def execute():
 			error_fields = []
-			for param in item[2]:
+			for param in command.params:
 				if not param.validate():
 					error_fields.append(param.name)
 			if len(error_fields):
@@ -181,7 +191,12 @@ class ActionList(QListWidget):
 					"<br />" +	"<br/>".join(error_fields))
 				msg.setVisible(True)
 				return
-			LL.write_cmd(item[0], item[2])
+			#LL.write_cmd(command)
+			LL.run_command(command)
+			logger.console.write_text("Executing %s:" % command.name)
+			logger.console.write_text(
+				"\n".join(map(str,command.returns)) + "\n"
+			)
 			dialog.done(0)
 		
 		cancelbutton.pressed.connect(cancel)
@@ -221,7 +236,7 @@ class PortList(QComboBox):
 		self.click.emit()
 		return QComboBox.mousePressEvent(self,evt)
 
-
+logger = None
 
 if __name__=='__main__':
 	app = QApplication(sys.argv)

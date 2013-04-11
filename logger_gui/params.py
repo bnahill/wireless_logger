@@ -13,6 +13,7 @@ import datetime
 import time
 import struct
 from parser import PARSER
+from copy import copy
 
 def parse_cmd(cmd):
 	""" Takes the full command definition string and parses to a tuple of the
@@ -24,7 +25,7 @@ def parse_cmd(cmd):
 	try:
 		parsed = PARSER.parse(cmd)
 	except PARSER.ParseException:
-		print("Error in parsing", e)
+		print("Error in parsing")
 		return None
 
 	print("Parsed %s" % parsed)
@@ -51,14 +52,14 @@ def parse_cmd(cmd):
 def mk_param(s):
 	""" Parse a single argument into a CmdParam field
 	"""
-	
 	# If it is an array, return it as an array of params
-	if s and not isinstance(s[0], basestring):
-		param = list()
+	if s and not isinstance(s, basestring):
+		params = list()
 		for c in s:
-			param.append(mk_param(c))
-		return param
+			params.append(mk_param(c))
+		return CmdParamArray("", fields=params)
 
+	s = s.split(":")
 	t = s[0]
 
 	if len(s) > 1:
@@ -98,23 +99,87 @@ class Cmd:
 		self.name = name
 		self.params = params
 		self.returns = returns
+	
+	def to_buffer(self):
+		buf = self.name + "\0"
+		for p in filter(bool,self.params):
+			buf += p.to_buffer()
+		buf = struct.pack("B",len(buf)) + buf
+		print("Send buffer:",buf)
+		return buf
 
 class CmdParam:
 	def __init__(self, name, doc=""):
 		self.name = name
 		self.doc = doc
 		self.widget = None
+		self.value = None
 	def update_value(self):
 		pass
 	def __str__(self):
 		self.update_value()
 		return str(self.value)
+
+class CmdParamArray(CmdParam):
+	def __init__(self, name, fields=[]):
+		CmdParam.__init__(self, "Array", "")
+		self.name = name
+		self.fields = fields
+		self.field_widgets = []
+		# The actual expanded fields for receiving data
+		self.expanded_fields = []
+		# The number of array elements
+		self.count = 0
+	
+	def make_widget(self, parent=None):
+		self.widget = QWidget(parent)
+		layout = QGridLayout(self.widget)
+		self.field_widgets = []
 		
-class CmdArray:
-	def __init__(self, fields=[]):
+		for (i,f) in zip(range(len(self.fields)),self.fields):
+			l = QLabel(f.name, parent=self.widget)
+			w = f.make_widget(self.widget)
+			self.field_widgets.append(w)
+			layout.addWidget(l, i, 0)
+			layout.addWidget(w, i, 1)
+		
+		return self.widget
+	
+	def update_value(self):
+		for f in self.fields:
+			f.update_value()
+	
+	def validate(self):
+		""" Validate *all* fields in serial
+		"""
+		valid = True
+		for f in self.fields:
+			valid = valid and f.validate()
+		return valid
+		
+	def to_buffer(self):
 		pass
+	
 	def from_buffer(self, buff):
-		pass
+		self.count = struct.unpack("<I", buff[:4])[0]
+		buff = buff[4:]
+		print("From_buffer: found %u entries" % self.count)
+		for i in range(self.count):
+			these_fields = []	
+			for f in self.fields:
+				print("Buffer: " + str(buff))
+				new_f = copy(f)
+				buff = new_f.from_buffer(buff)
+				these_fields.append(new_f)
+			self.expanded_fields.append(these_fields)
+		return buff
+	
+	def __str__(self):
+		s = []
+		for f in self.expanded_fields:
+			for p in f:
+				s.append(str(p))
+		return "\n".join(s)
 
 class CmdParamReal(CmdParam):
 	def __init__(self, name, doc="", initial=0.0, params=None):
@@ -131,7 +196,9 @@ class CmdParamReal(CmdParam):
 	def __str__(self):
 		self.update_value()
 		return str(self.value)
-
+	def from_buffer(self, buff):
+		self.value = struct.unpack("<f", buff[:4])[0]
+		return buff[4:]
 
 class CmdParamInt(CmdParam):
 	def __init__(self, name, doc="", initial=0.0, signed=True, params=None):
@@ -148,13 +215,17 @@ class CmdParamInt(CmdParam):
 		return True
 	def to_buffer(self):
 		self.update_value()
-		return struct.pack("<I",self.value)
+		s = "<i" if self.signed else "<I"
+		return struct.pack(s,self.value)
+	
+	def from_buffer(self, buff):
+		s = "<i" if self.signed else "<I"
+		self.value = struct.unpack(s, buff[:4])[0]
+		return buff[4:]
 		
 	def update_value(self):
 		if self.widget:
 			self.value = int(self.widget.text())
-		if self.signed:
-			return struct.pack("<i",self.value)
 
 	def __str__(self):
 		self.update_value()
@@ -171,10 +242,11 @@ class CmdParamString(CmdParam):
 			self.minlength = params[1]
 		if len(params) > 2:
 			self.maxlength = params[2]
+
 	def make_widget(self, parent=None):
 		self.widget = QLineEdit(unicode(self.value),parent)
 		if self.maxlength	:
-			self.widget.setMaxLength(maxlength)
+			self.widget.setMaxLength(self.maxlength)
 		return self.widget
 
 	def validate(self):
@@ -188,7 +260,18 @@ class CmdParamString(CmdParam):
 	def to_buffer(self):
 		self.update_value()
 		return struct.pack('%ds' % (len(self.value)+1), self.value)
-		
+	
+	def from_buffer(self, buff):
+		self.value = ""
+		while True:
+			assert len(buff)
+			char = struct.unpack("s", buff[0])[0]
+			buff = buff[1:]
+			if char == "\0":
+				break
+			self.value += char
+		return buff
+
 	def update_value(self):
 		if self.widget:
 			self.value = str(self.widget.text())
@@ -228,9 +311,9 @@ class CmdParamDateTime(CmdParam):
 		if self.widget:
 			if self.widget.text().strip() == "":
 				t = datetime.datetime.now()
-				self.timestamp = t.strftime("%y:%m:%d %H:%M:%S")
+				self.timestamp = str(t.strftime("%y:%m:%d %H:%M:%S"))
 			else:
-				self.timestamp = self.widget.text()
+				self.timestamp = str(self.widget.text())
 				
 	def __str__(self):
 		self.update_value()

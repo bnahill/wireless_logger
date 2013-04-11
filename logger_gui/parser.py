@@ -21,7 +21,7 @@ class CommandParser:
 		colon  = Suppress(":")
 		
 		unnamed_param = Word(alphas + "_")
-		named_param = Word(alphas + "_") + colon + Word(alphanums + "_")
+		named_param = Combine(Word(alphas + "_") + ":" + Word(alphanums + "_"))
 		
 		command_name = Word(alphanums + "_")
 		
@@ -32,7 +32,7 @@ class CommandParser:
 		
 		in_param = Forward()
 		in_param_array =  lbrack + delimitedList(in_param) + rbrack
-		in_param << Group(Or([named_param, in_param_array]))
+		in_param << Or([named_param, in_param_array])
 		in_params = lparen + Group(Optional(delimitedList(in_param))) + rparen
 		
 		self.expr = command_name + out_params + in_params
@@ -54,7 +54,7 @@ if __name__ == '__main__':
 	TEST = list()
 	TEST.append("test [s:name,s:format]()")
 	TEST.append("get_date (datetime:date)")
-	TEST.append("ping   [s]()")
+	TEST.append("ping   s(s:ping)")
 	TEST.append("fetchbuffer u,logbuffer(s:buffer_name)")
 	for t in TEST:
 		print(PARSER.parse(t))
