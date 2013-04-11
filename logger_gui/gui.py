@@ -171,7 +171,6 @@ class ActionList(QListWidget):
 			dialog.done(1)
 		
 		def execute():
-			print item
 			error_fields = []
 			for param in item[2]:
 				if not param.validate():
@@ -207,8 +206,6 @@ class ParamDialog(QDialog):
 	def __init__(self, item, parent=None):
 		QDialog.__init__(self,parent)
 		self.setModal(True)
-	
-	
 	
 
 class PortList(QComboBox):

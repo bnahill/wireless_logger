@@ -12,9 +12,7 @@ import re
 import datetime
 import time
 import struct
-
-cmd_pattern = re.compile(r"\A(?P<name>[a-zA-Z0-9_]*)\s*" +
-	r"(?P<out>[a-zA-Z0-9_:,\[\]]*)\s*\((?P<in>[a-zA-Z0-9_:,\[\]]*)\)\s*")
+from parser import PARSER
 
 def parse_cmd(cmd):
 	""" Takes the full command definition string and parses to a tuple of the
@@ -22,14 +20,18 @@ def parse_cmd(cmd):
 	"""
 
 	print "Matching %s" % cmd
-	m = cmd_pattern.match(cmd)
-	if not m:
-		print "Error " + cmd
+	#m = cmd_pattern.match(cmd)
+	try:
+		parsed = PARSER.parse(cmd)
+	except PARSER.ParseException:
+		print("Error in parsing", e)
 		return None
+
+	print("Parsed %s" % parsed)
 	
-	name = m.group("name")
-	outparams = m.group("out").split(',')
-	inparams = m.group("in").split(',')
+	name = parsed[0]
+	outparams = parsed[1]
+	inparams = parsed[2]
 	
 	returns = []
 	for p in outparams:
@@ -38,7 +40,7 @@ def parse_cmd(cmd):
 			returns.append(param)
 	
 	params = []
-	for p in inparams:
+	for p in filter(bool, inparams):
 		param = mk_param(p)
 		if param:
 			params.append(param)
@@ -46,35 +48,42 @@ def parse_cmd(cmd):
 	return (name, params, returns)
 	
 	
-def mk_param(string):
+def mk_param(s):
 	""" Parse a single argument into a CmdParam field
 	"""
-	split = string.split(':')
-	t = split[0]
+	
+	# If it is an array, return it as an array of params
+	if s and not isinstance(s[0], basestring):
+		param = list()
+		for c in s:
+			param.append(mk_param(c))
+		return param
 
-	if len(split) > 1:
-		name = split[1]
+	t = s[0]
+
+	if len(s) > 1:
+		name = s[1]
 	else:
 		name = ''
 	
 	cmd = None
 	
 	if t == "f":
-		cmd = CmdParamReal(name, params=split[1:])
+		cmd = CmdParamReal(name, params=s[1:])
 	elif t == "s":
-		cmd = CmdParamString(name, params=split[1:])
+		cmd = CmdParamString(name, params=s[1:])
 	elif t == "logbuffer":
 		pass
 	elif t == "stream":
 		pass
 	elif t == "u":
-		cmd = CmdParamInt(name, signed=False, params=split[1:])
+		cmd = CmdParamInt(name, signed=False, params=s[1:])
 	elif t == "i":
-		cmd = CmdParamInt(name, signed=True, params=split[1:])
+		cmd = CmdParamInt(name, signed=True, params=s[1:])
 	elif t == "datetime":
-		cmd = CmdParamDateTime(name, params=split[1:])
+		cmd = CmdParamDateTime(name, params=s[1:])
 	elif t == "logbuffer":
-		cmd = CmdParamLogBuffer(name, params=split[1:])
+		cmd = CmdParamLogBuffer(name, params=s[1:])
 	
 	return cmd
 
@@ -89,10 +98,6 @@ class Cmd:
 		self.name = name
 		self.params = params
 		self.returns = returns
-		
-		print name
-		print params
-		print returns
 
 class CmdParam:
 	def __init__(self, name, doc=""):
