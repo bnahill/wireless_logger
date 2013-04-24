@@ -112,8 +112,11 @@ usbserial1_t Platform::usbserial1({GPIOA, 9});
 // CC1101 platform configuration
 ///////////////////////////////////////////
 
+// CC1101 Platform::rf1(Platform::spi1,
+//                      {NULL, GPIOC, 9, SPI_CR1_BR_2 | SPI_CR1_BR_1});
+
 CC1101 Platform::rf1(Platform::spi1,
-                     {NULL, GPIOC, 9, SPI_CR1_BR_2 | SPI_CR1_BR_1});
+                     {NULL, GPIOA, 15, SPI_CR1_BR_2 | SPI_CR1_BR_1});
 
 GuardianRF Platform::guardian1(rf1);
 
@@ -125,14 +128,19 @@ MT29FxG01 Platform::flash(spi2, MT29FxG01::SIZE_1G,
                          {GPIOB, 12}, {GPIOA, 8}, {GPIOC, 6}, 
                          (SPI_CR1_BR_0 | SPI_CR1_CPOL | SPI_CR1_CPHA));
 
+
+
 //////////////////////////////////////////////////////////
 // Platform initialization
 //////////////////////////////////////////////////////////
+
+EventLog Platform::evt_log;
 
 void Platform::early_init(){
 	reg1.high_power(true);
 	reg1.buck_mode(LTC3559::MODE_BURST);
 	rf1.early_init();
+	evt_log.init();
 	
 	extStart(&EXTD1, &extcfg);
 }

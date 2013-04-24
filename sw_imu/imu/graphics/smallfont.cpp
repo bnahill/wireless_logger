@@ -13,7 +13,7 @@ bool SmallFont::write_text(uint8_t * buff, uint8_t line, char const * text,
 	// Iterate over each character of text
 	while(true){
 		// First column of letter in font
-		char_ptr = &font[char_width * text[0]];		
+		char_ptr = &font[char_width * text[0]];
 		
 		// Copy letter data
 		for(i = 0; i < char_width; i++){
@@ -24,7 +24,7 @@ bool SmallFont::write_text(uint8_t * buff, uint8_t line, char const * text,
 		
 		
 		// Check for exit before adding spacing
-		if(*(++text) == 0)
+		if(*(++text)  < ' ')
 			break;
 		
 		if((uint32_t)(buff - buff_orig) > max_cols)
@@ -42,11 +42,12 @@ bool SmallFont::write_text(uint8_t * buff, uint8_t line, char const * text,
 	return true;
 }
 
+
 uint32_t SmallFont::get_num_cols(const char * text){
 	uint8_t ret = 0;
 	while(true){
 		ret += char_width;
-		if(*(++text) == 0)
+		if(*(++text)  < ' ')
 			break;
 		ret += letter_spacing;
 	}

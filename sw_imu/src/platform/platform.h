@@ -36,6 +36,7 @@
 #include <imu/cc1101.h>
 #include <imu/guardian.h>
 #include <imu/mt29fxg01.h>
+#include <imu/eventlog.h>
 #include "rng.h"
 
 /*!
@@ -75,6 +76,8 @@ namespace Platform {
 	extern GuardianRF guardian1;
 	
 	extern MT29FxG01 flash;
+	
+	extern EventLog evt_log;
 	
 	//extern Lockable * const buses[];
 	

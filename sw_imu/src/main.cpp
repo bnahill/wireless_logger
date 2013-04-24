@@ -23,11 +23,15 @@ int main(void) {
 
 	oled.init();
 	
-	if(!flash.init())
-		while(1);
-
- 	if(!guardian1.init())
-		while(1);
+	if(!flash.init()){
+		evt_log.add("Flash init\n failed!", EventItem::SEVERITY_ERROR);
+	}
+		
+ 	if(!guardian1.init()) {
+		evt_log.add("Guardian init\nfailed!", EventItem::SEVERITY_ERROR);
+	}
+	
+	evt_log.add("Started up!", EventItem::SEVERITY_NOTE);
 	
 	Acquisition::init();
 

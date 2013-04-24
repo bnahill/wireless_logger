@@ -76,6 +76,7 @@
 #define GPIOA_OTG_FS_DP         12
 #define GPIOA_SWDIO             13
 #define GPIOA_SWCLK             14
+#define GPIOA_RF_NCS_ALT        15
 
 #define GPIOB_OLED_NRES         2
 #define GPIOB_SWO               3
@@ -159,12 +160,13 @@
                              PIN_MODE_ALTERNATE(GPIOA_OTG_FS_DP) |          \
                              PIN_MODE_ALTERNATE(GPIOA_SWDIO) |              \
                              PIN_MODE_ALTERNATE(GPIOA_SWCLK) |              \
-                             PIN_MODE_INPUT(15))
+                             PIN_MODE_OUTPUT(GPIOA_RF_NCS_ALT))
 #define VAL_GPIOA_OTYPER    (PIN_OTYPE_PUSHPULL(GPIOA_POW_MODE) |           \
                              PIN_OTYPE_PUSHPULL(GPIOA_SPI1_SCK) |           \
                              PIN_OTYPE_PUSHPULL(GPIOA_SPI1_MISO) |          \
                              PIN_OTYPE_PUSHPULL(GPIOA_SPI1_MOSI) |          \
-                             PIN_OTYPE_PUSHPULL(GPIOA_FLASH_NWP))
+                             PIN_OTYPE_PUSHPULL(GPIOA_FLASH_NWP) |          \
+                             PIN_OTYPE_PUSHPULL(GPIOA_RF_NCS_ALT))
 #define VAL_GPIOA_OSPEEDR   0xFFFFFFFF
 #define VAL_GPIOA_PUPDR     (PIN_PUDR_PULLUP(0) |                           \
                              PIN_PUDR_PULLUP(GPIOA_POW_NCHRG) |             \

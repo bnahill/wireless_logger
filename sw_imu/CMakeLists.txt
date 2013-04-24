@@ -225,6 +225,7 @@ set(APP_SOURCES
 	src/ui/testmenu.cpp
 	src/ui/filemenu.cpp
 	src/ui/tests.cpp
+	src/ui/eventlogmenu.cpp
 )
 
 
@@ -240,6 +241,7 @@ set(IMU_SOURCES
 	${IMU_DIR}/cc1101.cpp
 	${IMU_DIR}/guardian_spec.cpp
 	${IMU_DIR}/mt29fxg01.cpp
+	${IMU_DIR}/eventlog.cpp
 	
 	${IMU_DIR}/graphics/smallfont.cpp
 	${IMU_DIR}/graphics/mediumfont.cpp

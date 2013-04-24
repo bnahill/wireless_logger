@@ -32,7 +32,7 @@ bool Courier3::write_text(uint8_t * buff, uint8_t line, char const * text,
 		
 		
 		// Check for exit before adding spacing
-		if(*(++text) == 0)
+		if(*(++text)  < ' ')
 			break;
 		
 		if((uint32_t)(buff - buff_orig) > max_cols)
@@ -54,7 +54,7 @@ uint32_t Courier3::get_num_cols(const char * text){
 	uint8_t ret = 0;
 	while(true){
 		ret += char_width;
-		if(*(++text) == 0)
+		if(*(++text)  < ' ')
 			break;
 		ret += letter_spacing;
 	}

@@ -83,17 +83,21 @@ public:
 	 the caller to make sure that this doesn't overflow the buffer.
 	 */
 	template<class font_class>
-	uint32_t write_text_centered(char const * text, uint8_t page,
-	                             uint8_t center_column, uint32_t max_width){
-		uint32_t width = font_class::get_num_cols(text);
-		uint32_t start = max((int)(center_column - (width / 2)), (int)0);
-		return write_text_generic(font_class::write_text, text, page, start,
-		                          max(start + max_width, columns));
+	void write_text_centered(char const * text, uint8_t page,
+	                         uint8_t center_column = columns/2,
+	                         uint32_t max_width = columns){
+		uint32_t width, start;
+		do {
+			width = font_class::get_num_cols(text);
+			start = max((int)(center_column - (width / 2)), (int)0);
+			write_text_generic(font_class::write_text, text, page, start,
+			                   max(start + max_width, columns));
+			// Iterate to one character past the end of the string
+			while(*(text++) >= ' ');
+			page += font_class::n_lines;
+		} while (*(text-1) != '\0');
 	}
 	
-	
-// 	bool write_text(uint8_t * buff, uint8_t line, char const * text,
-// 	                       uint32_t &n_cols, uint32_t max_cols = 0 - 1);
 	
 	/*!
 	 @brief Draw a horizontally with a bit mask

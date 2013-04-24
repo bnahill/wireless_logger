@@ -95,7 +95,7 @@ void FrameBuffer< pages, columns >::draw_horizontal_mask(uint8_t page,
 	limits.x_max = max(limits.x_max, col_start + length);
 	limits.y_min = min(limits.y_min, page);
 	limits.y_max = max(limits.y_max, page);
-	while(0 != length--){
+	while(length--){
 		*(iter++) |= mask;
 	}
 	
