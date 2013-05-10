@@ -1,0 +1,103 @@
+EESchema Schematic File Version 2  date Fri 10 May 2013 11:58:47 AM EDT
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:special
+LIBS:analog_switches
+LIBS:interface
+LIBS:opto
+LIBS:contrib
+LIBS:wi_logger
+LIBS:wireless_logger-cache
+EELAYER 27 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 4
+Title "IMU Logger"
+Date "10 may 2013"
+Rev "2"
+Comp "McGill Integrated Microsystems Lab"
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Sheet
+S 4850 2900 1950 2100
+U 51784208
+F0 "STM32F4" 50
+F1 "stm32f4.sch" 50
+$EndSheet
+$Sheet
+S 8200 2900 1500 1600
+U 518BE394
+F0 "Sensors" 50
+F1 "sensors.sch" 50
+F2 "PRS_INT2" O L 8200 3600 60 
+F3 "PRS_INT1" O L 8200 3500 60 
+F4 "PRS_SPI_CLK" I L 8200 3400 60 
+F5 "PRS_SPI_MOSI" I L 8200 3300 60 
+F6 "PRS_SPI_MISO" O L 8200 3200 60 
+F7 "PRS_SPI_nCS" I L 8200 3100 60 
+F8 "MAG_INT1" O R 9700 4000 60 
+F9 "MAG_I2C_SCL" B R 9700 3900 60 
+F10 "MAG_I2C_SDA" B R 9700 3800 60 
+F11 "GYR_INT1" O L 8200 4200 60 
+F12 "GYR_DRDY/INT2" O L 8200 4300 60 
+F13 "GYR_SPI_CLK" I L 8200 4100 60 
+F14 "GYR_SPI_MOSI" I L 8200 4000 60 
+F15 "GYR_SPI_MISO" O L 8200 3900 60 
+F16 "GYR_SPI_nCS" I L 8200 3800 60 
+F17 "ACC_INT2" O R 9700 3600 60 
+F18 "ACC_INT1" O R 9700 3500 60 
+F19 "ACC_I2C_SCL" B R 9700 3400 60 
+F20 "ACC_I2C_SDA" B R 9700 3300 60 
+$EndSheet
+$Comp
+L USBMICROCONN J?
+U 1 1 518D2B08
+P 900 3450
+F 0 "J?" H 1000 3150 60  0000 C CNN
+F 1 "USBMICROCONN" V 650 3450 60  0000 C CNN
+F 2 "~" H 900 3450 60  0000 C CNN
+F 3 "~" H 900 3450 60  0000 C CNN
+	1    900  3450
+	1    0    0    -1  
+$EndComp
+Text GLabel 1350 3250 2    60   Output ~ 0
+Vbus
+$Comp
+L GND #PWR?
+U 1 1 518D2CA7
+P 1200 3800
+F 0 "#PWR?" H 1200 3800 30  0001 C CNN
+F 1 "GND" H 1200 3730 30  0001 C CNN
+F 2 "" H 1200 3800 60  0000 C CNN
+F 3 "" H 1200 3800 60  0000 C CNN
+	1    1200 3800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1200 3650 1100 3650
+Wire Wire Line
+	1200 3800 1200 3650
+Wire Wire Line
+	1350 3250 1100 3250
+$Sheet
+S 2250 1550 800  400 
+U 518D07D1
+F0 "Power" 50
+F1 "power.sch" 50
+F2 "MODE" I L 2250 1800 60 
+F3 "nCHG" O R 3050 1800 60 
+F4 "nUSB_CONN" O R 3050 1700 60 
+$EndSheet
+$EndSCHEMATC
