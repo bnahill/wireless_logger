@@ -89,6 +89,59 @@ char * uint_to_string(uint32_t i, char * s, bool ignore_leading=true);
  */
 char * float_to_string(float f, char * s);
 
+/*!
+ @brief A wrapper for printing unknown objects
+ 
+ If they have an imu_print method, everything will be okay. If you get compiler
+ errors here, you are trying to print something that hasn't been described.
+ */
+template <typename T>
+static inline char * imu_sprint_inner(char * dst, T v){
+	return v.imu_print(dst);
+}
+
+template <>
+char * imu_sprint_inner(char * dst, int i){
+	return uint_to_string(static_cast<uint32_t>(i), dst);
+}
+
+template <>
+char * imu_sprint_inner(char * dst, float f){
+	return float_to_string(f, dst);
+}
+
+template <>
+char * imu_sprint_inner(char * dst, const char * c){
+    while(*c){
+        *(dst++) = *(c++);
+    }
+    *dst = '\0';
+    return dst;
+}
+
+template <>
+char * imu_sprint_inner(char * dst, uint32_t u){
+	return uint_to_string(u, dst);
+}
+
+template<typename Thead>
+char * imu_sprint(char  * dst, const Thead& head){
+    return imu_sprint_inner(dst, head);
+}
+
+/*!
+ @brief Print function which doesn't need to allocate memory
+ 
+ Using the new variadic templates from C++11, we can iterate through arguments
+ safely, printing each one after the previous. All types must have a defined
+ imu_sprint function in imu.h or must implement their own imu_print menthod.
+ */
+template<typename Thead, typename... Ttail> 
+char * imu_sprint(char  * dst, const Thead& head, const Ttail&... tail){
+    return imu_sprint(imu_sprint_inner(dst, head), tail...);
+}
+
+
 //! @} @}
 
 #endif // __IMU_H_
