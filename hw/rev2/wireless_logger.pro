@@ -1,44 +1,8 @@
-update=Fri 10 May 2013 10:53:48 AM EDT
+update=Thu 16 May 2013 04:13:13 PM EDT
 version=1
-last_client=eeschema
-[pcbnew]
-version=1
-LastNetListRead=
-PadDrlX=320
-PadDimH=550
-PadDimV=550
-BoardThickness=620
-TxtPcbV=600
-TxtPcbH=600
-TxtModV=500
-TxtModH=500
-TxtModW=100
-VEgarde=100
-DrawLar=120
-EdgeLar=80
-TxtLar=120
-MSegLar=120
-[pcbnew/libraries]
-LibName1=sockets
-LibName2=connect
-LibName3=discret
-LibName4=pin_array
-LibName5=divers
-LibName6=libcms
-LibName7=display
-LibName8=led
-LibName9=dip_sockets
-LibName10=pga_sockets
-LibName11=valves
-LibName12=lib/STM32F4_BGA176
-LibDir=
+last_client=pcbnew
 [general]
 version=1
-[cvpcb]
-version=1
-NetIExt=net
-[cvpcb/libraries]
-EquName1=devcms
 [eeschema]
 version=1
 LibDir=
@@ -64,3 +28,30 @@ LibName13=interface
 LibName14=opto
 LibName15=contrib
 LibName16=lib/wi_logger
+[cvpcb]
+version=1
+NetIExt=net
+[cvpcb/libraries]
+EquName1=devcms
+[pcbnew]
+version=1
+LastNetListRead=wireless_logger.net
+UseCmpFile=1
+PadDrill="    0.000000"
+PadDrillOvalY="    0.000000"
+PadSizeH="    0.300000"
+PadSizeV="    1.000000"
+PcbTextSizeV="    1.500000"
+PcbTextSizeH="    1.500000"
+PcbTextThickness="    0.300000"
+ModuleTextSizeV="    1.500000"
+ModuleTextSizeH="    1.500000"
+ModuleTextSizeThickness="    0.150000"
+SolderMaskClearance="    0.200000"
+SolderMaskMinWidth="    0.000000"
+DrawSegmentWidth="    0.200000"
+BoardOutlineThickness="    0.150000"
+ModuleOutlineThickness="    0.150000"
+[pcbnew/libraries]
+LibDir=
+LibName1=lib/wi_logger
