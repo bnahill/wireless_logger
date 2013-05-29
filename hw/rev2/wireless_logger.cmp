@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2013-mar-30)-stable date = Thu 16 May 2013 04:10:59 PM EDT
+Cmp-Mod V01 Created by CvPcb (2013-mar-30)-stable date = Fri 24 May 2013 01:32:34 PM EDT
 
 BeginCmp
 TimeStamp = /518D865B/51949426;
@@ -522,7 +522,7 @@ BeginCmp
 TimeStamp = /518D07D1/505606DA;
 Reference = J2;
 ValeurCmp = CONN_2;
-IdModule  = ;
+IdModule  = HDR_2X1_50MIL;
 EndCmp
 
 BeginCmp
@@ -540,6 +540,13 @@ IdModule  = SULLINS_5X2_050_THRU;
 EndCmp
 
 BeginCmp
+TimeStamp = /518D8A49/5192816B;
+Reference = J5;
+ValeurCmp = CONN_5;
+IdModule  = HDR_5X1_50MIL;
+EndCmp
+
+BeginCmp
 TimeStamp = /518D07D1/518D0FC0;
 Reference = L1;
 ValeurCmp = MLP2016S1R0M;
@@ -547,10 +554,10 @@ IdModule  = SMD0805;
 EndCmp
 
 BeginCmp
-TimeStamp = /518D8A49/5192816B;
+TimeStamp = /519FB9D1;
 Reference = P1;
-ValeurCmp = CONN_5;
-IdModule  = ;
+ValeurCmp = CONN_6X2;
+IdModule  = HDR_6X2_50MIL;
 EndCmp
 
 BeginCmp
@@ -876,7 +883,7 @@ IdModule  = SOT23;
 EndCmp
 
 BeginCmp
-TimeStamp = /518D07D1/5195A0E0;
+TimeStamp = /518D07D1/519AEBA3;
 Reference = U7;
 ValeurCmp = BQ24095;
 IdModule  = BQ24095;
@@ -897,7 +904,7 @@ IdModule  = CC1101;
 EndCmp
 
 BeginCmp
-TimeStamp = /518D8A49/519296E9;
+TimeStamp = /518D8A49/519AF284;
 Reference = U10;
 ValeurCmp = CC2541;
 IdModule  = CC2541;

@@ -1,4 +1,4 @@
-update=Thu 16 May 2013 04:13:13 PM EDT
+update=Tue 21 May 2013 10:00:26 AM EDT
 version=1
 last_client=pcbnew
 [general]
@@ -37,10 +37,10 @@ EquName1=devcms
 version=1
 LastNetListRead=wireless_logger.net
 UseCmpFile=1
-PadDrill="    0.000000"
-PadDrillOvalY="    0.000000"
-PadSizeH="    0.300000"
-PadSizeV="    1.000000"
+PadDrill="    1.066800"
+PadDrillOvalY="    1.066800"
+PadSizeH="    1.778000"
+PadSizeV="    1.778000"
 PcbTextSizeV="    1.500000"
 PcbTextSizeH="    1.500000"
 PcbTextThickness="    0.300000"

@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Thu 16 May 2013 04:34:22 PM EDT
+EESchema Schematic File Version 2  date Tue 28 May 2013 07:20:24 PM EDT
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -22,7 +22,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 6 7
 Title "IMU Logger"
-Date "16 may 2013"
+Date "28 may 2013"
 Rev "2"
 Comp "McGill Integrated Microsystems Lab"
 Comment1 "Ben Nahill (bnahill@gmail.com)"
@@ -96,10 +96,10 @@ F 3 "" H 5350 5050 60  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L GND #PWR41
+L GND #PWR041
 U 1 1 504A0CF1
 P 5050 6200
-F 0 "#PWR41" H 5050 6200 30  0001 C CNN
+F 0 "#PWR041" H 5050 6200 30  0001 C CNN
 F 1 "GND" H 5050 6130 30  0001 C CNN
 F 2 "" H 5050 6200 60  0001 C CNN
 F 3 "" H 5050 6200 60  0001 C CNN
@@ -150,8 +150,6 @@ F 3 "~" H 4950 5700 60  0000 C CNN
 	1    4950 5700
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	4500 4900 4500 5350
 Connection ~ 4800 3850
 Wire Wire Line
 	4800 4450 4800 3850
@@ -219,19 +217,8 @@ Wire Wire Line
 	5050 5900 5050 6200
 Text HLabel 4050 5700 0    60   Input ~ 0
 EN
-$Comp
-L GND #PWR40
-U 1 1 518F923F
-P 4500 5350
-F 0 "#PWR40" H 4500 5350 30  0001 C CNN
-F 1 "GND" H 4500 5280 30  0001 C CNN
-F 2 "" H 4500 5350 60  0001 C CNN
-F 3 "" H 4500 5350 60  0001 C CNN
-	1    4500 5350
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
-	4800 5300 5550 5300
+	4500 5300 5550 5300
 Wire Wire Line
 	4050 5700 5200 5700
 $Comp
@@ -257,7 +244,7 @@ Connection ~ 4750 5700
 Text GLabel 4700 3850 0    60   Input ~ 0
 Vbat
 Text GLabel 5300 4050 0    60   Input ~ 0
-Vdd
+V3
 Wire Wire Line
 	4950 3950 4950 5300
 Connection ~ 4950 5300
@@ -282,4 +269,7 @@ Wire Wire Line
 Connection ~ 5050 6100
 Text Label 5550 5300 0    60   ~ 0
 OLED_GND
+Connection ~ 4800 5300
+Wire Wire Line
+	4500 5300 4500 4900
 $EndSCHEMATC
