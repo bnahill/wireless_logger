@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Tue 28 May 2013 07:20:24 PM EDT
+EESchema Schematic File Version 2  date Thu 30 May 2013 04:48:17 PM EDT
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -22,7 +22,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 5 7
 Title "IMU Logger"
-Date "28 may 2013"
+Date "30 may 2013"
 Rev "2"
 Comp "McGill Integrated Microsystems Lab"
 Comment1 "Ben Nahill (bnahill@gmail.com)"
@@ -33,12 +33,12 @@ $EndDescr
 $Comp
 L ANTENNA ANT2
 U 1 1 518D9049
-P 8750 4900
-F 0 "ANT2" H 9000 4700 60  0000 C CNN
-F 1 "Molex 47948" H 8750 5100 60  0000 C CNN
-F 2 "MOLEX_47948" H 8750 4900 60  0001 C CNN
-F 3 "~" H 8750 4900 60  0000 C CNN
-	1    8750 4900
+P 9250 4900
+F 0 "ANT2" H 9500 4700 60  0000 C CNN
+F 1 "Molex 47948" H 9250 5100 60  0000 C CNN
+F 2 "MOLEX_47948" H 9250 4900 60  0001 C CNN
+F 3 "~" H 9250 4900 60  0000 C CNN
+	1    9250 4900
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -46,9 +46,7 @@ Wire Wire Line
 Wire Wire Line
 	6850 5350 7750 5350
 Wire Wire Line
-	8350 5250 8750 5250
-Wire Wire Line
-	8750 5250 8750 5050
+	9250 5250 9250 5050
 $Comp
 L GND #PWR035
 U 1 1 51926031
@@ -65,7 +63,7 @@ Wire Wire Line
 Wire Wire Line
 	7650 5450 7650 5650
 Wire Wire Line
-	7650 5650 8600 5650
+	7650 5650 8950 5650
 Wire Wire Line
 	8600 5450 8350 5450
 Wire Wire Line
@@ -422,7 +420,7 @@ Wire Notes Line
 	8400 3200 8400 1500
 Wire Notes Line
 	8400 1500 3950 1500
-Text Notes 5950 1600 0    60   ~ 0
+Text Notes 5950 1650 0    90   ~ 0
 Power
 Text Notes 5100 7050 0    60   ~ 0
 Pin mapping on p81 of SWRU191D
@@ -483,7 +481,7 @@ F 3 "~" H 6000 5300 60  0000 C CNN
 	1    6000 5300
 	1    0    0    -1  
 $EndComp
-Text Label 8750 5250 0    60   ~ 0
+Text Label 9250 5250 0    60   ~ 0
 BT_ANT_SE
 Text Label 7000 5250 0    60   ~ 0
 BT_ANT_DN
@@ -491,4 +489,47 @@ Text Label 7000 5350 0    60   ~ 0
 BT_ANT_DP
 Wire Wire Line
 	6900 6300 7000 6300
+$Comp
+L CAP C65
+U 1 1 51A77CCB
+P 8750 5250
+F 0 "C65" H 8770 5220 50  0000 L TNN
+F 1 "CAP" H 8775 5270 30  0000 L BNN
+F 2 "SMD0402" H 8750 5250 60  0001 C CNN
+F 3 "~" H 8750 5250 60  0000 C CNN
+	1    8750 5250
+	1    0    0    -1  
+$EndComp
+$Comp
+L CAP C66
+U 1 1 51A77CD8
+P 8950 5400
+F 0 "C66" H 8970 5370 50  0000 L TNN
+F 1 "CAP" H 8975 5420 30  0000 L BNN
+F 2 "SMD0603" H 8950 5400 60  0001 C CNN
+F 3 "~" H 8950 5400 60  0000 C CNN
+	1    8950 5400
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8350 5250 8650 5250
+Wire Wire Line
+	8850 5250 9250 5250
+Wire Wire Line
+	8950 5250 8950 5300
+Connection ~ 8950 5250
+Wire Wire Line
+	8950 5650 8950 5500
+Wire Notes Line
+	8550 5150 8550 5550
+Wire Notes Line
+	8550 5550 9100 5550
+Wire Notes Line
+	9100 5550 9100 5150
+Wire Notes Line
+	9100 5150 8550 5150
+Text Notes 9150 5450 0    60   ~ 0
+Optional matching\ncircuit. See App Note\nfor details
+Text Notes 5300 1750 0    60   ~ 0
+Optionally implement buck regulator
 $EndSCHEMATC
