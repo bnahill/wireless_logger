@@ -1,9 +1,9 @@
-PCBNEW-LibModule-V1  Thu 30 May 2013 02:46:37 PM EDT
+PCBNEW-LibModule-V1  Sat 01 Jun 2013 03:35:01 PM EDT
 # encoding utf-8
 Units mm
 $INDEX
 A1101RxxA
-BQ24095
+BQ24095_MSOP
 CC1101
 CC2541
 DSK-XXXXXX-HL
@@ -267,13 +267,13 @@ Ne 0 ""
 Po -3.9 -6
 $EndPAD
 $EndMODULE A1101RxxA
-$MODULE BQ24095
-Po 0 0 0 15 51951C55 00000000 ~~
-Li BQ24095
+$MODULE BQ24095_MSOP
+Po 0 0 0 15 51AA4909 00000000 ~~
+Li BQ24095_MSOP
 Sc 0
 AR 
 Op 0 0 0
-T0 0 -3.4 1.1 1.1 0 0.17 N V 21 N "BQ24095"
+T0 0 -3.4 1.1 1.1 0 0.17 N V 21 N "BQ24095_MSOP"
 T1 0 3 1.1 1.1 0 0.17 N I 21 N "VAL**"
 DC -2 -1.9 -1.8 -1.7 0.15 21
 DS -1.5 -1.5 1.5 -1.5 0.15 21
@@ -283,7 +283,7 @@ DS -1.5 1.5 -1.5 -1.5 0.15 21
 $PAD
 Sh "GND" R 1.57 1.88 0 0 0
 Dr 0 0 0
-At SMD N 00880001
+At SMD N 00000001
 Ne 0 ""
 Po 0 0
 .ZoneConnection 2
@@ -321,7 +321,7 @@ Sh "10" R 0.3 1 0 0 900
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
-Po 1.8 -1
+Po 2.2 -1
 .LocalClearance 0.1524
 $EndPAD
 $PAD
@@ -329,7 +329,7 @@ Sh "9" R 0.3 1 0 0 900
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
-Po 1.8 -0.5
+Po 2.2 -0.5
 .LocalClearance 0.1524
 $EndPAD
 $PAD
@@ -337,7 +337,7 @@ Sh "7" R 0.3 1 0 0 900
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
-Po 1.8 0.5
+Po 2.2 0.5
 .LocalClearance 0.1524
 $EndPAD
 $PAD
@@ -345,7 +345,7 @@ Sh "8" R 0.3 1 0 0 900
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
-Po 1.8 0
+Po 2.2 0
 .LocalClearance 0.1524
 $EndPAD
 $PAD
@@ -353,7 +353,7 @@ Sh "6" R 0.3 1 0 0 900
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
-Po 1.8 1
+Po 2.2 1
 .LocalClearance 0.1524
 $EndPAD
 $PAD
@@ -361,7 +361,7 @@ Sh "5" R 0.3 1 0 0 900
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
-Po -1.8 1
+Po -2.2 1
 .LocalClearance 0.1524
 $EndPAD
 $PAD
@@ -369,7 +369,7 @@ Sh "3" R 0.3 1 0 0 900
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
-Po -1.8 0
+Po -2.2 0
 .LocalClearance 0.1524
 $EndPAD
 $PAD
@@ -377,7 +377,7 @@ Sh "4" R 0.3 1 0 0 900
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
-Po -1.8 0.5
+Po -2.2 0.5
 .LocalClearance 0.1524
 $EndPAD
 $PAD
@@ -385,7 +385,7 @@ Sh "2" R 0.3 1 0 0 900
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
-Po -1.8 -0.5
+Po -2.2 -0.5
 .LocalClearance 0.1524
 $EndPAD
 $PAD
@@ -393,7 +393,7 @@ Sh "1" R 0.3 1 0 0 900
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
-Po -1.8 -1
+Po -2.2 -1
 .LocalClearance 0.1524
 $EndPAD
 $PAD
@@ -411,7 +411,7 @@ At STD N 00E0FFFF
 Ne 0 ""
 Po 0.4 -0.6
 $EndPAD
-$EndMODULE BQ24095
+$EndMODULE BQ24095_MSOP
 $MODULE CC1101
 Po 0 0 0 15 5195102B 00000000 ~~
 Li CC1101

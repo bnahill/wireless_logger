@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2013-mar-30)-stable date = Thu 30 May 2013 02:26:33 PM EDT
+Cmp-Mod V01 Created by CvPcb (2013-mar-30)-stable date = Sat 01 Jun 2013 03:19:06 PM EDT
 
 BeginCmp
 TimeStamp = /518D865B/51949426;
@@ -255,7 +255,7 @@ EndCmp
 BeginCmp
 TimeStamp = /518F8CF1/504A0E3E;
 Reference = C33;
-ValeurCmp = 1u;
+ValeurCmp = 2.2u;
 IdModule  = SMD0603;
 EndCmp
 
@@ -914,7 +914,7 @@ BeginCmp
 TimeStamp = /518D07D1/519AEBA3;
 Reference = U7;
 ValeurCmp = BQ24095;
-IdModule  = BQ24095;
+IdModule  = BQ24095_MSOP;
 EndCmp
 
 BeginCmp
