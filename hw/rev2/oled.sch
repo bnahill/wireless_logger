@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sat 01 Jun 2013 04:42:25 PM EDT
+EESchema Schematic File Version 2  date Sat 01 Jun 2013 05:22:15 PM EDT
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -96,10 +96,10 @@ F 3 "" H 5350 5050 60  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L GND #PWR041
+L GND #PWR42
 U 1 1 504A0CF1
 P 5050 6200
-F 0 "#PWR041" H 5050 6200 30  0001 C CNN
+F 0 "#PWR42" H 5050 6200 30  0001 C CNN
 F 1 "GND" H 5050 6130 30  0001 C CNN
 F 2 "" H 5050 6200 60  0001 C CNN
 F 3 "" H 5050 6200 60  0001 C CNN
