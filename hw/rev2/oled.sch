@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Thu 30 May 2013 04:48:17 PM EDT
+EESchema Schematic File Version 2  date Sat 01 Jun 2013 02:52:41 PM EDT
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -22,7 +22,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 6 7
 Title "IMU Logger"
-Date "30 may 2013"
+Date "1 jun 2013"
 Rev "2"
 Comp "McGill Integrated Microsystems Lab"
 Comment1 "Ben Nahill (bnahill@gmail.com)"
@@ -198,15 +198,11 @@ Wire Wire Line
 	4950 3950 5650 3950
 Connection ~ 5150 5300
 Wire Wire Line
-	4700 3850 4800 3850
-Wire Wire Line
-	4800 3850 5650 3850
+	4700 3850 5650 3850
 Wire Wire Line
 	5650 4450 5300 4450
 Wire Wire Line
-	4300 4250 4500 4250
-Wire Wire Line
-	4500 4250 5650 4250
+	4300 4250 5650 4250
 Wire Wire Line
 	4800 5300 4800 4650
 Wire Wire Line
@@ -218,33 +214,13 @@ Wire Wire Line
 	5050 5300 5050 5500
 Connection ~ 5050 5300
 Wire Wire Line
-	5050 5900 5050 6000
-Wire Wire Line
-	5050 6000 5050 6100
-Wire Wire Line
-	5050 6100 5050 6200
+	5050 5900 5050 6200
 Text HLabel 4050 5700 0    60   Input ~ 0
 EN
 Wire Wire Line
-	4500 5300 4800 5300
+	4500 5300 5550 5300
 Wire Wire Line
-	4800 5300 4950 5300
-Wire Wire Line
-	4950 5300 5050 5300
-Wire Wire Line
-	5050 5300 5150 5300
-Wire Wire Line
-	5150 5300 5350 5300
-Wire Wire Line
-	5350 5300 5500 5300
-Wire Wire Line
-	5500 5300 5550 5300
-Wire Wire Line
-	4050 5700 4300 5700
-Wire Wire Line
-	4300 5700 4750 5700
-Wire Wire Line
-	4750 5700 5200 5700
+	4050 5700 5200 5700
 $Comp
 L MOS_N Q2
 U 1 1 518F9B5D
