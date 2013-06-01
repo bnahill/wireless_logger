@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sat 01 Jun 2013 03:52:55 PM EDT
+EESchema Schematic File Version 2  date Sat 01 Jun 2013 04:42:25 PM EDT
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -590,9 +590,9 @@ Connection ~ 9100 4450
 Wire Wire Line
 	7700 4900 6100 4900
 Wire Wire Line
-	6100 4800 7800 4800
+	7800 4800 6100 4800
 Wire Wire Line
-	7800 4800 7800 4400
+	7800 4200 7800 4800
 Wire Wire Line
 	7800 4400 8200 4400
 Wire Wire Line
@@ -621,7 +621,7 @@ Wire Wire Line
 Wire Wire Line
 	7400 3700 9600 3700
 Wire Wire Line
-	7950 3850 8850 3850
+	7800 3850 8850 3850
 Wire Wire Line
 	8500 3850 8500 3950
 Wire Wire Line
@@ -897,4 +897,19 @@ Wire Wire Line
 	3500 5900 3500 5500
 Wire Wire Line
 	3300 5800 4100 5800
+$Comp
+L RES R?
+U 1 1 51AA996D
+P 7800 4050
+F 0 "R?" H 7900 4100 50  0000 L TNN
+F 1 "100k" H 7800 4105 30  0000 C BNN
+F 2 "SMD0402" H 7800 4050 60  0001 C CNN
+F 3 "~" H 7800 4050 60  0000 C CNN
+	1    7800 4050
+	0    -1   -1   0   
+$EndComp
+Connection ~ 7800 4400
+Wire Wire Line
+	7800 3900 7800 3850
+Connection ~ 7950 3850
 $EndSCHEMATC
