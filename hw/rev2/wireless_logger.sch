@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sat 01 Jun 2013 05:22:15 PM EDT
+EESchema Schematic File Version 2  date Sat 01 Jun 2013 10:51:59 PM EDT
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -22,7 +22,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 7
 Title "IMU Logger"
-Date "1 jun 2013"
+Date "2 jun 2013"
 Rev "2"
 Comp "McGill Integrated Microsystems Lab"
 Comment1 "Ben Nahill (bnahill@gmail.com)"
@@ -714,8 +714,6 @@ Wire Wire Line
 	2050 3600 2250 3600
 Wire Wire Line
 	2550 3600 3000 3600
-Wire Wire Line
-	3000 3600 3000 4500
 Wire Notes Line
 	2100 3300 2100 3800
 Wire Notes Line
@@ -829,7 +827,7 @@ Wire Wire Line
 Wire Wire Line
 	3200 4300 4100 4300
 Wire Wire Line
-	3000 4500 4100 4500
+	3600 4500 4100 4500
 Wire Wire Line
 	1000 5100 4100 5100
 Wire Wire Line
@@ -886,7 +884,7 @@ Wire Wire Line
 Wire Wire Line
 	2150 7350 2850 7350
 Wire Wire Line
-	4100 4400 3600 4400
+	3000 4400 4100 4400
 Wire Wire Line
 	3600 4600 4100 4600
 Wire Wire Line
@@ -912,4 +910,6 @@ Connection ~ 7800 4400
 Wire Wire Line
 	7800 3900 7800 3850
 Connection ~ 7950 3850
+Wire Wire Line
+	3000 3600 3000 4400
 $EndSCHEMATC
