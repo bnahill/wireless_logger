@@ -46,10 +46,10 @@ void MT29FxG01::set_defaults(){
 	// Unlock all blocks
 	set_feature(FADDR_BLOCK_LOCK, 0x00);
 	// Enable ECC
-	//set_feature(FADDR_OTP, 0x10);
+	set_feature(FADDR_OTP, 0x10);
 	
 	// Disable ECC
-	set_feature(FADDR_OTP, 0x00);
+	//set_feature(FADDR_OTP, 0x00);
 }
 
 
@@ -97,6 +97,8 @@ bool MT29FxG01::read_page(uint8_t * dst, uint16_t block, uint8_t page, uint16_t 
 	lock();
 	
 	page_read_to_cache(addr);
+	
+	chThdSleep(MS2ST(1));
 	
 	for(i = 0; i < num_tries; i++){
 		chThdYield();
@@ -173,6 +175,70 @@ void MT29FxG01::cleanup(){
 	unlock();
 }
 
+bool MT29FxG01::page_open ( uint16_t block, uint8_t page ) {
+	lock();
+	
+	current_addr = address_t(block, page, 0);
+	
+	page_read_to_cache(current_addr);
+	
+	do {
+		chThdYield();
+	} while(get_feature(FADDR_STATUS) & STATMASK_OIP);
+	
+	write_enable();
+	
+	return true;
+}
+
+bool MT29FxG01::page_commit () {
+	constexpr uint32_t num_tries = 200;
+	
+	uint32_t i;
+	uint8_t stat;
+	
+	program_execute(current_addr);
+	
+	for(i = 0; i < num_tries; i++){
+		chThdYield();
+		stat = get_feature(FADDR_STATUS);
+		if(stat & STATMASK_P_FAIL){
+			// oops
+			break;
+		}
+		if((stat & STATMASK_OIP) == 0){
+			// Done
+			unlock();
+			return true;
+		}
+	}
+	
+	unlock();
+	
+	return false;
+}
+
+bool MT29FxG01::page_read_continued ( uint8_t* dst, uint16_t offset, uint16_t n ) {
+	uint8_t tx[4];
+	
+	// Now read that page from cache
+	
+	tx[0] = CMD_READ_CACHE;
+	current_addr.get_column_address(&tx[1]);
+	tx[3] = 0;
+	
+	spi.wr_sequence_sync(spi_slave, tx, 4, dst, n);
+	
+	return true;
+}
+
+bool MT29FxG01::page_write_continued ( const uint8_t* src, uint16_t offset, uint16_t n ) {
+	current_addr.offset = offset;
+	program_load(current_addr, src, n, true);
+	
+	return true;
+}
+
 void MT29FxG01::page_read_to_cache( const MT29FxG01::address_t& addr ) {
 	uint8_t tx[4];
 	
@@ -181,6 +247,7 @@ void MT29FxG01::page_read_to_cache( const MT29FxG01::address_t& addr ) {
 	
 	spi.send_sync(spi_slave, 4, tx);
 }
+
 
 
 void MT29FxG01::program_load (address_t const &addr, const uint8_t * src,

@@ -28,7 +28,7 @@ public:
 	 @param speed The clock rate in Hz
 	 */
 	I2C(I2CDriver &driver, i2copmode_t opmode, i2cdutycycle_t dutycycle,
-	    uint32_t speed);
+	    uint32_t speed, gpio_pin_t const &sda, gpio_pin_t const &scl);
 	
 	/*!
 	 @brief Start the driver. If it is already started it will merely count a
@@ -79,6 +79,9 @@ protected:
 	uint32_t refcnt;
 	//! ChibiOS I2C driver
 	I2CDriver &driver;
+	
+	gpio_pin_t const &sda;
+	gpio_pin_t const &scl;
 };
 
 //! @} @}

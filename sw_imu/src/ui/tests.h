@@ -12,6 +12,8 @@ bool flash_test();
  */
 bool flash_bad_block_check();
 
+bool flash_ecc_flexibility_test();
+
 };
 
 #endif // __UI_TESTS_H_

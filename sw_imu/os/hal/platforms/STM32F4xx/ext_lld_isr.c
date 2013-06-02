@@ -283,7 +283,17 @@ CH_IRQ_HANDLER(RTC_WKUP_IRQHandler) {
   CH_IRQ_PROLOGUE();
 
   EXTI->PR = (1 << 22);
-  EXTD1.config->channels[22].cb(&EXTD1, 22);
+  RTC->ISR &= ~RTC_ISR_WUTF;
+  
+#if SCHED_TICK_RTC
+  chSysLockFromIsr();
+  chSysTimerHandlerI();
+  chSysUnlockFromIsr();
+    EXTI->PR = (1 << 22);
+  RTC->ISR &= ~RTC_ISR_WUTF;
+#else
+//  EXTD1.config->channels[22].cb(&EXTD1, 22);
+#endif
 
   CH_IRQ_EPILOGUE();
 }

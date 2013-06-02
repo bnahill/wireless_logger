@@ -72,6 +72,16 @@ public:
 		s.exec();
 	}
 	
+	void inhibit_suspend(){
+		suspend_enabled = false;
+		chVTReset(&timer);
+	}
+	
+	void enable_suspend(){
+		suspend_enabled = false;
+		resume();
+	}
+	
 	//! The thread stack size to use
 	static constexpr uint32_t stack_size = 8192*2;
 	

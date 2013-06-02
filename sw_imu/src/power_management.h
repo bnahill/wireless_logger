@@ -42,6 +42,28 @@ public:
 		chSysUnlock();
 		unlock_buses();
 	}
+	
+	static void enable_rtc_tick(){
+		// Enable the RTC wakeup EXTI line
+		EXTI->RTSR |= (1 << 22);
+		EXTI->FTSR &= ~(1 << 22);
+		EXTI->IMR |= (1 << 22);
+		
+		RTC->WUTR = floorf((16384.0 / CH_FREQUENCY) + 0.5f) - 1;
+		// Enable wakeup timer
+		RTC->CR &= ~RTC_CR_WUTE;
+		RTC->CR |= RTC_CR_WUTE | RTC_CR_WUTIE |
+				RTC_CR_WUCKSEL_1 | RTC_CR_WUCKSEL_0; // 16384Hz
+		nvicEnableVector(RTC_WKUP_IRQn,
+						CORTEX_PRIORITY_MASK(CORTEX_PRIORITY_SYSTICK));
+		RTC->ISR &= ~RTC_ISR_WUTF;
+	}
+
+	static void disable_systick(){
+		// Disable the regular tick interrupt
+		SysTick->CTRL = 0;
+		nvicDisableVector(HANDLER_SYSTICK);	
+	}
 
 protected:
 	static speed_t current_speed;

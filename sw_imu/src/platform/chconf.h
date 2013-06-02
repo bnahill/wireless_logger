@@ -36,6 +36,8 @@
 //! @addtogroup Kernel
 //! @{
 
+#define SCHED_TICK_RTC                      FALSE
+
 /*===========================================================================*/
 /**
  * @name Kernel parameters and options
@@ -49,7 +51,7 @@
  *          setting also defines the system tick time unit.
  */
 #if !defined(CH_FREQUENCY) || defined(__DOXYGEN__)
-#define CH_FREQUENCY                    1000
+#define CH_FREQUENCY                    200
 #endif
 
 /**
@@ -64,7 +66,7 @@
  *          and generally faster.
  */
 #if !defined(CH_TIME_QUANTUM) || defined(__DOXYGEN__)
-#define CH_TIME_QUANTUM                 20
+#define CH_TIME_QUANTUM                 5
 #endif
 
 /**
@@ -528,7 +530,7 @@
 }
 #endif
 
-#define CHPRINTF_USE_FLOAT TRUE
+#define CHPRINTF_USE_FLOAT FALSE
 
 //! @} @} @}
 

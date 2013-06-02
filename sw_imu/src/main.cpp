@@ -7,7 +7,6 @@
 #include "ui/ui.h"
 #include "power_management.h"
 
-#include "coffee/cfs-coffee.h"
 
 extern "C"{
 	int main(void);
@@ -15,12 +14,19 @@ extern "C"{
 
 using namespace Platform;
 
+
 int main(void) {
+	char test[32];
+
 	halInit();
 	chSysInit();
-
+	
 	Platform::early_init();
 
+	PowerManagement::enable_rtc_tick();
+#if SCHED_TICK_RTC
+	PowerManagement::disable_systick();
+#endif
 	oled.init();
 	
 	if(!flash.init()){

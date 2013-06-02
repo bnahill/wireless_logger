@@ -7,6 +7,147 @@
 
 using namespace Platform;
 
+bool Tests::flash_ecc_flexibility_test() {
+	uint32_t constexpr block = 11;
+	uint32_t constexpr page = 0;
+	uint32_t constexpr bytes = 2112;
+	
+	char textbuffer[32];
+	
+	uint8_t buffer[bytes];
+	
+	oled.fb.clear_area(1);
+	
+	textbuffer[0] = 0;
+	
+	for(uint32_t i = 0; i < bytes; i++){
+		buffer[i] = i;
+	}
+	
+	flash.erase_block(block);
+	
+	// Write to protected areas
+	
+	flash.page_open(block, page);
+	flash.page_write_continued(buffer, 0, 512);
+	flash.page_write_continued(buffer, 0x804, 4);
+	flash.page_commit();
+	
+	flash.page_open(block, page);
+	flash.page_write_continued(buffer + 0x200, 0x200, 512);
+	flash.page_write_continued(buffer, 0x814, 4);
+	flash.page_commit();
+	
+	flash.page_open(block, page);
+	flash.page_write_continued(buffer + 0x400, 0x400, 512);
+	flash.page_write_continued(buffer, 0x824, 4);
+	flash.page_commit();
+	
+	flash.page_open(block, page);
+	flash.page_write_continued(buffer + 0x600, 0x600, 512);
+	flash.page_write_continued(buffer, 0x834, 4);
+	flash.page_commit();
+	
+	// Write to unprotected areas
+	
+	flash.page_open(block, page);
+	flash.page_write_continued(buffer, 0x802, 2);
+	flash.page_commit();
+	
+	flash.page_open(block, page);
+	flash.page_write_continued(buffer, 0x812, 2);
+	flash.page_commit();
+	
+	flash.page_open(block, page);
+	flash.page_write_continued(buffer, 0x822, 2);
+	flash.page_commit();
+	
+	flash.page_open(block, page);
+	flash.page_write_continued(buffer, 0x832, 2);
+	flash.page_commit();
+	
+
+	// Check protected areas
+	
+	if(!flash.read_page(buffer, block, page, 0, 2048)){
+		imu_sprint(textbuffer, "Failed to read\nmain!");
+		goto end;
+	}
+	
+	if(!flash.read_page(buffer, block, page, 0, 2048)){
+		imu_sprint(textbuffer, "Failed to read\nmain twice!");
+		goto end;
+	}
+	
+	
+	
+	for(uint32_t i = 0; i < 2048; i++){
+		if(buffer[i] != static_cast<uint8_t>(i)){
+			imu_sprint(textbuffer, "Error at ", i);
+			goto end;
+		}
+	}
+	
+	if(!flash.read_page(buffer, block, page, 0x802, 2)){
+		imu_sprint(textbuffer, "Failed to read\nspare 0!");
+		goto end;
+	}
+	
+	for(uint32_t i = 0; i < 2; i++){
+		if(buffer[i] != static_cast<uint8_t>(i)){
+			imu_sprint(textbuffer, "Error spare 0\nat ", i);
+			goto end;
+		}
+	}
+	
+	if(!flash.read_page(buffer, block, page, 0x812, 2)){
+		imu_sprint(textbuffer, "Failed to read\nspare 1!");
+		goto end;
+	}
+	
+	for(uint32_t i = 0; i < 2; i++){
+		if(buffer[i] != static_cast<uint8_t>(i)){
+			imu_sprint(textbuffer, "Error spare 1\nat ", i);
+			goto end;
+		}
+	}
+	
+	if(!flash.read_page(buffer, block, page, 0x822, 2)){
+		imu_sprint(textbuffer, "Failed to read\nspare 2!");
+		goto end;
+	}
+	
+	for(uint32_t i = 0; i < 2; i++){
+		if(buffer[i] != static_cast<uint8_t>(i)){
+			imu_sprint(textbuffer, "Error spare 2\nat ", i);
+			goto end;
+		}
+	}
+	
+	if(!flash.read_page(buffer, block, page, 0x832, 2)){
+		imu_sprint(textbuffer, "Failed to read\nspare 3!");
+		goto end;
+	}
+
+	for(uint32_t i = 0; i < 2; i++){
+		if(buffer[i] != static_cast<uint8_t>(i)){
+			imu_sprint(textbuffer, "Error spare 3\nat ", i);
+			goto end;
+		}
+	}
+	
+	imu_sprint(textbuffer, "Success!");
+
+end:
+	
+	oled.fb.write_text_centered<SmallFont>(textbuffer, 2, 0);
+	
+	UI::wait_for_button(UI::MASK_SELECT);
+	
+	return true;
+}
+
+
 bool Tests::flash_create_test_file(){
 	int fd;
 	constexpr auto size = 2048;

@@ -211,6 +211,13 @@ void _unhandled_exception(void) {
     ;
 }
 
+#if !defined(__DOXYGEN__)
+__attribute__ ((naked))
+#endif
+void _ignore_exception(void) {
+
+}
+
 void NMIVector(void) __attribute__((weak, alias("_unhandled_exception")));
 void HardFaultVector(void) __attribute__((weak, alias("_unhandled_exception")));
 void MemManageVector(void) __attribute__((weak, alias("_unhandled_exception")));
@@ -254,6 +261,7 @@ void VectorA4(void) __attribute__((weak, alias("_unhandled_exception")));
 void VectorA8(void) __attribute__((weak, alias("_unhandled_exception")));
 void VectorAC(void) __attribute__((weak, alias("_unhandled_exception")));
 void VectorB0(void) __attribute__((weak, alias("_unhandled_exception")));
+//void VectorB4(void) __attribute__((weak, alias("_ignore_exception")));
 void VectorB4(void) __attribute__((weak, alias("_unhandled_exception")));
 void VectorB8(void) __attribute__((weak, alias("_unhandled_exception")));
 void VectorBC(void) __attribute__((weak, alias("_unhandled_exception")));

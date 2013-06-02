@@ -104,6 +104,32 @@ public:
 	bool check_block_bad(uint16_t block);
 	
 	/*!
+	 @brief Open a page for a sequence of edits
+	 
+	 This will read a page to a buffer in flash to be modified
+	 
+	 @note This MUST be followed by a call to \ref page_commit in the same thread
+	 @note This will prevent any other non-page flash actions until committed
+	 */
+	bool page_open(uint16_t block, uint8_t page);
+	/*!
+	 @brief Write to an open page from \ref page_open
+	 
+	 This will not be committed until a cal to \ref page_commit
+	 */
+	bool page_write_continued(uint8_t const * src, uint16_t offset, uint16_t n);
+	/*!
+	 @brief Read from an open page from \ref page_open
+	 */
+	bool page_read_continued(uint8_t * dst, uint16_t offset, uint16_t n);
+	/*!
+	 @brief Commit a modified page back to the flash bank
+	 
+	 @pre \ref page_open was called
+	 */
+	bool page_commit();
+	
+	/*!
 	 @brief Go read all blocks and rewrite them completely to refresh the data
 	 
 	 Occasional use of this function should reduce the frequency of bit errors
@@ -176,6 +202,9 @@ protected:
 			offset(offset)
 		{}
 		
+		address_t() : 
+		address_t(0,0,0){};
+		
 		uint16_t block;
 		uint16_t page;
 		uint16_t offset;
@@ -190,6 +219,8 @@ protected:
 			dst[2] = (block << 6) | page;
 		}
 	};
+	
+	address_t current_addr;
 	
 	void page_read_to_cache(address_t const &addr);
 	
@@ -214,7 +245,6 @@ protected:
 	void lock(){chMtxLock(&mutex);}
 	//! Unlock (in mutual exclusion sense) the device
 	void unlock(){chMtxUnlock();}
-	
 	
 	Mutex mutex;
 	

@@ -226,6 +226,7 @@ set(APP_SOURCES
 	src/ui/filemenu.cpp
 	src/ui/tests.cpp
 	src/ui/eventlogmenu.cpp
+	#src/ui/footstepcount.cpp
 )
 
 

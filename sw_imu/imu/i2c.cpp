@@ -7,10 +7,12 @@
 #include "imu/i2c.h"
 
 I2C::I2C(I2CDriver& driver, i2copmode_t opmode,
-         i2cdutycycle_t dutycycle, uint32_t speed) :
+         i2cdutycycle_t dutycycle, uint32_t speed,
+         gpio_pin_t const &sda, gpio_pin_t const &scl) :
 	driver(driver),
 	refcnt(0),
-	config({opmode,speed,dutycycle}){}
+	config({opmode,speed,dutycycle}),
+	sda(sda), scl(scl){}
 	
 void I2C::init(){
 	if(!(refcnt++)){
@@ -67,8 +69,18 @@ uint8_t I2C::read_byte_test(i2caddr_t addr, uint8_t regaddr){
 		ret = 0;
 		i2cAcquireBus(&driver);
 		driver.i2c->CR1 |= I2C_CR1_START;
-		while(0 == (driver.i2c->SR2 & I2C_SR2_MSL));
-		driver.i2c->DR = 0xFF;
+		chThdSleep(MS2ST(1));
+		if((driver.i2c->SR2 & I2C_SR2_MSL) == 0){
+			// I2C is messed up
+			scl.set_mode(gpio_pin_t::MODE_OUTPUT);
+			for(uint32_t i = 0; i < 9; i++){
+				scl.clear();
+				chThdSleep(MS2ST(1));
+				scl.set();
+				chThdSleep(MS2ST(1));
+			}
+			scl.set_mode(gpio_pin_t::MODE_ALT);
+		}
 		while(driver.i2c->SR1 & I2C_SR1_TXE);
 		i2cReleaseBus(&driver);
 		msg = transmit(addr, &regaddr, 1, &ret, 1, MS2ST(4));

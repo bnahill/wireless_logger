@@ -1,10 +1,13 @@
 #include "ui/testmenu.h"
 #include "ui/tests.h"
+//#include "ui/footstepcount.h"
 
 MenuItem const TestMenu::items[] = {
 	{"FS RW Test", (MenuItem::item_handler)Tests::flash_create_test_file},
 	{"Flash Bad Blocks", (MenuItem::item_handler)Tests::flash_bad_block_check},
 	{"Flash RW Test\n(will corrupt mem)", (MenuItem::item_handler)Tests::flash_test},
+	{"Flash ECC Test\n(will corrupt mem)", (MenuItem::item_handler)Tests::flash_ecc_flexibility_test},
+//	{"Count Steps", (MenuItem::item_handler)UI::launch_screen<FootstepCount>},
 	{"Exit", (MenuItem::item_handler)TestMenu::exit},
 };
 

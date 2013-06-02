@@ -67,6 +67,18 @@ struct gpio_pin_t {
 	void clear() const{
 		gpio.BSRR.H.clear = mask;
 	}
+	
+	typedef enum {
+		MODE_INPUT = 0,
+		MODE_OUTPUT = 1,
+		MODE_ALT = 2,
+		MODE_ANALOG = 3
+	} gpio_mode_t;
+	
+	void set_mode(gpio_mode_t mode) const {
+		gpio.MODER = (gpio.MODER & ~(3 << (index * 2))) | (mode << (index * 2));
+	}
+	
 	GPIO_TypeDef &gpio;
 	uint16_t mask;
 	uint16_t index;
@@ -100,6 +112,11 @@ static inline char * imu_sprint_inner(char * dst, T v){
 	return v.imu_print(dst);
 }
 
+template <typename T>
+static inline char * imu_snprint_inner(char * dst, T v){
+	return v.imu_nprint(dst);
+}
+
 template <>
 char * imu_sprint_inner(char * dst, int i){
 	return uint_to_string(static_cast<uint32_t>(i), dst);
@@ -112,6 +129,15 @@ char * imu_sprint_inner(char * dst, float f){
 
 template <>
 char * imu_sprint_inner(char * dst, const char * c){
+    while(*c){
+        *(dst++) = *(c++);
+    }
+    *dst = '\0';
+    return dst;
+}
+
+template <>
+char * imu_snprint_inner(char * dst, const char * c){
     while(*c){
         *(dst++) = *(c++);
     }
@@ -141,6 +167,15 @@ char * imu_sprint(char  * dst, const Thead& head, const Ttail&... tail){
     return imu_sprint(imu_sprint_inner(dst, head), tail...);
 }
 
+template<typename Thead, typename... Ttail> 
+char * imu_snprint(char  * dst, const Thead& head, const Ttail&... tail){
+    return imu_snprint(imu_snprint_inner(dst, head), tail...);
+}
+
+// template<GPIO_TypeDef * gpio, typename Thead, typename... Ttail>
+// constexpr uint32_t get_af_value(const Thead head, const Ttail... tail){
+// 	
+// }
 
 //! @} @}
 

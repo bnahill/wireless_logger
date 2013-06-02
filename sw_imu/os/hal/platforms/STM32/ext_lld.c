@@ -87,11 +87,16 @@ void ext_lld_start(EXTDriver *extp) {
     ext_lld_exti_irq_enable();
 
   /* Configuration of automatic channels.*/
-  for (i = 0; i < EXT_MAX_CHANNELS; i++)
+  for (i = 0; i < EXT_MAX_CHANNELS; i++){
+#if SCHED_TICK_RTC
+	if(i == 22)
+		continue;
+#endif
     if (extp->config->channels[i].mode & EXT_CH_MODE_AUTOSTART)
       ext_lld_channel_enable(extp, i);
     else
       ext_lld_channel_disable(extp, i);
+  }
 }
 
 /**
