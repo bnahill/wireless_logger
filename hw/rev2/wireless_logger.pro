@@ -1,6 +1,6 @@
-update=Fri 31 May 2013 10:11:50 AM EDT
+update=Mon 03 Jun 2013 07:23:32 PM EDT
 version=1
-last_client=eeschema
+last_client=pcbnew
 [general]
 version=1
 [cvpcb]
@@ -8,28 +8,6 @@ version=1
 NetIExt=net
 [cvpcb/libraries]
 EquName1=devcms
-[pcbnew]
-version=1
-LastNetListRead=wireless_logger.net
-UseCmpFile=1
-PadDrill="    1.066800"
-PadDrillOvalY="    1.066800"
-PadSizeH="    1.778000"
-PadSizeV="    1.778000"
-PcbTextSizeV="    1.500000"
-PcbTextSizeH="    1.500000"
-PcbTextThickness="    0.300000"
-ModuleTextSizeV="    1.500000"
-ModuleTextSizeH="    1.500000"
-ModuleTextSizeThickness="    0.150000"
-SolderMaskClearance="    0.200000"
-SolderMaskMinWidth="    0.000000"
-DrawSegmentWidth="    0.200000"
-BoardOutlineThickness="    0.150000"
-ModuleOutlineThickness="    0.150000"
-[pcbnew/libraries]
-LibDir=
-LibName1=lib/wi_logger
 [eeschema]
 version=1
 LibDir=
@@ -55,3 +33,25 @@ LibName13=interface
 LibName14=opto
 LibName15=contrib
 LibName16=lib/wi_logger
+[pcbnew]
+version=1
+LastNetListRead=wireless_logger.net
+UseCmpFile=1
+PadDrill="    0.330200"
+PadDrillOvalY="    0.330200"
+PadSizeH="    0.600000"
+PadSizeV="    0.600000"
+PcbTextSizeV="    1.500000"
+PcbTextSizeH="    1.500000"
+PcbTextThickness="    0.300000"
+ModuleTextSizeV="    1.500000"
+ModuleTextSizeH="    1.500000"
+ModuleTextSizeThickness="    0.150000"
+SolderMaskClearance="    0.200000"
+SolderMaskMinWidth="    0.000000"
+DrawSegmentWidth="    0.200000"
+BoardOutlineThickness="    0.200000"
+ModuleOutlineThickness="    0.150000"
+[pcbnew/libraries]
+LibDir=
+LibName1=lib/wi_logger
