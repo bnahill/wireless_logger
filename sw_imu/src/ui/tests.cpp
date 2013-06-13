@@ -24,6 +24,7 @@ bool Tests::flash_ecc_flexibility_test() {
 		buffer[i] = i;
 	}
 	
+	flash.lock();
 	flash.erase_block(block);
 	
 	// Write to protected areas
@@ -66,7 +67,8 @@ bool Tests::flash_ecc_flexibility_test() {
 	flash.page_write_continued(buffer, 0x832, 2);
 	flash.page_commit();
 	
-
+	flash.unlock();
+	
 	// Check protected areas
 	
 	if(!flash.read_page(buffer, block, page, 0, 2048)){
@@ -139,6 +141,7 @@ bool Tests::flash_ecc_flexibility_test() {
 	imu_sprint(textbuffer, "Success!");
 
 end:
+	
 	
 	oled.fb.write_text_centered<SmallFont>(textbuffer, 2, 0);
 	

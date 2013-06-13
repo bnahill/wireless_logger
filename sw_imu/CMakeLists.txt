@@ -57,6 +57,7 @@ set(CMSIS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMSIS)
 set(DSP_SRC ${CMSIS_DIR}/DSP_Lib/Source)
 set(OS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/os)
 set(FS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/coffee)
+set(FLOGFS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/flogfs)
 
 
 
@@ -127,6 +128,8 @@ include_directories(
 	${IMU_DIR}
 	
 	${FS_DIR}
+	
+	${FLOGFS_DIR}/inc
 	
 	src/platform
 )
@@ -250,6 +253,10 @@ set(IMU_SOURCES
 	${IMU_DIR}/graphics/courier3.cpp
 )
 
+set(FLOGFS_SOURCES
+	${FLOGFS_DIR}/src/flogfs.cpp
+)
+
 # Add required CMSIS-DSP sources as needed
 set(DSP_SOURCES
 	${DSP_SRC}/BasicMathFunctions/arm_abs_f32.c
@@ -263,7 +270,7 @@ set(DSP_SOURCES
 # add_library(dsp_lib STATIC ${DSP_SOURCES})
 # add_library(imu_lib STATIC ${IMU_SOURCES})
 #add_library(fs_lib STATIC ${FS_SOURCES})
-add_executable(${OUTFILE} ${APP_SOURCES} ${OS_SOURCES} ${FS_SOURCES} ${IMU_SOURCES} ${DSP_SOURCES})
+add_executable(${OUTFILE} ${APP_SOURCES} ${OS_SOURCES} ${FLOGFS_SOURCES} ${FS_SOURCES} ${IMU_SOURCES} ${DSP_SOURCES})
 target_link_libraries(${OUTFILE}  gcc c)
 
 

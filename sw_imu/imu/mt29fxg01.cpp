@@ -175,9 +175,7 @@ void MT29FxG01::cleanup(){
 	unlock();
 }
 
-bool MT29FxG01::page_open ( uint16_t block, uint8_t page ) {
-	lock();
-	
+bool MT29FxG01::page_open ( uint16_t block, uint8_t page ) {	
 	current_addr = address_t(block, page, 0);
 	
 	page_read_to_cache(current_addr);
@@ -208,12 +206,9 @@ bool MT29FxG01::page_commit () {
 		}
 		if((stat & STATMASK_OIP) == 0){
 			// Done
-			unlock();
 			return true;
 		}
 	}
-	
-	unlock();
 	
 	return false;
 }

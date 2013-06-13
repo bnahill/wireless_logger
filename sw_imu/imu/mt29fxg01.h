@@ -136,6 +136,11 @@ public:
 	 */
 	void cleanup();
 	
+	//! Lock (in mutual exclusion sense) the device
+	void lock(){chMtxLock(&mutex);}
+	//! Unlock (in mutual exclusion sense) the device
+	void unlock(){chMtxUnlock();}
+	
 	
 	MemoryPool pool;
 protected:
@@ -240,11 +245,6 @@ protected:
 	 @note This doesn't wait for the operation to finish
 	 */
 	void program_execute(address_t const &addr);
-	
-	//! Lock (in mutual exclusion sense) the device
-	void lock(){chMtxLock(&mutex);}
-	//! Unlock (in mutual exclusion sense) the device
-	void unlock(){chMtxUnlock();}
 	
 	Mutex mutex;
 	
