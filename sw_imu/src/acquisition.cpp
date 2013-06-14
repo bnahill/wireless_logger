@@ -23,11 +23,10 @@ GPTDriver &Acquisition::timer = GPTD8;
 
 using namespace Platform;
 
-static uint32_t mag_count = 0, acc_count = 0;
-
 static WORKING_AREA(waAccThread, 512);
 static msg_t AccThread(void *arg) {
 	EventListener listener;
+	Euclidean3_f32 reading;
 	(void)arg;
 	chRegSetThreadName("AccThread");
 	
@@ -35,19 +34,13 @@ static msg_t AccThread(void *arg) {
 	acc1.init();
 
 	chEvtRegisterMask(&Acquisition::tick_source, &listener, 1);
-	Euclidean3_f32 measurement;
 	while(1){
 		chEvtWaitOne(1);
 		acc1.read();
-		acc_count++;
-		acc1.get_reading(measurement);
-		chEvtBroadcastFlags(&Acquisition::sensor_source,
-		                    Acquisition::SRC_ACC1);
-		if(measurement.mag_squared()> 3){
-			//led1.on();
-		} else {
-			//led1.off();
-		}
+		acc1.get_reading(reading);
+		acc_source.put(reading);
+		//chEvtBroadcastFlags(&Acquisition::sensor_source,
+		//                    Acquisition::SRC_ACC1);
 	}
 	return 0;
 }
@@ -56,6 +49,7 @@ static msg_t AccThread(void *arg) {
 static WORKING_AREA(waMagThread, 512);
 static msg_t MagThread(void *arg) {
 	EventListener listener;
+	Euclidean3_f32 reading;
 	(void)arg;
 	chRegSetThreadName("MagThread");
 
@@ -68,9 +62,10 @@ static msg_t MagThread(void *arg) {
 	while(1){
 		chEvtWaitOne(1);
 		mag1.read();
-		chEvtBroadcastFlags(&Acquisition::sensor_source,
-		                    Acquisition::SRC_MAG1);
-		mag_count++;
+		mag1.get_reading(reading);
+		mag_source.put(reading);
+		//chEvtBroadcastFlags(&Acquisition::sensor_source,
+		//                    Acquisition::SRC_MAG1);
 	}
 	return 0;
 }
@@ -79,6 +74,8 @@ static WORKING_AREA(waGyroThread, 512);
 static msg_t GyroThread(void *arg) {
 	EventListener listener;
 	eventmask_t event;
+	Euclidean3_f32 reading;
+	
 	(void)arg;
 	chRegSetThreadName("GyroThread");
 
@@ -93,8 +90,10 @@ static msg_t GyroThread(void *arg) {
 		switch(event){
 			case 1:
 				gyro1.read();
-				chEvtBroadcastFlags(&Acquisition::sensor_source,
-				                    Acquisition::SRC_GYRO1);
+				//chEvtBroadcastFlags(&Acquisition::sensor_source,
+				//                    Acquisition::SRC_GYRO1);
+				gyro1.get_reading(reading);
+				gyro_source.put(reading);
 				break;
 			case 8:
 				gyro1.read_temperature();

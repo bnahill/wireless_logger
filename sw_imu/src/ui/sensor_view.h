@@ -29,6 +29,7 @@ public:
 	void exec();
 protected:
 	static constexpr uint32_t stack_size = 1024;
+	static constexpr uint32_t buffer_len = 8;
 	
 	WORKING_AREA(SVThread, stack_size);
 
@@ -49,6 +50,9 @@ protected:
 		sv->thread_action();
 		return 0;
 	}
+	
+	DataListener<Euclidean3_f32> data_listener;
+	Euclidean3_f32 data_buffer[buffer_len];
 	
 	mode_t mode;
 	display_mode_t display_mode;

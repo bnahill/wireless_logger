@@ -4,6 +4,7 @@ using namespace Platform;
 
 void SensorView::exec(){
 	eventmask_t evt;
+	bool just_set_mode;
 	
 	oled.fb.clear_area(1);
 	
@@ -12,6 +13,7 @@ void SensorView::exec(){
 	chEvtGetAndClearEvents(ALL_EVENTS);
 
 	while(!chThdShouldTerminate()){
+		just_set_mode = false;
 		evt = chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(5));
 		if(!evt) continue;
 		
@@ -64,26 +66,58 @@ void SensorView::thread_action(){
 	EventListener listener;
 	char some_string[32];
 	
-	chEvtRegisterMask(&Acquisition::tick_source, &listener, 1);
+	auto old_mode = MODE_ACC;
+	
+	//chEvtRegisterMask(&Acquisition::tick_source, &listener, 1);
+	
+	data_listener.init(data_buffer, buffer_len);
+	gyro_source.register_queue(data_listener);
 	
 	while(!chThdShouldTerminate()){
-		chEvtWaitOne(1);
+		//chEvtWaitOne(1);
+		if(mode != old_mode){
+			switch(old_mode){
+			case MODE_ACC:
+				acc_source.unregister_queue(data_listener);
+				break;
+			case MODE_MAG:
+				mag_source.unregister_queue(data_listener);
+				break;
+			case MODE_GYRO:
+				gyro_source.unregister_queue(data_listener);
+				break;
+			}
+			switch(mode){
+			case MODE_ACC:
+				acc_source.register_queue(data_listener);
+				break;
+			case MODE_MAG:
+				mag_source.register_queue(data_listener);
+				break;
+			case MODE_GYRO:
+				gyro_source.register_queue(data_listener);
+				break;
+			}
+			mode = old_mode;
+		}
+		
+		data_listener.receive_to(measurement);
 		
 		oled.fb.clear_area(1, 3, 0, 90);
 		switch(mode){
 		case MODE_ACC:
 			oled.fb.write_text<Courier3>("ACC:", 1, 0, 90);
-			acc1.get_reading(measurement);
+			//acc1.get_reading(measurement);
 			if(display_mode == DISP_PROGRESS) measurement *= 0.2;
 			break;
 		case MODE_GYRO:
 			oled.fb.write_text<Courier3>("GYR:", 1, 0, 90);
-			gyro1.get_reading(measurement);
+			//gyro1.get_reading(measurement);
 			if(display_mode == DISP_PROGRESS) measurement *= 0.01;
 			break;
 		case MODE_MAG:
 			oled.fb.write_text<Courier3>("MAG:", 1, 0, 90);
-			mag1.get_reading(measurement);
+			//mag1.get_reading(measurement);
 			if(display_mode == DISP_PROGRESS) measurement *= 0.01;
 			break;
 		}

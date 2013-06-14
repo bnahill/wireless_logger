@@ -37,6 +37,7 @@
 #include <imu/guardian.h>
 #include <imu/mt29fxg01.h>
 #include <imu/eventlog.h>
+#include <imu/datasource.h>
 #include "rng.h"
 
 /*!
@@ -50,6 +51,10 @@ namespace Platform {
 	extern I2C i2c1;
 	extern MMA8452Q acc1;
 	extern MAG3110 mag1;
+	
+	extern DataSource<Euclidean3_f32> acc_source;
+	extern DataSource<Euclidean3_f32> mag_source;
+	extern DataSource<Euclidean3_f32> gyro_source;
 	
 	extern SPI spi1;
 	extern SPI spi2;
