@@ -12,7 +12,7 @@ end
 set remotetimeout 2
 file @OUTFILE@
 
-shell killall openocd
+shell killall -q openocd
 target remote | openocd -c "gdb_port pipe; log_output openocd.log" @OPENOCD_ARGS@
 monitor reset init
 
