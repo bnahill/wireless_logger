@@ -22,12 +22,14 @@ void MainMenu::exec(){
 	menu.run(false);
 }
 
-void MainMenu::launch_sensor_view_bar(){
-	SensorView sv(SensorView::DISP_PROGRESS);
-	sv.exec();
-}
+
 
 void MainMenu::launch_sensor_view_num(){
 	SensorView sv(SensorView::DISP_NUMBER);
+	sv.exec();
+}
+
+void MainMenu::launch_sensor_view_bar(){
+	SensorView sv(SensorView::DISP_PROGRESS);
 	sv.exec();
 }

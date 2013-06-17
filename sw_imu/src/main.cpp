@@ -16,8 +16,6 @@ using namespace Platform;
 
 
 int main(void) {
-	char test[32];
-
 	halInit();
 	chSysInit();
 	

@@ -20,6 +20,7 @@ EventSource Acquisition::sensor_source;
 
 GPTDriver &Acquisition::timer = GPTD8;
 
+static uint32_t acc_sample_count = 0;
 
 using namespace Platform;
 
@@ -39,6 +40,7 @@ static msg_t AccThread(void *arg) {
 		acc1.read();
 		acc1.get_reading(reading);
 		acc_source.put(reading);
+		acc_sample_count += 1;
 		//chEvtBroadcastFlags(&Acquisition::sensor_source,
 		//                    Acquisition::SRC_ACC1);
 	}

@@ -28,7 +28,7 @@ public:
 	
 	void exec();
 protected:
-	static constexpr uint32_t stack_size = 1024;
+	static constexpr uint32_t stack_size = 2048;
 	static constexpr uint32_t buffer_len = 8;
 	
 	WORKING_AREA(SVThread, stack_size);

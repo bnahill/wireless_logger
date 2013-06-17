@@ -4,7 +4,6 @@ using namespace Platform;
 
 void SensorView::exec(){
 	eventmask_t evt;
-	bool just_set_mode;
 	
 	oled.fb.clear_area(1);
 	
@@ -13,8 +12,7 @@ void SensorView::exec(){
 	chEvtGetAndClearEvents(ALL_EVENTS);
 
 	while(!chThdShouldTerminate()){
-		just_set_mode = false;
-		evt = chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(5));
+		evt = chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(50));
 		if(!evt) continue;
 		
 		evt = UI::ui.handle_evt(evt);
@@ -63,18 +61,15 @@ msg_t SensorView::terminate(){
 	
 void SensorView::thread_action(){
 	Euclidean3_f32 measurement;
-	EventListener listener;
 	char some_string[32];
 	
 	auto old_mode = MODE_ACC;
 	
-	//chEvtRegisterMask(&Acquisition::tick_source, &listener, 1);
 	
 	data_listener.init(data_buffer, buffer_len);
-	gyro_source.register_queue(data_listener);
+	acc_source.register_queue(data_listener);
 	
 	while(!chThdShouldTerminate()){
-		//chEvtWaitOne(1);
 		if(mode != old_mode){
 			switch(old_mode){
 			case MODE_ACC:
@@ -98,17 +93,19 @@ void SensorView::thread_action(){
 				gyro_source.register_queue(data_listener);
 				break;
 			}
-			mode = old_mode;
+			old_mode = mode;
 		}
 		
-		data_listener.receive_to(measurement);
+		if(!data_listener.receive_to(measurement, MS2ST(100))){
+			continue;
+		}
 		
 		oled.fb.clear_area(1, 3, 0, 90);
-		switch(mode){
+		switch(old_mode){
 		case MODE_ACC:
 			oled.fb.write_text<Courier3>("ACC:", 1, 0, 90);
 			//acc1.get_reading(measurement);
-			if(display_mode == DISP_PROGRESS) measurement *= 0.2;
+			if(display_mode == DISP_PROGRESS) measurement *= 0.4;
 			break;
 		case MODE_GYRO:
 			oled.fb.write_text<Courier3>("GYR:", 1, 0, 90);
@@ -123,11 +120,11 @@ void SensorView::thread_action(){
 		}
 		switch(display_mode){
 		case DISP_NUMBER:
-			float_to_string(measurement.x, some_string);
+			imu_sprint(some_string, measurement.x);
 			oled.fb.write_text<SmallFont>(some_string, 1, 90);
-			float_to_string(measurement.y, some_string);
+			imu_sprint(some_string, measurement.y);
 			oled.fb.write_text<SmallFont>(some_string, 2, 90);
-			float_to_string(measurement.z, some_string);
+			imu_sprint(some_string, measurement.z);
 			oled.fb.write_text<SmallFont>(some_string, 3, 90);
 			break;
 		case DISP_PROGRESS:
@@ -139,5 +136,15 @@ void SensorView::thread_action(){
 		oled.update();
 	}
 	
-	chEvtUnregister(&Acquisition::tick_source, &listener);
+	switch(old_mode){
+	case MODE_ACC:
+		acc_source.unregister_queue(data_listener);
+		break;
+	case MODE_MAG:
+		mag_source.unregister_queue(data_listener);
+		break;
+	case MODE_GYRO:
+		gyro_source.unregister_queue(data_listener);
+		break;
+	}
 }
