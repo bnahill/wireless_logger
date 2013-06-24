@@ -1,4 +1,4 @@
-update=Mon 03 Jun 2013 07:23:32 PM EDT
+update=Mon 24 Jun 2013 12:41:25 PM EDT
 version=1
 last_client=pcbnew
 [general]
@@ -47,7 +47,7 @@ PcbTextThickness="    0.300000"
 ModuleTextSizeV="    1.500000"
 ModuleTextSizeH="    1.500000"
 ModuleTextSizeThickness="    0.150000"
-SolderMaskClearance="    0.200000"
+SolderMaskClearance="    0.000000"
 SolderMaskMinWidth="    0.000000"
 DrawSegmentWidth="    0.200000"
 BoardOutlineThickness="    0.200000"

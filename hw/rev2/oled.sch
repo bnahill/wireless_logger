@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sun 02 Jun 2013 06:15:59 PM EDT
+EESchema Schematic File Version 2
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -22,7 +22,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 6 7
 Title "IMU Logger"
-Date "2 jun 2013"
+Date "24 jun 2013"
 Rev "2"
 Comp "McGill Integrated Microsystems Lab"
 Comment1 "Ben Nahill (bnahill@gmail.com)"

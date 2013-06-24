@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2013-mar-30)-stable date = Sat 01 Jun 2013 03:19:06 PM EDT
+Cmp-Mod V01 Created by CvPcb (2013-may-18)-stable date = Mon 24 Jun 2013 01:18:14 PM EDT
 
 BeginCmp
 TimeStamp = /518D865B/51949426;
@@ -491,6 +491,20 @@ IdModule  = SMD0402;
 EndCmp
 
 BeginCmp
+TimeStamp = /518D8A49/51AAD9AF;
+Reference = C67;
+ValeurCmp = 1u;
+IdModule  = SMD0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /518D8A49/51AAD9B5;
+Reference = C68;
+ValeurCmp = 1u;
+IdModule  = SMD0603;
+EndCmp
+
+BeginCmp
 TimeStamp = /51784208/518D51D1;
 Reference = D1;
 ValeurCmp = BAT43XV2;
@@ -561,17 +575,17 @@ IdModule  = HDR_5X1_50MIL;
 EndCmp
 
 BeginCmp
+TimeStamp = /519FB9D1;
+Reference = J6;
+ValeurCmp = CONN_6X2;
+IdModule  = HDR_6X2_50MIL;
+EndCmp
+
+BeginCmp
 TimeStamp = /518D07D1/518D0FC0;
 Reference = L1;
 ValeurCmp = MLP2016S1R0M;
 IdModule  = SMD0805;
-EndCmp
-
-BeginCmp
-TimeStamp = /519FB9D1;
-Reference = P1;
-ValeurCmp = CONN_6X2;
-IdModule  = HDR_6X2_50MIL;
 EndCmp
 
 BeginCmp
@@ -865,6 +879,13 @@ BeginCmp
 TimeStamp = /51784208/51A40C1B;
 Reference = R35;
 ValeurCmp = 10k;
+IdModule  = SMD0402;
+EndCmp
+
+BeginCmp
+TimeStamp = /51AA996D;
+Reference = R36;
+ValeurCmp = 100k;
 IdModule  = SMD0402;
 EndCmp
 

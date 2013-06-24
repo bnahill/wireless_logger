@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sun 02 Jun 2013 06:15:59 PM EDT
+EESchema Schematic File Version 2
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -22,7 +22,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 7
 Title "IMU Logger"
-Date "2 jun 2013"
+Date "24 jun 2013"
 Rev "2"
 Comp "McGill Integrated Microsystems Lab"
 Comment1 "Ben Nahill (bnahill@gmail.com)"
@@ -464,10 +464,10 @@ F 3 "~" H 3150 5800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CONN_6X2 P1
+L CONN_6X2 J6
 U 1 1 519FB9D1
 P 1750 7300
-F 0 "P1" H 1750 7650 60  0000 C CNN
+F 0 "J6" H 1750 7650 60  0000 C CNN
 F 1 "CONN_6X2" V 1750 7300 60  0000 C CNN
 F 2 "~" H 1750 7300 60  0000 C CNN
 F 3 "~" H 1750 7300 60  0000 C CNN
