@@ -1,4 +1,4 @@
-update=Mon 24 Jun 2013 12:41:25 PM EDT
+update=Tue 25 Jun 2013 10:57:37 AM EDT
 version=1
 last_client=pcbnew
 [general]
@@ -55,3 +55,4 @@ ModuleOutlineThickness="    0.150000"
 [pcbnew/libraries]
 LibDir=
 LibName1=lib/wi_logger
+LibName2=lib/EAGLE
