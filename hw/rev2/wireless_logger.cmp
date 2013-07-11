@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2013-may-18)-stable date = Mon 24 Jun 2013 01:18:14 PM EDT
+Cmp-Mod V01 Created by CvPcb (2013-may-18)-stable date = Wed 10 Jul 2013 08:48:56 AM EDT
 
 BeginCmp
 TimeStamp = /518D865B/51949426;
@@ -505,6 +505,27 @@ IdModule  = SMD0603;
 EndCmp
 
 BeginCmp
+TimeStamp = /51DD8457;
+Reference = C69;
+ValeurCmp = 10u;
+IdModule  = SMD0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /51DD8247;
+Reference = C70;
+ValeurCmp = 10u;
+IdModule  = SMD0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /51784208/51DD5A93;
+Reference = C71;
+ValeurCmp = 1u;
+IdModule  = SMD0402;
+EndCmp
+
+BeginCmp
 TimeStamp = /51784208/518D51D1;
 Reference = D1;
 ValeurCmp = BAT43XV2;
@@ -530,6 +551,13 @@ TimeStamp = /51784208/5194AED1;
 Reference = D4;
 ValeurCmp = LB Q39E-N1P1-35-1;
 IdModule  = SMD0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /51DD79DB;
+Reference = D5;
+ValeurCmp = BAT43XV2;
+IdModule  = SOD-523F;
 EndCmp
 
 BeginCmp
@@ -886,6 +914,20 @@ BeginCmp
 TimeStamp = /51AA996D;
 Reference = R36;
 ValeurCmp = 100k;
+IdModule  = SMD0402;
+EndCmp
+
+BeginCmp
+TimeStamp = /51784208/51DD5A64;
+Reference = R37;
+ValeurCmp = 1M;
+IdModule  = SMD0402;
+EndCmp
+
+BeginCmp
+TimeStamp = /51784208/51DD5A7C;
+Reference = R38;
+ValeurCmp = 1M;
 IdModule  = SMD0402;
 EndCmp
 
