@@ -1,4 +1,4 @@
-update=Tue 25 Jun 2013 10:57:37 AM EDT
+update=Fri 12 Jul 2013 10:34:16 AM EDT
 version=1
 last_client=pcbnew
 [general]
@@ -37,10 +37,10 @@ LibName16=lib/wi_logger
 version=1
 LastNetListRead=wireless_logger.net
 UseCmpFile=1
-PadDrill="    0.330200"
-PadDrillOvalY="    0.330200"
-PadSizeH="    0.600000"
-PadSizeV="    0.600000"
+PadDrill="    0.000000"
+PadDrillOvalY="    0.000000"
+PadSizeH="    0.220000"
+PadSizeV="    0.220000"
 PcbTextSizeV="    1.500000"
 PcbTextSizeH="    1.500000"
 PcbTextThickness="    0.300000"
@@ -55,4 +55,6 @@ ModuleOutlineThickness="    0.150000"
 [pcbnew/libraries]
 LibDir=
 LibName1=lib/wi_logger
-LibName2=lib/EAGLE
+LibName2=lib/eagle
+LibName3=lib/mcgill
+LibName4=lib/oshw

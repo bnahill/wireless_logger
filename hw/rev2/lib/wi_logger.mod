@@ -1,4 +1,4 @@
-PCBNEW-LibModule-V1  Tue 09 Jul 2013 10:32:12 PM EDT
+PCBNEW-LibModule-V1  Fri 12 Jul 2013 11:16:33 AM EDT
 # encoding utf-8
 Units mm
 $INDEX
@@ -4997,7 +4997,7 @@ Po -2.54 0.635
 $EndPAD
 $EndMODULE SULLINS_5X2_050_THRU
 $MODULE TPS62698
-Po 0 0 0 15 51DCC7A1 00000000 ~~
+Po 0 0 0 15 51E01DC7 00000000 ~~
 Li TPS62698
 Sc 0
 AR 
@@ -5010,52 +5010,46 @@ DS 0.4 -0.6 0.4 0.6 0.15 21
 DS 0.4 0.6 -0.4 0.6 0.15 21
 DS -0.4 0.6 -0.4 -0.6 0.15 21
 $PAD
-Sh "C1" C 0.22 0.22 0 0 0
+Sh "C1" C 0.26318 0.26318 0 0 0
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
 Po -0.2 0.4
-.LocalClearance 0.1778
 $EndPAD
 $PAD
-Sh "C2" C 0.22 0.22 0 0 0
+Sh "C2" C 0.26318 0.26318 0 0 0
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
 Po 0.2 0.4
-.LocalClearance 0.1778
 $EndPAD
 $PAD
-Sh "B2" C 0.22 0.22 0 0 0
+Sh "B2" C 0.26318 0.26318 0 0 0
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
 Po 0.2 0
-.LocalClearance 0.1778
 $EndPAD
 $PAD
-Sh "B1" C 0.22 0.22 0 0 0
+Sh "B1" C 0.26318 0.26318 0 0 0
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
 Po -0.2 0
-.LocalClearance 0.1778
 $EndPAD
 $PAD
-Sh "A1" C 0.22 0.22 0 0 0
+Sh "A1" C 0.26318 0.26318 0 0 0
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
 Po -0.2 -0.4
-.LocalClearance 0.1778
 $EndPAD
 $PAD
-Sh "A2" C 0.22 0.22 0 0 0
+Sh "A2" C 0.26318 0.26318 0 0 0
 Dr 0 0 0
 At SMD N 00888000
 Ne 0 ""
 Po 0.2 -0.4
-.LocalClearance 0.1778
 $EndPAD
 $EndMODULE TPS62698
 $MODULE TP_SMD_1_2MM
