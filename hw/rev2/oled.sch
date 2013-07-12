@@ -22,7 +22,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 6 7
 Title "IMU Logger"
-Date "24 jun 2013"
+Date "10 jul 2013"
 Rev "2"
 Comp "McGill Integrated Microsystems Lab"
 Comment1 "Ben Nahill (bnahill@gmail.com)"
@@ -96,10 +96,10 @@ F 3 "" H 5350 5050 60  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L GND #PWR042
+L GND #PWR043
 U 1 1 504A0CF1
 P 5050 6200
-F 0 "#PWR042" H 5050 6200 30  0001 C CNN
+F 0 "#PWR043" H 5050 6200 30  0001 C CNN
 F 1 "GND" H 5050 6130 30  0001 C CNN
 F 2 "" H 5050 6200 60  0001 C CNN
 F 3 "" H 5050 6200 60  0001 C CNN
