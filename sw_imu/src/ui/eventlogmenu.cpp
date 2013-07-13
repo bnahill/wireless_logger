@@ -94,7 +94,7 @@ void EventMenu::exec() {
 			switch(position){
 			case POS_ITEMS:
 				tmp_item = evt_log.previous(item);
-				if(!tmp_item && item){
+				if((!tmp_item) && item){
 					// Beginning of list
 				} else {
 					item = tmp_item;

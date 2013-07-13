@@ -62,6 +62,10 @@ public:
 	
 	EventItem * previous(EventItem * item) const {
 		EventItem * tmp;
+		if(item == items_head){
+			// Don't go there
+			return nullptr;
+		}
 		if(item && items_head){
 			for(tmp = items_head; tmp->next != item; tmp = tmp->next);
 			return tmp;
