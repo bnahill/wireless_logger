@@ -22,7 +22,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 3 7
 Title "IMU Logger"
-Date "10 jul 2013"
+Date "16 jul 2013"
 Rev "2"
 Comp "McGill Integrated Microsystems Lab"
 Comment1 "Ben Nahill (bnahill@gmail.com)"

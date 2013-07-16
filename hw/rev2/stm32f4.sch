@@ -22,7 +22,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 7 7
 Title "IMU Logger"
-Date "10 jul 2013"
+Date "16 jul 2013"
 Rev "2"
 Comp "McGill Integrated Microsystems Lab"
 Comment1 "Ben Nahill (bnahill@gmail.com)"
@@ -1240,8 +1240,6 @@ Wire Wire Line
 	6150 3000 5900 3000
 Wire Wire Line
 	6150 2700 5900 2700
-Wire Wire Line
-	4200 3600 4200 3750
 Text Label 5150 2900 2    60   ~ 0
 LED3
 Wire Wire Line
