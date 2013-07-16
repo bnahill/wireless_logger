@@ -9,6 +9,7 @@ from PySide.QtGui import *
 
 from logger_link import LoggerLink
 from params import *
+import cmdsupport
 
 LL = LoggerLink()
 
@@ -16,70 +17,70 @@ class LoggerUI(QMainWindow):
 	def __init__(self):
 		QMainWindow.__init__(self)
 		self.setWindowTitle("Logger GUI")
-		
+
 		self.setup_layout()
-		
+
 		self.setup_menubar()
 		self.setup_toolbar()
-	
+
 	def setup_menubar(self):
 		self.menuBar().addMenu("&File")
-		
+
 	def setup_toolbar(self):
 		exitAction = QAction(
 			QIcon('icons/application-exit-4.png'),
 			'&Exit', self
 		)
 		exitAction.triggered.connect(self.close)
-		
+
 		self.connectAction = QAction(
 			QIcon('icons/network-disconnect-3.png'),
 			'&Connect', self
 		)
 		self.connectAction.triggered.connect(self.connect_disconnect)
-				
+
 		self.set_time_flag = QCheckBox("Set clock on connect?", self)
-		self.set_time_flag.setCheckState(Qt.CheckState.Checked)				
-		
+		self.set_time_flag.setCheckState(Qt.CheckState.Checked)
+
 		self.port_list = PortList(self)
 		self.port_list.click.connect(self.update_port_list)
-		
+
 		self.toolbar = self.addToolBar('Exit')
 		self.toolbar.addAction(exitAction)
 		self.toolbar.addAction(self.connectAction)
 		self.toolbar.addWidget(self.port_list)
 		self.toolbar.addWidget(self.set_time_flag)
 		self.update_port_list()
-	
+
 	def setup_layout(self):
 		self.mainbox = QWidget(self)
 		self.setCentralWidget(self.mainbox)
-		
+
 		self.hbox = QHBoxLayout()
 		self.mainbox.setLayout(self.hbox)
-		
+
 		self.action_list = ActionList(self)
 		self.action_list.setMaximumWidth(200)
 		self.action_list.disable()
-		
+
 		self.hbox.addWidget(self.action_list)
-		
+
 		self.console = Console(self)
 		self.console.setReadOnly(True)
 		self.hbox.addWidget(self.console)
-		
+
 		self.action_list.update()
-	
+
 	def handle_action(self, item):
 		pass
-		
-			
+
+
 	def update_port_list(self):
 		l = LL.list_ports()
 		self.port_list.clear()
 		self.port_list.addItems(l)
-		
-	
+
+
 	def connect_disconnect(self):
 		""" Either connect or disconnect using the port specified
 		"""
@@ -110,13 +111,13 @@ class LoggerUI(QMainWindow):
 			LL.set_current_time()
 		self.action_list.enable()
 		self.action_list.update()
-	
+
 	def on_disconnect(self):
 		self.connectAction.setIcon(
 			QIcon('icons/network-disconnect-3.png')
 		)
 		self.action_list.disable()
-		
+
 	def status(self, msg):
 		""" Update the status bar"""
 		self.statusBar().showMessage(msg)
@@ -125,10 +126,11 @@ class LoggerUI(QMainWindow):
 class Console(QTextEdit):
 	def __init__(self, parent=None):
 		QTextEdit.__init__(self, parent)
-		
+		self.setFont(QFont("Courier", 9));
+
 	def clear(self):
 		self.setPlainText("")
-	
+
 	def write_text(self, text):
 		self.setPlainText(self.toPlainText() + text + "\n")
 
@@ -141,20 +143,20 @@ class ActionList(QListWidget):
 		QListWidget.__init__(self,parent)
 		self.itemDoubleClicked.connect(self.select_item)
 		self.items = []
-	
+
 	def disable(self):
 		self.setDisabled(True)
-	
+
 	def enable(self):
 		self.setDisabled(False)
-	
+
 	def update(self):
 		self.items = LL.get_command_list()
 		self.clear()
-		
+
 		for i in self.items:
 			item = ActionListItem(i, self)
-	
+
 	def select_item(self, item):
 		command = item.command
 		dialog = ParamDialog(command)
@@ -163,7 +165,7 @@ class ActionList(QListWidget):
 		cmdlabel = QLabel("<b>Command: %s</b>" % command.name, parent=dialog)
 		cmdlabel.setAlignment(Qt.AlignHCenter)
 		layout.addWidget(cmdlabel,0,0,1,2)
-		
+
 		i = 1
 		for param in command.params:
 			w = param.make_widget(dialog)
@@ -175,11 +177,11 @@ class ActionList(QListWidget):
 			i += 1
 
 		execbutton = QPushButton("Execute", dialog)
-		cancelbutton = QPushButton("Cancel", dialog)		
-		
+		cancelbutton = QPushButton("Cancel", dialog)
+
 		def cancel():
 			dialog.done(1)
-		
+
 		def execute():
 			error_fields = []
 			for param in command.params:
@@ -194,18 +196,26 @@ class ActionList(QListWidget):
 			#LL.write_cmd(command)
 			LL.run_command(command)
 			logger.console.write_text("Executing %s:" % command.name)
-			logger.console.write_text(
-				"\n".join(map(str,command.returns)) + "\n"
-			)
+			if command.handler and command.handler.handle_result:
+				logger.console.write_text(
+					str(command.handler.handle_result()) + "\n"
+				)
+			else:
+				logger.console.write_text(
+					"\n".join(map(str,command.returns)) + "\n"
+				)
+			bar = logger.console.verticalScrollBar()
+			bar.setValue(bar.maximum())
+
 			dialog.done(0)
-		
+
 		cancelbutton.pressed.connect(cancel)
 		execbutton.pressed.connect(execute)
-		
+
 		group = QButtonGroup(dialog)
 		group.addButton(execbutton)
 		group.addButton(cancelbutton)
-		
+
 		layout.addWidget(execbutton, i, 1)
 		layout.addWidget(cancelbutton, i, 0)
 		dialog.setLayout(layout)
@@ -221,7 +231,7 @@ class ParamDialog(QDialog):
 	def __init__(self, item, parent=None):
 		QDialog.__init__(self,parent)
 		self.setModal(True)
-	
+
 
 class PortList(QComboBox):
 	""" Just a combobox capable of emitting a signal to update its entries
@@ -231,7 +241,7 @@ class PortList(QComboBox):
 	def __init__(self,parent=None):
 		QComboBox.__init__(self,parent)
 		self.setMinimumContentsLength(18)
-	
+
 	def mousePressEvent(self, evt):
 		self.click.emit()
 		return QComboBox.mousePressEvent(self,evt)

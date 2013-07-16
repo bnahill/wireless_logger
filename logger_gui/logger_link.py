@@ -16,7 +16,7 @@ class LoggerLink:
 		self.connected = False
 		self.s = None
 		self.baud = 115200*2
-		
+
 	def write_cmd(self, command):
 		self.s.flushInput()
 		print "Sending command:"
@@ -28,10 +28,10 @@ class LoggerLink:
 		buf = struct.pack("B%ss" % len(buf), len(buf), buf)
 		print buf
 		self.s.write(buf)
-		
+
 	def get_response(self, command):
 		buf = ""
-		buf += self.s.read(1000000)
+		buf += self.s.read(200000000)
 		print("Read buffer:",buf)
 		print(command.returns)
 		for r in command.returns:
@@ -43,13 +43,13 @@ class LoggerLink:
 			if not p.validate():
 				return False
 		return True
-	
+
 	def run_command(self, command):
 		self.write_cmd(command)
 		self.get_response(command)
 		for r in command.returns:
 			print(r.name + ": " + str(r))
-		
+
 	def ping(self, s):
 		cmd = Cmd()
 		cmd.from_cmd_string("ping s(s:ping)")
@@ -61,7 +61,7 @@ class LoggerLink:
 		print("Command: ", cmd)
 		print("Returns: ", cmd.returns)
 		return cmd.returns[0].value
-	
+
 	def read_response(self):
 		timeout = 0.5
 		length = self.s.read(4)
@@ -81,7 +81,7 @@ class LoggerLink:
 			data += newdata
 			if length == 0:
 				break
-		
+
 		retcode = self.s.read(2, timeout=timeout)
 		self.s.flushInput()
 		return (data, retcode)
@@ -100,7 +100,7 @@ class LoggerLink:
 				return True
 			else:
 				print("Ping failed!")
-			
+
 		except serial.SerialException:
 			return False
 		return False
@@ -109,7 +109,7 @@ class LoggerLink:
 		cmd = Cmd("settime", [CmdParamDateTime('')])
 		self.write_cmd(cmd)
 		return self.read_return_code() == 0
-	
+
 	def read_string_response(self):
 		s = ""
 		while True:
@@ -122,18 +122,18 @@ class LoggerLink:
 	def read_return_code(self):
 		response = self.s.read(1)
 		return response[0]
-			
-		
+
+
 	def get_command_list(self):
 		""" Query the device for available commands
 		"""
 		if not self.connected:
 			return []
-		
+
 		self.write_cmd(Cmd("listcmds",[],[]))
 		num_commands = struct.unpack("<I",self.s.read(4))[0]
 		print "%d commands available" % num_commands
-		commands = []		
+		commands = []
 		for i in range(num_commands):
 			r = self.read_string_response()
 			cmd = Cmd()
@@ -142,7 +142,7 @@ class LoggerLink:
 				commands.append(cmd)
 			else:
 				print "Error parsing %s" % r
-		
+
 		return commands
 
 	def disconnect(self):
@@ -164,7 +164,7 @@ class LoggerLink:
 			return available
 		else:
 			return glob.glob("/dev/ttyACM*") + glob.glob("/dev/ttyUSB*")
-	
+
 	def exec_command(self, cmd):
 		""" Execute a command and return the values
 		"""
