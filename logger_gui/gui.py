@@ -9,7 +9,6 @@ from PySide.QtGui import *
 
 from logger_link import LoggerLink
 from params import *
-import cmdsupport
 
 LL = LoggerLink()
 
@@ -126,7 +125,7 @@ class LoggerUI(QMainWindow):
 class Console(QTextEdit):
 	def __init__(self, parent=None):
 		QTextEdit.__init__(self, parent)
-		self.setFont(QFont("Courier", 9));
+		self.setFont(QFont("Courier", 9))
 
 	def clear(self):
 		self.setPlainText("")
@@ -193,8 +192,9 @@ class ActionList(QListWidget):
 					"<br />" +	"<br/>".join(error_fields))
 				msg.setVisible(True)
 				return
-			#LL.write_cmd(command)
-			LL.run_command(command)
+			# TODO: Let the command itself do execution so it may make
+			# use of support hooks
+			retcode = LL.run_command(command)
 			logger.console.write_text("Executing %s:" % command.name)
 			if command.handler and command.handler.handle_result:
 				logger.console.write_text(
@@ -204,6 +204,9 @@ class ActionList(QListWidget):
 				logger.console.write_text(
 					"\n".join(map(str,command.returns)) + "\n"
 				)
+			logger.console.write_text(
+				"Return Code: {}".format(str(retcode))
+			)
 			bar = logger.console.verticalScrollBar()
 			bar.setValue(bar.maximum())
 

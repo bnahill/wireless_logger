@@ -37,6 +37,11 @@ class LoggerLink:
 		for r in command.returns:
 			buf = r.from_buffer(buf)
 		print command.returns
+		try:
+			(retcode,) = struct.unpack("B",buf[:1])
+			return retcode
+		except:
+			return None
 
 	def validate_command(self, command):
 		for p in command.params:
@@ -46,9 +51,10 @@ class LoggerLink:
 
 	def run_command(self, command):
 		self.write_cmd(command)
-		self.get_response(command)
+		retcode = self.get_response(command)
 		for r in command.returns:
 			print(r.name + ": " + str(r))
+		return retcode
 
 	def ping(self, s):
 		cmd = Cmd()
@@ -119,9 +125,13 @@ class LoggerLink:
 			if ord(c[0]) == 0:
 				return s
 			s += c[0]
+
 	def read_return_code(self):
 		response = self.s.read(1)
-		return response[0]
+		try:
+			return response[0]
+		except:
+			return None
 
 
 	def get_command_list(self):
@@ -131,7 +141,7 @@ class LoggerLink:
 			return []
 
 		self.write_cmd(Cmd("listcmds",[],[]))
-		num_commands = struct.unpack("<I",self.s.read(4))[0]
+		(num_commands,) = struct.unpack("B",self.s.read(1))
 		print "%d commands available" % num_commands
 		commands = []
 		for i in range(num_commands):

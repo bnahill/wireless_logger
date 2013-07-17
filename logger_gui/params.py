@@ -70,24 +70,31 @@ def mk_param(s):
 
 	cmd = None
 
+	kwparams = dict()
+	for w in filter(lambda x: "=" in x, s[1:]):
+		kwsplit = w.split('=')
+		if len(kwsplit) == 2:
+			kwparams[kwsplit[0]] = kwsplit[1]
+
+
 	if t == "f":
-		cmd = CmdParamReal(name, params=s[1:])
+		cmd = CmdParamReal(name, params=kwparams)
 	elif t == "s":
-		cmd = CmdParamString(name, params=s[1:])
+		cmd = CmdParamString(name, params=kwparams)
 	elif t == "logbuffer":
 		pass
 	elif t == "stream":
 		pass
 	elif t == "u":
-		cmd = CmdParamInt(name, signed=False, params=s[1:])
+		cmd = CmdParamInt(name, signed=False, params=kwparams)
 	elif t == "i":
-		cmd = CmdParamInt(name, signed=True, params=s[1:])
+		cmd = CmdParamInt(name, signed=True, params=kwparams)
 	elif t == "datetime":
-		cmd = CmdParamDateTime(name, params=s[1:])
+		cmd = CmdParamDateTime(name, params=kwparams)
 	elif t == "buffer":
-		cmd = CmdParamBuffer(name, params=s[1:])
+		cmd = CmdParamBuffer(name, params=kwparams)
 	elif t == "logbuffer":
-		cmd = CmdParamLogBuffer(name, params=s[1:])
+		cmd = CmdParamLogBuffer(name, params=kwparams)
 
 	return cmd
 
@@ -172,18 +179,24 @@ class CmdParamArray(CmdParam):
 		pass
 
 	def from_buffer(self, buff):
-		self.count = struct.unpack("<I", buff[:4])[0]
-		buff = buff[4:]
-		print("From_buffer: found %u entries" % self.count)
-		for i in range(self.count):
-			these_fields = []
-			for f in self.fields:
-				print("Buffer: " + str(buff))
-				new_f = copy(f)
-				buff = new_f.from_buffer(buff)
-				these_fields.append(new_f)
-			self.expanded_fields.append(these_fields)
-		return buff
+		self.count = 0
+		while(True):
+			(count_in_frame,) = struct.unpack("B", buff[:1])
+			self.count += count_in_frame
+			buff = buff[1:]
+			if count_in_frame == 0:
+				return buff
+
+			print("From_buffer: found %u entries" % count_in_frame)
+			for i in range(count_in_frame):
+				these_fields = []
+				for f in self.fields:
+					print("Buffer: " + str(buff))
+					new_f = copy(f)
+					buff = new_f.from_buffer(buff)
+					these_fields.append(new_f)
+				self.expanded_fields.append(these_fields)
+			return buff
 
 	def __str__(self):
 		s = []
@@ -193,9 +206,71 @@ class CmdParamArray(CmdParam):
 		return "\n".join(s)
 
 class CmdParamBuffer(CmdParam):
-	def __init__(self, name, params=[]):
-		CmdParam.__init__(self, "Buffer", "")
+	def __init__(self, name, params={}):
+		CmdParam.__init__(self, name, "")
 		self.value = ""
+		try:
+			self.max_len = int(params['max'])
+		except:
+			self.max_len = 99999999999
+		self.value = buffer("")
+		self.widget = None
+
+	def make_widget(self, parent=None):
+		self.widget = QFrame(parent)
+		self.layout = QHBoxLayout(self.widget)
+
+		self.dropdown = QComboBox(self.widget)
+		self.dropdown.addItems(["Hex","Decimal","Binary","String"])
+		self.textbox = QTextEdit(self.widget)
+		self.textbox.setFont(QFont("Courier", 9))
+
+		self.layout.addWidget(self.dropdown)
+		self.layout.addWidget(self.textbox)
+		return self.widget
+
+	def update_value(self):
+		if not self.widget:
+			return
+
+		cur = self.dropdown.currentText()
+		text = self.textbox.toPlainText()
+		if cur in ["Hex","Decimal","Binary"]:
+			text = filter(lambda x: x not in (" ", "\n", "\t"), text)
+
+		print "Type is '%s'" % cur
+		print "Text is '%s'" % text
+
+		# Let's be lazy!
+		if cur == "Decimal":
+			text=hex(long(text))[:-1]
+			cur = "Hex"
+
+		if cur == "String":
+			self.value = buffer(text)
+		elif cur == "Hex":
+			if len(text) % 2 == 1:
+				text += '0'
+			self.value = buffer("")
+			for i in range(len(text) / 2):
+				self.value += struct.pack("B",int(text[2*i:2*i+2],16))
+		elif cur == "Binary":
+			text += '0' * ((8 - (len(text) % 8)) % 8)
+			self.value = buffer("")
+			for i in range(len(text) / 8):
+				self.value += struct.pack("B",int(text[8*i:8*i+8],2))
+		print "Value:"
+		print self.value
+
+	def validate(self):
+		try:
+			self.update_value()
+		except:
+			return False
+		if len(self.value) > self.max_len:
+			return False
+		return True
+
 	def from_buffer(self, buff):
 		# Use the first 4 bytes as length
 		l = struct.unpack("<I", buff[:4])[0]
@@ -203,6 +278,11 @@ class CmdParamBuffer(CmdParam):
 		self.value = copy(buff[4:4+l])
 		print self.value
 		return buff[4+l:]
+	def to_buffer(self):
+		self.update_value()
+		b = buffer(struct.pack("<I", len(self.value))) + buffer(self.value)
+		print "Returned buffer len {}".format(len(b))
+		return b
 
 class CmdParamReal(CmdParam):
 	def __init__(self, name, doc="", initial=0.0, params=None):

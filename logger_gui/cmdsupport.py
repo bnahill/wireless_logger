@@ -44,7 +44,7 @@ class CMD_flash_read_sector(CmdSupport):
 			if block_type == 1:
 				# This is inode
 				(block_type, nothing, inode_index) = \
-					struct.unpack("BBH",self.spare[:1])
+					struct.unpack("BBH",self.spare[:4])
 				text += "Block Type: Inode\n"
 				text += "Inode Index: {}\n".format(inode_index)
 			elif block_type == 2:
