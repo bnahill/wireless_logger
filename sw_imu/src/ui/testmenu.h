@@ -26,8 +26,6 @@ private:
 	
 	static void exit();
 	
-	static void launch_flash_test();
-	
 	Menu menu;
 	
 	bool should_exit;

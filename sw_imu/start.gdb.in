@@ -19,5 +19,4 @@ monitor reset init
 l
 r
 b main
-
-
+r

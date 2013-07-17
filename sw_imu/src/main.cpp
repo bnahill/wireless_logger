@@ -26,10 +26,6 @@ int main(void) {
 	PowerManagement::disable_systick();
 #endif
 	oled.init();
-	
-	if(!flash.init()){
-		evt_log.add("Flash init\n failed!", EventItem::SEVERITY_ERROR);
-	}
 		
  	if(!guardian1.init()) {
 		evt_log.add("Guardian init\nfailed!", EventItem::SEVERITY_ERROR);
@@ -37,7 +33,7 @@ int main(void) {
 	
 	evt_log.add("Started up!", EventItem::SEVERITY_NOTE);
 	
-	Acquisition::init();
+	//Acquisition::init();
 
 	UI::ui.start();
 

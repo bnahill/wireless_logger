@@ -186,11 +186,11 @@ public:
 	                void const * tx_buff, bool important=false);
 	
 	/*!
-	 @brief Perform a synchronous transmission
+	 @brief Perform a synchronous receive operation
 	 @param config The slave configuration to use
 	 @param addr The address to write to
 	 @param n The number of bytes to send
-	 @param tx_buff The n-length buffer to transmit
+	 @param rx_buff The n-length buffer to receive to
 	 @param important Force to front of queue?
 	 @return The value read during address transmission
 	 */

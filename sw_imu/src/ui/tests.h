@@ -3,8 +3,9 @@
 
 namespace Tests {
 bool flash_create_test_file();
+bool flash_erase();
 /*!
- @brief A basic erase/write/read test for flash memory
+@brief A basic erase/write/read test for flash memory
  */
 bool flash_test();
 /*!
@@ -13,6 +14,9 @@ bool flash_test();
 bool flash_bad_block_check();
 
 bool flash_ecc_flexibility_test();
+
+bool fs_format();
+bool fs_mount();
 
 };
 

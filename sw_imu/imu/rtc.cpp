@@ -1,6 +1,6 @@
 /*!
  @file rtc.cpp
- @brief Templated body for \ret RealTimeClock driver
+ @brief Templated body for \ref RealTimeClock driver
  @author Ben Nahill <bnahill@gmail.com>
  */
 

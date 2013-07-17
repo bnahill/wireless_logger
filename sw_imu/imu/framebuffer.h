@@ -1,6 +1,6 @@
 /*!
  @file framebuffer.h
- @brief Class declaration for \ref Framebuffer class
+ @brief Class declaration for \ref FrameBuffer class
  @author Ben Nahill <bnahill@gmail.com>
  */
 
@@ -59,6 +59,7 @@ public:
 	 @param text The text to write
 	 @param page The page to start on
 	 @param column The column to start on
+	 @param max_end_column A column to limit print length
 	 
 	 The height of the result depends on the font. It is the responsibility of
 	 the caller to make sure that this doesn't overflow the buffer.
@@ -174,11 +175,12 @@ protected:
 	
 	/*!
 	 @brief Write text on the framebuffer
-	 @tparam font_class The class of font to write with
+	 @param f The write function to use
 	 @param text The text to write
 	 @param page The page to start on
 	 @param column The column to start on
-	
+	 @param max_end_column A column to limit print length
+
 	 The height of the result depends on the font. It is the responsibility of
 	 the caller to make sure that this doesn't overflow the buffer.
 	*/

@@ -125,8 +125,7 @@ public:
 	
 	/*!
 	 @brief Set operating mode
-	 @param new_mode New mode
-	 @param update Actually update registers?
+	 @param new_autoreset_mode New mode
 	 */
 	void set_autoreset_mode(autoreset_mode_t new_autoreset_mode){
 		autoreset_mode = new_autoreset_mode;

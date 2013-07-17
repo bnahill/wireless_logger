@@ -26,6 +26,8 @@ public:
 	 @param opmode The I2C mode for the ChibiOS driver
 	 @param dutycycle The clock duty cycle to use
 	 @param speed The clock rate in Hz
+	 @param sda The GPIO pin for SDA to be used in resets of I2C
+	 @param scl The GPIO pin for SCL to be used in resets of I2C
 	 */
 	I2C(I2CDriver &driver, i2copmode_t opmode, i2cdutycycle_t dutycycle,
 	    uint32_t speed, gpio_pin_t const &sda, gpio_pin_t const &scl);

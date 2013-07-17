@@ -3,7 +3,10 @@
 //#include "ui/footstepcount.h"
 
 MenuItem const TestMenu::items[] = {
-	{"FS RW Test", (MenuItem::item_handler)Tests::flash_create_test_file},
+	{"FLog Format", (MenuItem::item_handler)Tests::fs_format},
+	{"FLog Mount", (MenuItem::item_handler)Tests::fs_mount},
+	{"Flash Erase", (MenuItem::item_handler)Tests::flash_erase},
+	//{"FS RW Test", (MenuItem::item_handler)Tests::flash_create_test_file},
 	{"Flash Bad Blocks", (MenuItem::item_handler)Tests::flash_bad_block_check},
 	{"Flash RW Test\n(will corrupt mem)", (MenuItem::item_handler)Tests::flash_test},
 	{"Flash ECC Test\n(will corrupt mem)", (MenuItem::item_handler)Tests::flash_ecc_flexibility_test},

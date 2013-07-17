@@ -9,6 +9,7 @@
 
 #include "platform.h"
 #include "platform_usbserial.h"
+#include "flogfs.h"
 
 #include "imu/ssd1306.cpp"
 #include "imu/datasource.cpp"
@@ -143,7 +144,7 @@ GuardianRF Platform::guardian1(rf1);
 
 MT29FxG01 Platform::flash(spi2, MT29FxG01::SIZE_1G,
                          {GPIOB, 12}, {GPIOA, 8}, {GPIOC, 6}, 
-                         (SPI_CR1_BR_0 | SPI_CR1_CPOL | SPI_CR1_CPHA));
+                         (SPI_CR1_CPOL | SPI_CR1_CPHA));
 
 
 
@@ -158,7 +159,11 @@ void Platform::early_init(){
 	reg1.buck_mode(LTC3559::MODE_BURST);
 	rf1.early_init();
 	evt_log.init();
-	
+	if(!flogfs_init()){
+		evt_log.add("FLogFS init\n failed!", EventItem::SEVERITY_ERROR);
+	}
+	//flogfs_mount();
+
 	extStart(&EXTD1, &extcfg);
 }
 

@@ -16,7 +16,7 @@
 #define MT29FxG01_PAGES_PER_BLOCK      (1 << MT29FxG01_PAGE_BITS)
 
 
-#ifdef __cplusplus
+#if defined(IS_DOXYGEN) || defined(__cplusplus)
 
 #include "imu/imu.h"
 #include "imu/spi.h"
@@ -109,7 +109,6 @@ public:
 	 This will read a page to a buffer in flash to be modified
 	 
 	 @note This MUST be followed by a call to \ref page_commit in the same thread
-	 @note This will prevent any other non-page flash actions until committed
 	 */
 	bool page_open(uint16_t block, uint8_t page);
 	/*!

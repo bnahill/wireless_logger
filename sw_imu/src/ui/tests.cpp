@@ -4,8 +4,61 @@
 #include "stdlib.h"
 #include "string.h"
 #include "coffee/cfs-coffee.h"
+#include "flogfs.h"
 
 using namespace Platform;
+
+bool Tests::fs_format() {
+	bool res;
+	oled.fb.clear_area(1);
+
+	oled.fb.write_text_centered<SmallFont>("Formatting...", 2);
+	oled.update();
+	res = (flogfs_format() == FLOG_SUCCESS);
+
+	oled.fb.clear_area(1);
+	if(res){
+		oled.fb.write_text_centered<SmallFont>("Success", 2);
+	} else {
+		oled.fb.write_text_centered<SmallFont>("Failed", 2);
+	}
+	oled.update();
+	UI::wait_for_button(UI::MASK_SELECT);
+	return res;
+}
+
+
+bool Tests::fs_mount(){
+	bool res;
+	oled.fb.clear_area(1);
+
+	oled.fb.write_text_centered<SmallFont>("Mounting...", 2);
+	oled.update();
+	res = (flogfs_mount() == FLOG_SUCCESS);
+
+	oled.fb.clear_area(1);
+	if(res){
+		oled.fb.write_text_centered<SmallFont>("Success", 2);
+	} else {
+		oled.fb.write_text_centered<SmallFont>("Failed", 2);
+	}
+	oled.update();
+	UI::wait_for_button(UI::MASK_SELECT);
+	return res;
+}
+
+bool Tests::flash_erase(){
+	oled.fb.clear_area(1);
+
+	oled.fb.write_text_centered<SmallFont>("Erasing...", 2);
+	for(auto i = flash.num_blocks - 1; i; i--){
+		flash.erase_block(i);
+	}
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Done", 2);
+	UI::wait_for_button(UI::MASK_SELECT);
+	return true;
+}
 
 bool Tests::flash_ecc_flexibility_test() {
 	uint32_t constexpr block = 11;
@@ -17,7 +70,10 @@ bool Tests::flash_ecc_flexibility_test() {
 	uint8_t buffer[bytes];
 	
 	oled.fb.clear_area(1);
-	
+
+	oled.fb.write_text_centered<SmallFont>("Starting", 2);
+	oled.update();
+
 	textbuffer[0] = 0;
 	
 	for(uint32_t i = 0; i < bytes; i++){
@@ -143,7 +199,7 @@ bool Tests::flash_ecc_flexibility_test() {
 end:
 	
 	
-	oled.fb.write_text_centered<SmallFont>(textbuffer, 2, 0);
+	oled.fb.write_text_centered<SmallFont>(textbuffer, 2);
 	
 	UI::wait_for_button(UI::MASK_SELECT);
 	

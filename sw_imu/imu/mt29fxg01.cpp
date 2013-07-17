@@ -98,7 +98,7 @@ bool MT29FxG01::read_page(uint8_t * dst, uint16_t block, uint8_t page, uint16_t 
 	
 	page_read_to_cache(addr);
 	
-	chThdSleep(MS2ST(1));
+	//chThdSleep(MS2ST(1));
 	
 	for(i = 0; i < num_tries; i++){
 		chThdYield();
@@ -190,7 +190,7 @@ bool MT29FxG01::page_open ( uint16_t block, uint8_t page ) {
 }
 
 bool MT29FxG01::page_commit () {
-	constexpr uint32_t num_tries = 200;
+	constexpr uint32_t num_tries = 20000;
 	
 	uint32_t i;
 	uint8_t stat;
@@ -215,7 +215,8 @@ bool MT29FxG01::page_commit () {
 
 bool MT29FxG01::page_read_continued ( uint8_t* dst, uint16_t offset, uint16_t n ) {
 	uint8_t tx[4];
-	
+
+	current_addr.offset = offset;
 	// Now read that page from cache
 	
 	tx[0] = CMD_READ_CACHE;
@@ -230,7 +231,6 @@ bool MT29FxG01::page_read_continued ( uint8_t* dst, uint16_t offset, uint16_t n 
 bool MT29FxG01::page_write_continued ( const uint8_t* src, uint16_t offset, uint16_t n ) {
 	current_addr.offset = offset;
 	program_load(current_addr, src, n, true);
-	
 	return true;
 }
 
@@ -345,20 +345,18 @@ bool MT29FxG01::write ( const uint8_t * src, uint16_t block, uint8_t page,
 bool MT29FxG01::erase_block ( uint16_t block ){
 	uint8_t tx[4];
 	uint8_t stat;
-	constexpr uint32_t num_tries = 5;
-	uint32_t i;
 	
 	address_t addr(block,0,0);
 	
-	lock();
+	//lock();
 	write_enable();
 	tx[0] = CMD_BLOCK_ERASE;
 	addr.get_row_address(&tx[1]);
 	
 	spi.send_sync(spi_slave, 4, tx);
 	
-	for(i = 0; i < num_tries; i++){
-		chThdSleep(MS2ST(1));
+	while(1){
+		chThdYield();
 		stat = get_feature(FADDR_STATUS);
 		if(stat & STATMASK_E_FAIL){
 			// There was the fail
@@ -366,11 +364,11 @@ bool MT29FxG01::erase_block ( uint16_t block ){
 		}
 		if((stat & STATMASK_OIP) == 0){
 			// Done
-			unlock();
+			//unlock();
 			return true;
 		}
 	}
 	
-	unlock();
+	//unlock();
 	return false;
 }

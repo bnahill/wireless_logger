@@ -1,7 +1,7 @@
 /*!
  @file framebuffer.cpp
  
- @brief Templated body for \ref Framebuffer class
+ @brief Templated body for \ref FrameBuffer class
  
  @note This file is not compiled directly; It should be included by your
  platform.

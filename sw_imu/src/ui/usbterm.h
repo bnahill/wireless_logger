@@ -97,6 +97,14 @@ protected:
 	int32_t cmd_fetchbuffer(char const *cmd);
 	int32_t cmd_liststreams(char const *cmd);
 	int32_t cmd_startstream(char const *cmd);
+	int32_t cmd_flash_read_sector(char const *cmd);
+	int32_t cmd_flash_write_sector(char const *cmd);
+	int32_t cmd_flash_erase_block(char const *cmd);
+	int32_t cmd_fs_format(char const *cmd);
+	int32_t cmd_fs_mount(char const *cmd);
+	int32_t cmd_fs_ls(char const *cmd);
+	int32_t cmd_fs_append(char const *cmd);
+	int32_t cmd_fs_read(char const *cmd);
 	//! @}
 	
 	//! @name Parsing functions
@@ -105,6 +113,7 @@ protected:
 	static uint32_t parse_uint(char const * &str);
 	static int32_t parse_int(char const * &str);
 	static char const * parse_string(char const * &str);
+	static uint8_t const * parse_buffer(char const * &str, uint32_t &len);
 	//! @}
 	
 	template <typename T>
