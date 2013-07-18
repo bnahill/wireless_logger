@@ -57,7 +57,7 @@ ShellCommand const USBTerm::commands[] = {
 	 "[s]()",
 	 (ShellCommand::shell_callback_t)&USBTerm::cmd_fs_ls},
 	{"fs_append",
-	 "(s:name,buffer:data:max=1024)",
+	 "(s:name,buffer:data:max=900)",
 	 (ShellCommand::shell_callback_t)&USBTerm::cmd_fs_append},
 	{"fs_read",
 	 "[buffer](s:name,u:len)", // Returns an array of buffers

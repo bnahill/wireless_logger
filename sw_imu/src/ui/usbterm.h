@@ -28,7 +28,7 @@ public:
 		return (usb.*cb)(cmd);
 	}
 	
-	bool match(uint8_t const * cmd, uint8_t length) const {
+	bool match(uint8_t const * cmd, uint32_t length) const {
 		uint8_t const * iter1;
 		uint8_t const * iter2;
 		iter1 = root;

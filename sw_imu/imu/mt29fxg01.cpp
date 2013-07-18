@@ -184,8 +184,6 @@ bool MT29FxG01::page_open ( uint16_t block, uint8_t page ) {
 		chThdYield();
 	} while(get_feature(FADDR_STATUS) & STATMASK_OIP);
 	
-	write_enable();
-	
 	return true;
 }
 
@@ -194,7 +192,7 @@ bool MT29FxG01::page_commit () {
 	
 	uint32_t i;
 	uint8_t stat;
-	
+	write_enable();
 	program_execute(current_addr);
 	
 	for(i = 0; i < num_tries; i++){
