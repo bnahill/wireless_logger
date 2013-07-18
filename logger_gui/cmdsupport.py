@@ -18,6 +18,24 @@ def get_hex(data, columns=8):
 		text += " %02X" % struct.unpack("B",data[i])[0]
 	return text[1:]
 
+class CMD_fs_read(CmdSupport):
+	def __init__(self, cmd):
+		self.cmd = cmd
+
+	def handle_result(self):
+		# Concatenate all of the data!
+		data = buffer("")
+		text = ""
+		for frame in self.cmd.returns[0].expanded_fields:
+			print frame
+			data += frame[0].value
+		text += "File Read: {}\n".format(self.cmd.params[0].value)
+		text += "Requested {} bytes\n".format(self.cmd.params[1].value)
+		text += "Received {} bytes\n".format(len(data))
+		text += "Data:\n"
+		text += get_hex(data) + "\n"
+		return text
+
 class CMD_flash_read_sector(CmdSupport):
 	sig = "buffer:data,buffer:spare(u:block,u:sector)"
 	def __init__(self, cmd):

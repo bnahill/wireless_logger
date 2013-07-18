@@ -25,8 +25,8 @@ class LoggerLink:
 		buf = c.to_buffer()
 		for p in command.params:
 			buf += p.to_buffer()
-		buf = struct.pack("B%ss" % len(buf), len(buf), buf)
-		print buf
+		buf = struct.pack("<I%ss" % len(buf), len(buf), buf)
+		print("Buffer Sent:", buf)
 		self.s.write(buf)
 
 	def get_response(self, command):

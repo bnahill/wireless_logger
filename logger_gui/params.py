@@ -122,7 +122,7 @@ class Cmd:
 		buf = self.name + "\0"
 		for p in filter(bool,self.params):
 			buf += p.to_buffer()
-		buf = struct.pack("B",len(buf)) + buf
+		buf = struct.pack("I",len(buf)) + buf
 		print("Send buffer:",buf)
 		return buf
 
