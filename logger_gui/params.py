@@ -180,6 +180,7 @@ class CmdParamArray(CmdParam):
 
 	def from_buffer(self, buff):
 		self.count = 0
+		self.expanded_fields = []
 		while(True):
 			(count_in_frame,) = struct.unpack("B", buff[:1])
 			self.count += count_in_frame
@@ -194,9 +195,9 @@ class CmdParamArray(CmdParam):
 					print("Buffer: " + str(buff))
 					new_f = copy(f)
 					buff = new_f.from_buffer(buff)
+					print("Buffer after field:", buff)
 					these_fields.append(new_f)
 				self.expanded_fields.append(these_fields)
-			return buff
 
 	def __str__(self):
 		s = []

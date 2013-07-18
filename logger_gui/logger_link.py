@@ -96,7 +96,7 @@ class LoggerLink:
 		""" Try to open the port and ping the device there
 		"""
 		try:
-			self.s = serial.Serial(str(port), self.baud, timeout=0.25)
+			self.s = serial.Serial(str(port), self.baud, timeout=0.50)
 			self.s.flushInput()
 			data = self.ping("pong")
 			print("Data: ",data)
