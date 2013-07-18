@@ -9,10 +9,10 @@
 MenuItem const MainMenu::items[] = {
 	{"Sensor output\n(numeric)", (MenuItem::item_handler)launch_sensor_view_num},
 	{"Sensor output\n(bar)", (MenuItem::item_handler)launch_sensor_view_bar},
-	{"Event Viewer", (MenuItem::item_handler)UI::launch_screen<EventMenu>},
-	{"USB Transfer", (MenuItem::item_handler)UI::launch_screen<USBScreen>},
-	{"Files", (MenuItem::item_handler)UI::launch_screen<FileMenu>},
+	{"USB Mode", (MenuItem::item_handler)UI::launch_screen<USBScreen>},
 	{"Tests", (MenuItem::item_handler)UI::launch_screen<TestMenu>},
+	{"Event Viewer", (MenuItem::item_handler)UI::launch_screen<EventMenu>},
+	{"Files", (MenuItem::item_handler)UI::launch_screen<FileMenu>},
 	{"Random numbers", (MenuItem::item_handler)UI::launch_screen<RNGScreen>},
 };
 

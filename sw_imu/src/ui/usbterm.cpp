@@ -84,7 +84,7 @@ msg_t USBTerm::terminate(){
 
 void USBTerm::thread_action(){
 	//Euclidean3_f32 m;
-	uint8_t command[256];
+	uint8_t command[1024];
 	uint8_t *iter;
 	uint32_t i;
 	
@@ -97,7 +97,13 @@ void USBTerm::thread_action(){
 		ST_READING,
 	} state = ST_IDLE;
 	
-	uint_fast8_t length = 0;
+	uint_fast8_t len_bytes_recvd = 0;
+	union {
+		uint8_t len_buffer[4];
+		uint32_t length;
+	};
+	length = 0;
+
 	uint8_t silent_count = 0;
 	
 	while(!chThdShouldTerminate()){
@@ -107,6 +113,7 @@ void USBTerm::thread_action(){
 				state = ST_IDLE;
 				iter = command;
 				length = 0;
+				len_bytes_recvd = 0;
 			}
 			continue;
 		}
@@ -115,10 +122,11 @@ void USBTerm::thread_action(){
 		
 		switch(state){
 		case ST_IDLE:
-			length = *iter;
+			len_buffer[len_bytes_recvd] = *iter;
 			// Ignore 0-length commands
-			if(length){
+			if(++len_bytes_recvd == 4){
 				state = ST_READING;
+				len_bytes_recvd = 0;
 			}
 			break;
 		case ST_READING:
@@ -228,9 +236,9 @@ int32_t USBTerm::cmd_listcmds(const char* cmd){
 }
 
 int32_t USBTerm::cmd_listbuffers(const char* cmd){
-	flog_read_file_t r;
-	flog_write_file_t w;
-	uint8_t test[50];
+// 	flog_read_file_t r;
+// 	flog_write_file_t w;
+// 	uint8_t test[50];
 
 // 	flogfs_init();
 //
@@ -259,7 +267,11 @@ int32_t USBTerm::cmd_liststreams ( const char* cmd ) {
 	return 0;
 }
 
-static uint8_t usb_flash_buffer[512];
+static union {
+	uint8_t usb_flash_buffer[512];
+	flog_write_file_t write_file;
+	flog_read_file_t read_file;
+};
 
 int32_t USBTerm::cmd_flash_read_sector ( const char* cmd ) {
 	uint32_t block, sector;
@@ -334,6 +346,7 @@ int32_t USBTerm::cmd_fs_format ( const char* cmd ) {
 }
 
 int32_t USBTerm::cmd_fs_mount ( const char* cmd ) {
+	flogfs_init();
 	if(flogfs_mount() == FLOG_SUCCESS)
 		return 0;
 	return 1;
@@ -342,11 +355,12 @@ int32_t USBTerm::cmd_fs_mount ( const char* cmd ) {
 
 int32_t USBTerm::cmd_fs_ls ( const char* cmd ) {
 	char fname[FLOG_MAX_FNAME_LEN];
-	flog_ls_iterator_t iter;
+	flogfs_ls_iterator_t iter;
 	flogfs_start_ls(&iter);
 	while(flogfs_ls_iterate(&iter, fname)){
 		usbserial1.write_byte(1);
 		chprintf(usbserial1.stream(), fname);
+		usbserial1.write_byte(0);
 	}
 	flogfs_stop_ls(&iter);
 	// And close the array
@@ -355,7 +369,6 @@ int32_t USBTerm::cmd_fs_ls ( const char* cmd ) {
 }
 
 int32_t USBTerm::cmd_fs_append ( const char* cmd ) {
-	flog_write_file_t f;
 	char const * fname;
 	uint8_t const * data;
 	uint32_t len;
@@ -363,16 +376,16 @@ int32_t USBTerm::cmd_fs_append ( const char* cmd ) {
 	fname = parse_string(cmd);
 	data = parse_buffer(cmd, len);
 
-	if(flogfs_open_write(&f, fname) != FLOG_SUCCESS){
+	if(flogfs_open_write(&write_file, fname) != FLOG_SUCCESS){
 		return 1;
 	}
 
-	if(flogfs_write(&f, data, len) != len){
-		flogfs_close_write(&f);
+	if(flogfs_write(&write_file, data, len) != len){
+		flogfs_close_write(&write_file);
 		return 1;
 	}
 
-	if(flogfs_close_write(&f) != FLOG_SUCCESS){
+	if(flogfs_close_write(&write_file) != FLOG_SUCCESS){
 		return 1;
 	}
 	return 0;
@@ -380,7 +393,6 @@ int32_t USBTerm::cmd_fs_append ( const char* cmd ) {
 
 int32_t USBTerm::cmd_fs_read ( const char* cmd ) {
 	uint8_t buffer[128];
-	flog_read_file_t f;
 	char const * fname;
 	uint32_t to_read, num_read;
 
@@ -389,17 +401,18 @@ int32_t USBTerm::cmd_fs_read ( const char* cmd ) {
 	fname = parse_string(cmd);
 	len = parse_uint(cmd);
 
-	if(flogfs_open_read(&f, fname) != FLOG_SUCCESS){
+	if(flogfs_open_read(&read_file, fname) != FLOG_SUCCESS){
 		return 1;
 	}
 	while(len){
 		to_read = min(len, 128);
-		num_read = flogfs_read(&f, buffer, to_read);
+		num_read = flogfs_read(&read_file, buffer, to_read);
 		if(num_read){
 			// Sending one buffer element
 			usbserial1.write_byte(1);
 			write_value<uint32_t>(num_read);
 			usbserial1.write_buffer(buffer, num_read);
+			len -= num_read;
 		}
 		if(num_read != to_read){
 			// EOF
@@ -410,7 +423,7 @@ int32_t USBTerm::cmd_fs_read ( const char* cmd ) {
 	// Close the array
 	usbserial1.write_byte(0);
 
-	if(flogfs_close_read(&f) != FLOG_SUCCESS){
+	if(flogfs_close_read(&read_file) != FLOG_SUCCESS){
 		return 1;
 	}
 	return 0;

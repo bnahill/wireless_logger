@@ -67,7 +67,7 @@ public:
 	msg_t terminate();
 	
 protected:
-	static constexpr uint32_t stack_size = 1024;
+	static constexpr uint32_t stack_size = 2048;
 	
 	WORKING_AREA(USBTermThread, stack_size);
 	
