@@ -53,6 +53,12 @@ class CMD_flash_read_sector(CmdSupport):
 					struct.unpack("BBH",self.spare)
 				(age, file_id) = struct.unpack("II",self.data[:8])
 				text += "Block Type: File\n"
+				text += "Age: {}\n".format(age)
+				text += "File ID: {}\n".format(file_id)
+				text += "File Data:\n"
+				text += get_hex(self.data[8:]) + "\n"
+				text += "Spare:\n"
+				text += get_hex(self.spare) + "\n"
 			else:
 				text += "Block Type: Unknown ({})\n".format(block_type)
 				text += "Data:\n"

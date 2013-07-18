@@ -234,7 +234,7 @@ class CmdParamBuffer(CmdParam):
 			return
 
 		cur = self.dropdown.currentText()
-		text = self.textbox.toPlainText()
+		text = str(self.textbox.toPlainText())
 		if cur in ["Hex","Decimal","Binary"]:
 			text = filter(lambda x: x not in (" ", "\n", "\t"), text)
 
