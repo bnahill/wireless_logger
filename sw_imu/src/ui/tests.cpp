@@ -8,6 +8,95 @@
 
 using namespace Platform;
 
+bool Tests::fs_test() {
+	bool res;
+	uint8_t buffer[1024];
+	flog_write_file_t write_file;
+	char txt[32];
+
+	for(uint32_t i = 0; i < 1024; i++){
+		buffer[i] = i * 5;
+	}
+
+	txt[0] = 0;
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Press SELECT\nto Advance", 2);
+	oled.update();
+
+	UI::wait_for_button(UI::MASK_SELECT);
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Formatting...", 2);
+	oled.update();
+	res = (flogfs_format() == FLOG_SUCCESS);
+	if(!res) goto failure;
+	oled.fb.write_text_centered<SmallFont>("Success", 3);
+	oled.update();
+
+	UI::wait_for_button(UI::MASK_SELECT);
+
+	// Mount it
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Mounting...", 2);
+	oled.update();
+	res = (flogfs_mount() == FLOG_SUCCESS);
+	if(!res) goto failure;
+	oled.fb.write_text_centered<SmallFont>("Success", 3);
+	oled.update();
+
+	UI::wait_for_button(UI::MASK_SELECT);
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Making big file", 2);
+	oled.update();
+	res = (flogfs_open_write(&write_file, "test") == FLOG_SUCCESS);
+	if(!res){
+		imu_sprint(txt, "Failed opening");
+		goto failure;
+	}
+	for(uint32_t i = 0; ; i++){
+		uint32_t count = flogfs_write(&write_file, buffer, sizeof(buffer));
+		imu_sprint(txt, "Wrote ", write_file.write_head / 1024, " kB");
+		oled.fb.write_text_centered<SmallFont>(txt, 3);
+		oled.update();
+		if(count != sizeof(buffer)){
+			// Disk presumably full!
+			break;
+		}
+	}
+	txt[0] = 0;
+
+	UI::wait_for_button(UI::MASK_SELECT);
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Closing file", 2);
+	oled.update();
+	res = (flogfs_close_write(&write_file) == FLOG_SUCCESS);
+	if(!res) goto failure;
+	oled.fb.write_text_centered<SmallFont>("Success", 3);
+	oled.update();
+
+	UI::wait_for_button(UI::MASK_SELECT);
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Done!", 2);
+	oled.update();
+
+	// All tests passed!
+
+	UI::wait_for_button(UI::MASK_SELECT);
+	return true;
+
+failure:
+	if(txt[0] == 0)
+		imu_sprint(txt, "Failure");
+	oled.fb.write_text_centered<SmallFont>(txt, 3);
+	oled.update();
+	UI::wait_for_button(UI::MASK_SELECT);
+	return false;
+}
+
 bool Tests::fs_format() {
 	bool res;
 	oled.fb.clear_area(1);

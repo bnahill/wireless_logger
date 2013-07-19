@@ -5,6 +5,7 @@
 MenuItem const TestMenu::items[] = {
 	{"FLog Format", (MenuItem::item_handler)Tests::fs_format},
 	{"FLog Mount", (MenuItem::item_handler)Tests::fs_mount},
+	{"FLog Test", (MenuItem::item_handler)Tests::fs_test},
 	{"Flash Erase", (MenuItem::item_handler)Tests::flash_erase},
 	//{"FS RW Test", (MenuItem::item_handler)Tests::flash_create_test_file},
 	{"Flash Bad Blocks", (MenuItem::item_handler)Tests::flash_bad_block_check},

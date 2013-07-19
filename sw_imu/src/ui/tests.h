@@ -4,6 +4,7 @@
 namespace Tests {
 bool flash_create_test_file();
 bool flash_erase();
+bool fs_test();
 /*!
 @brief A basic erase/write/read test for flash memory
  */
