@@ -188,14 +188,14 @@ class CmdParamArray(CmdParam):
 			if count_in_frame == 0:
 				return buff
 
-			print("From_buffer: found %u entries" % count_in_frame)
+			#print("From_buffer: found %u entries" % count_in_frame)
 			for i in range(count_in_frame):
 				these_fields = []
 				for f in self.fields:
-					print("Buffer: " + str(buff))
+					#print("Buffer: " + str(buff))
 					new_f = copy(f)
 					buff = new_f.from_buffer(buff)
-					print("Buffer after field:", buff)
+					#print("Buffer after field:", buff)
 					these_fields.append(new_f)
 				self.expanded_fields.append(these_fields)
 
@@ -275,9 +275,9 @@ class CmdParamBuffer(CmdParam):
 	def from_buffer(self, buff):
 		# Use the first 4 bytes as length
 		l = struct.unpack("<I", buff[:4])[0]
-		print "Len: {}".format(l)
+		#print "Len: {}".format(l)
 		self.value = copy(buff[4:4+l])
-		print self.value
+		#print self.value
 		return buff[4+l:]
 	def to_buffer(self):
 		self.update_value()
