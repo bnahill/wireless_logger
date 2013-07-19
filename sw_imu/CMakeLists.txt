@@ -73,16 +73,25 @@ set(FLOGFS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/flogfs)
 # Build Options
 ########################################################
 
-set(OPTIMIZATION "-Og")
+set(OPTIMIZATION "-Os")
 set(LTO )#"-flto")
 
 set(MCU cortex-m4)
 
+set(USE_FPU true)
 
-set(MCFLAGS "-mcpu=${MCU} -g -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fsingle-precision-constant -fomit-frame-pointer -D__NEWLIB__")# -fomit-frame-pointer")
+set(MCFLAGS "-mcpu=${MCU} -g -mthumb -fsingle-precision-constant -fomit-frame-pointer -D__NEWLIB__")# -fomit-frame-pointer")
+
+if(${USE_FPU})
+	set(MCFLAGS "${MCFLAGS} -mfpu=fpv4-sp-d16 -mfloat-abi=hard")
+	add_definitions(-D__FPU_PRESENT -DCORTEX_USE_FPU=1)
+else(${USE_FPU})
+	set(MCFLAGS "${MCFLAGS} -mfloat-abi=soft")
+	add_definitions(-DCORTEX_USE_FPU=0)
+endif(${USE_FPU})
 
 add_definitions(${MCFLAGS})
-add_definitions(-DHSE_VALUE=8000000 -DARM_MATH_CM4 -D__FPU_PRESENT -DUSE_RESTRICT)
+add_definitions(-DHSE_VALUE=8000000 -DARM_MATH_CM4 -DUSE_RESTRICT)
 
 set(LINKER_SCRIPT ${OS_DIR}/ports/GCC/ARMCMx/STM32F4xx/ld/STM32F405xG.ld)
 
