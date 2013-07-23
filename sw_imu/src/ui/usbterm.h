@@ -105,6 +105,7 @@ protected:
 	int32_t cmd_fs_ls(char const *cmd);
 	int32_t cmd_fs_append(char const *cmd);
 	int32_t cmd_fs_read(char const *cmd);
+	int32_t cmd_fs_rm(char const *cmd);
 	//! @}
 	
 	//! @name Parsing functions
@@ -133,3 +134,4 @@ protected:
 //! @}
 
 #endif // __USB_TERM_H_
+

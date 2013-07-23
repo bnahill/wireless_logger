@@ -14,7 +14,7 @@ def get_hex(data, columns=8):
 	text = ""
 	for i in range(len(data)):
 		if i % columns == 0:
-			text += "\n%04X|" % (i * columns)
+			text += "\n%08X|" % i
 		text += " %02X" % struct.unpack("B",data[i])[0]
 	return text[1:]
 
@@ -23,6 +23,7 @@ class CMD_fs_read(CmdSupport):
 		self.cmd = cmd
 
 	def handle_result(self):
+		print("Received file data")
 		# Concatenate all of the data!
 		data = buffer("")
 		text = ""
@@ -56,7 +57,7 @@ class CMD_flash_read_sector(CmdSupport):
 		"Block {}\n".format(self.block) + \
 		"Sector {}\n".format(self.sector)
 
-		if self.sector == 0:
+		if self.sector == 1:
 			# This will indicate the type of block
 			(block_type,) = struct.unpack("B",self.spare[:1])
 			if block_type == 1:

@@ -57,14 +57,19 @@ bool Tests::fs_test() {
 	}
 	for(uint32_t i = 0; ; i++){
 		uint32_t count = flogfs_write(&write_file, buffer, sizeof(buffer));
-		imu_sprint(txt, "Wrote ", write_file.write_head / 1024, " kB");
-		oled.fb.write_text_centered<SmallFont>(txt, 3);
-		oled.update();
+		if((i & 0x1F) == 0){
+			imu_sprint(txt, "Wrote ", write_file.write_head / 1024, " kB");
+			oled.fb.write_text_centered<SmallFont>(txt, 3);
+			// oled.update();
+		}
 		if(count != sizeof(buffer)){
 			// Disk presumably full!
 			break;
 		}
 	}
+	imu_sprint(txt, "Wrote ", write_file.write_head / 1024, " kB");
+	oled.fb.write_text_centered<SmallFont>(txt, 3);
+	oled.update();
 	txt[0] = 0;
 
 	UI::wait_for_button(UI::MASK_SELECT);
@@ -72,8 +77,8 @@ bool Tests::fs_test() {
 	oled.fb.clear_area(1);
 	oled.fb.write_text_centered<SmallFont>("Closing file", 2);
 	oled.update();
-	res = (flogfs_close_write(&write_file) == FLOG_SUCCESS);
-	if(!res) goto failure;
+	// Don't care about return, it should fail since it can't finish allocation
+	flogfs_close_write(&write_file);
 	oled.fb.write_text_centered<SmallFont>("Success", 3);
 	oled.update();
 

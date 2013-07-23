@@ -30,13 +30,12 @@ class LoggerLink:
 		self.s.write(buf)
 
 	def get_response(self, command):
-		buf = ""
-		buf += self.s.read(200000000)
-		print("Read buffer:",buf)
-		print(command.returns)
+		buf = buffer(self.s.read(200000000))
+		#print("Read buffer:",buf)
+		#print(command.returns)
 		for r in command.returns:
 			buf = r.from_buffer(buf)
-		print command.returns
+		#print command.returns
 		try:
 			(retcode,) = struct.unpack("B",buf[:1])
 			return retcode

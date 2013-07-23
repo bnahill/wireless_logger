@@ -110,6 +110,7 @@ class LoggerUI(QMainWindow):
 			LL.set_current_time()
 		self.action_list.enable()
 		self.action_list.update()
+		self.console.clear()
 
 	def on_disconnect(self):
 		self.connectAction.setIcon(
@@ -122,9 +123,9 @@ class LoggerUI(QMainWindow):
 		self.statusBar().showMessage(msg)
 
 
-class Console(QTextEdit):
+class Console(QPlainTextEdit):
 	def __init__(self, parent=None):
-		QTextEdit.__init__(self, parent)
+		QPlainTextEdit.__init__(self, parent)
 		self.setFont(QFont("Courier", 9))
 
 	def clear(self):

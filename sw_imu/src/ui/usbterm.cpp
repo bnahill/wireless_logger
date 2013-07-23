@@ -62,6 +62,9 @@ ShellCommand const USBTerm::commands[] = {
 	{"fs_read",
 	 "[buffer](s:name,u:len)", // Returns an array of buffers
 	 (ShellCommand::shell_callback_t)&USBTerm::cmd_fs_read},
+	 {"fs_rm",
+	 "(s:name)",
+	 (ShellCommand::shell_callback_t)&USBTerm::cmd_fs_rm},
 	{"flash_read_sector",
 	 "buffer:data,buffer:spare(u:block,u:sector)",
 	 (ShellCommand::shell_callback_t)&USBTerm::cmd_flash_read_sector},
@@ -427,6 +430,13 @@ int32_t USBTerm::cmd_fs_read ( const char* cmd ) {
 		return 1;
 	}
 	return 0;
+}
+
+int32_t USBTerm::cmd_fs_rm(const char* cmd){
+	parse_string(cmd);
+	if(flogfs_rm(parse_string(cmd)) == FLOG_SUCCESS)
+		return 0;
+	return 1;
 }
 
 
