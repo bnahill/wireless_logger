@@ -78,7 +78,7 @@ set(LTO )#"-flto")
 
 set(MCU cortex-m4)
 
-set(USE_FPU true)
+set(USE_FPU false)
 
 set(MCFLAGS "-mcpu=${MCU} -g -mthumb -fsingle-precision-constant -fomit-frame-pointer -D__NEWLIB__")# -fomit-frame-pointer")
 
@@ -320,6 +320,12 @@ add_custom_target(openocd COMMAND ${OPENOCD} ${OPENOCD_ARGS} -c "stm32f4x.cpu co
 add_custom_target(openocd_no_os COMMAND ${OPENOCD} ${OPENOCD_ARGS}
 	COMMENT "Launching OpenOCD..."
 )
+
+if(${USE_FPU})
+	set(OPENOCD_RTOS "")
+else(${USE_FPU})
+	set(OPENOCD_RTOS "-c \"stm32f4x.cpu configure -rtos auto\"")
+endif(${USE_FPU})
 
 configure_file(${CMAKE_SOURCE_DIR}/start.gdb.in ${CMAKE_CURRENT_BINARY_DIR}/start.gdb)
 set(GDB_ARGS -x start.gdb)
