@@ -15,29 +15,22 @@ class LoggerLink:
 	def __init__(self):
 		self.connected = False
 		self.s = None
-		self.baud = 115200*2
+		self.baud = 115200*8
 
 	def write_cmd(self, command):
 		self.s.flushInput()
 		print "Sending command:"
 		print command
 		c = CmdParamString('', initial=str(command.name))
-		buf = c.to_buffer()
+		c.to_stream(self.s)
 		for p in command.params:
-			buf += p.to_buffer()
-		buf = struct.pack("<I%ss" % len(buf), len(buf), buf)
-		print("Buffer Sent:", buf)
-		self.s.write(buf)
-
+			p.to_stream(self.s)
+		
 	def get_response(self, command):
-		buf = buffer(self.s.read(200000000))
-		#print("Read buffer:",buf)
-		#print(command.returns)
 		for r in command.returns:
-			buf = r.from_buffer(buf)
-		#print command.returns
+			r.from_stream(self.s)
 		try:
-			(retcode,) = struct.unpack("B",buf[:1])
+			(retcode,) = struct.unpack("B",self.s.read(1))
 			return retcode
 		except:
 			return None
@@ -59,9 +52,7 @@ class LoggerLink:
 		cmd = Cmd()
 		cmd.from_cmd_string("ping s(s:ping)")
 		cmd.params[0].value = s
-		#c = struct.pack('b5s%ds' % (len(s)+1), 6+len(s), "ping", s)
-		buf = cmd.to_buffer()
-		self.s.write(buf)
+		cmd.to_stream(self.s)
 		self.get_response(cmd)
 		print("Command: ", cmd)
 		print("Returns: ", cmd.returns)
@@ -95,7 +86,7 @@ class LoggerLink:
 		""" Try to open the port and ping the device there
 		"""
 		try:
-			self.s = serial.Serial(str(port), self.baud, timeout=0.50)
+			self.s = serial.Serial(str(port), timeout=0.50)
 			self.s.flushInput()
 			data = self.ping("pong")
 			print("Data: ",data)
@@ -106,7 +97,9 @@ class LoggerLink:
 			else:
 				print("Ping failed!")
 
-		except serial.SerialException:
+		except serial.SerialException as e:
+			print "EXCEPTION"
+			print e
 			return False
 		return False
 

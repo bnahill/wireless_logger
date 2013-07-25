@@ -107,14 +107,17 @@ protected:
 	int32_t cmd_fs_read(char const *cmd);
 	int32_t cmd_fs_rm(char const *cmd);
 	//! @}
+
+	static constexpr uint32_t parse_byte_timeout = MS2ST(500);
 	
 	//! @name Parsing functions
 	//! @brief Read a value from a string and advance the string pointer
 	//! @{
-	static uint32_t parse_uint(char const * &str);
-	static int32_t parse_int(char const * &str);
-	static char const * parse_string(char const * &str);
-	static uint8_t const * parse_buffer(char const * &str, uint32_t &len);
+	template <typename T>
+	static T parse_data(bool &err);
+	static void parse_string(char * str, uint32_t max_len, uint32_t &len, bool &err);
+	static void parse_buffer(uint8_t * dst, uint32_t max_len, uint32_t &len, bool &err);
+	static bool parse_buffer_pkt(uint8_t * dst, uint32_t max_len, uint32_t &len, bool &err);
 	//! @}
 	
 	template <typename T>

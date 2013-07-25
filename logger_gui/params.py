@@ -125,6 +125,13 @@ class Cmd:
 		buf = struct.pack("I",len(buf)) + buf
 		print("Send buffer:",buf)
 		return buf
+		
+	def to_stream(self, stream):
+		c = CmdParamString('', initial=str(self.name))
+		c.to_stream(stream)
+		for p in filter(bool, self.params):
+			p.to_stream(stream)
+			
 
 class CmdParam:
 	def __init__(self, name, doc=""):
@@ -199,6 +206,26 @@ class CmdParamArray(CmdParam):
 					these_fields.append(new_f)
 				self.expanded_fields.append(these_fields)
 
+	def from_stream(self, stream):
+		self.count = 0
+		self.expanded_fields = []
+		while(True):
+			(count_in_frame,) = struct.unpack("B", stream.read(1))
+			self.count += count_in_frame
+			if count_in_frame == 0:
+				return
+
+			#print("From_buffer: found %u entries" % count_in_frame)
+			for i in range(count_in_frame):
+				these_fields = []
+				for f in self.fields:
+					#print("Buffer: " + str(buff))
+					new_f = copy(f)
+					new_f.from_stream(stream)
+					#print("Buffer after field:", buff)
+					these_fields.append(new_f)
+				self.expanded_fields.append(these_fields)
+
 	def __str__(self):
 		s = []
 		for f in self.expanded_fields:
@@ -214,6 +241,11 @@ class CmdParamBuffer(CmdParam):
 			self.max_len = int(params['max'])
 		except:
 			self.max_len = 99999999999
+		try:
+			self.max_pkt = int(params['maxpkt'])
+		except:
+			self.max_pkt = 99999999999
+				
 		self.value = buffer("")
 		self.widget = None
 
@@ -229,6 +261,27 @@ class CmdParamBuffer(CmdParam):
 		self.layout.addWidget(self.dropdown)
 		self.layout.addWidget(self.textbox)
 		return self.widget
+	
+	def make_returnwidget(self, parent=None):
+		self.rwidget = QFrame(parent)
+		self.rlayout = QHBoxLayout(self.rwidget)
+		self.rbutton = QPushButton("&Select Destination File", self.rwidget)
+		self.rline = QLineEdit(self.rwidget)
+		
+		def launch_file_finder():
+			dialog = QFileDialog(self.rwidget)
+			dialog.setFileMode(QFileDialog.AnyFile)
+			if dialog.exec_():
+				try:
+					self.rline.setText(dialog.selectedFiles()[0])
+				except:
+					pass
+			
+		self.rbutton.clicked.connect(launch_file_finder)
+		
+		self.rlayout.addWidget(self.rbutton)
+		self.rlayout.addWidget(self.rline)
+		return self.rwidget
 
 	def update_value(self):
 		if not self.widget:
@@ -273,17 +326,66 @@ class CmdParamBuffer(CmdParam):
 		return True
 
 	def from_buffer(self, buff):
-		# Use the first 4 bytes as length
-		l = struct.unpack("<I", buff[:4])[0]
-		#print "Len: {}".format(l)
-		self.value = copy(buff[4:4+l])
-		#print self.value
-		return buff[4+l:]
+		self.value = buffer("")
+		while True:
+			# Use the first 4 bytes as length
+			l = struct.unpack("<I", buff[:4])[0]
+			if l == 0:
+				return buff[4:]
+			self.value = copy(buff[4:4+l])
+			#print self.value
+			buff = buff[4+l:]
+		self.len = len(self.value)
+			
+
+	def from_stream(self, stream):
+		self.value = buffer("")
+		self.len = 0
+		try:
+			f = open(self.rline.text(), "w")
+		except:
+			f = None
+		try:
+			i = 0
+			while(True):
+				# Use the first 4 bytes as length
+				(l,) = struct.unpack("<I", stream.read(4))
+				if l == 0:
+					break
+				#print "Len: {}".format(l)
+				data = stream.read(l)
+				self.len += len(data)
+				i += 1
+				if i % 10 == 0:
+					print("Read {} bytes".format(self.len))
+				if f:
+					f.write(data)
+				else:
+					self.value += data
+		except Exception as e:
+			if f:
+				f.close()
+			raise e
+		if f:
+			f.close()
+		
 	def to_buffer(self):
 		self.update_value()
 		b = buffer(struct.pack("<I", len(self.value))) + buffer(self.value)
 		print "Returned buffer len {}".format(len(b))
 		return b
+		
+	def to_stream(self, stream):
+		self.update_value()
+		maxpkt = min(self.max_pkt, len(self.value))
+		start = 0
+		while len(self.value) > start:
+			pktlen = min(len(self.value) - start, maxpkt)
+			stream.write(buffer(struct.pack("<I", pktlen)) +
+			             buffer(self.value[start:start+pktlen]))
+			start += pktlen
+		stream.write(struct.pack("<I",0))
+
 
 class CmdParamReal(CmdParam):
 	def __init__(self, name, doc="", initial=0.0, params=None):
@@ -296,13 +398,21 @@ class CmdParamReal(CmdParam):
 	def validate(self):
 		return self.widget.hasAcceptableInput()
 	def update_value(self):
-		pass
+		if self.widget:
+			self.value = float(self.widget.text())
 	def __str__(self):
 		self.update_value()
 		return str(self.value)
 	def from_buffer(self, buff):
 		self.value = struct.unpack("<f", buff[:4])[0]
 		return buff[4:]
+	def from_stream(self, stream):
+		self.value = struct.unpack("<f", stream.read(4))[0]
+	def to_buffer(self):
+		self.update_value()
+		return struct.pack("<f",self.value)
+	def to_stream(self, stream):
+		stream.write(self.to_buffer())
 
 class CmdParamInt(CmdParam):
 	def __init__(self, name, doc="", initial=0, signed=True, params=None):
@@ -321,11 +431,15 @@ class CmdParamInt(CmdParam):
 		self.update_value()
 		s = "<i" if self.signed else "<I"
 		return struct.pack(s,self.value)
-
+	def to_stream(self, stream):
+		stream.write(self.to_buffer())
 	def from_buffer(self, buff):
 		s = "<i" if self.signed else "<I"
 		self.value = struct.unpack(s, buff[:4])[0]
 		return buff[4:]
+	def from_stream(self, stream):
+		s = "<i" if self.signed else "<I"
+		self.value = struct.unpack(s, stream.read(4))[0]
 
 	def update_value(self):
 		if self.widget:
@@ -364,6 +478,9 @@ class CmdParamString(CmdParam):
 	def to_buffer(self):
 		self.update_value()
 		return struct.pack('%ds' % (len(self.value)+1), self.value)
+	
+	def to_stream(self, stream):
+		stream.write(self.to_buffer())
 
 	def from_buffer(self, buff):
 		self.value = ""
@@ -375,6 +492,15 @@ class CmdParamString(CmdParam):
 				break
 			self.value += char
 		return buff
+	def from_stream(self, stream):
+		self.value = ""
+		while True:
+			c = stream.read(1)
+			print c
+			char = struct.unpack("s", c)[0]
+			if char == "\0":
+				break
+			self.value += char
 
 	def update_value(self):
 		if self.widget:
@@ -410,6 +536,9 @@ class CmdParamDateTime(CmdParam):
 	def to_buffer(self):
 		self.update_value()
 		return struct.pack("<%dsb" % len(self.timestamp), self.timestamp, 0)
+	
+	def to_stream(self, stream):
+		stream.write(self.to_buffer())
 
 	def update_value(self):
 		if self.widget:

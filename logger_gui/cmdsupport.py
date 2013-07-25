@@ -4,6 +4,7 @@ from PySide.QtGui import *
 from PySide.QtCore import *
 import struct
 
+
 class CmdSupport:
 	# Undefined actions
 	handle_result = None
@@ -21,20 +22,30 @@ def get_hex(data, columns=8):
 class CMD_fs_read(CmdSupport):
 	def __init__(self, cmd):
 		self.cmd = cmd
+	
+	def handle_run(self, parent=None):
+		pass
 
-	def handle_result(self):
-		print("Received file data")
+	def handle_result(self, parent=None):
+		try:
+			fname = self.cmd.returns[0].rline.text()
+			with open(fname, 'r') as f:
+				name = fname
+		except:
+			name = None
+			
 		# Concatenate all of the data!
 		data = buffer("")
 		text = ""
-		for frame in self.cmd.returns[0].expanded_fields:
-			print frame
-			data += frame[0].value
+		data += self.cmd.returns[0].value
 		text += "File Read: {}\n".format(self.cmd.params[0].value)
 		text += "Requested {} bytes\n".format(self.cmd.params[1].value)
-		text += "Received {} bytes\n".format(len(data))
-		text += "Data:\n"
-		text += get_hex(data) + "\n"
+		text += "Received {} bytes\n".format(self.cmd.returns[0].len)
+		if name:
+			text += "Data Dumped to \"{}\"\n".format(name)
+		else:
+			text += "Data:\n"
+			text += get_hex(data) + "\n"
 		return text
 
 class CMD_flash_read_sector(CmdSupport):
@@ -42,7 +53,7 @@ class CMD_flash_read_sector(CmdSupport):
 	def __init__(self, cmd):
 		self.cmd = cmd
 
-	def handle_result(self):
+	def handle_result(self, parent=None):
 		self.block = self.cmd.params[0].value
 		self.sector = self.cmd.params[1].value
 		self.data = self.cmd.returns[0].value
@@ -70,12 +81,15 @@ class CMD_flash_read_sector(CmdSupport):
 				# This is a file header
 				(block_type, nothing, n) = \
 					struct.unpack("BBH",self.spare)
-				(age, file_id) = struct.unpack("II",self.data[:8])
+				(ts, age, file_id) = struct.unpack("<III",self.data[:12])
+				(n,) = struct.unpack("<H",self.spare[2:4])
 				text += "Block Type: File\n"
+				text += "Timestamp: {}\n".format(ts)
 				text += "Age: {}\n".format(age)
 				text += "File ID: {}\n".format(file_id)
-				text += "File Data:\n"
-				text += get_hex(self.data[8:]) + "\n"
+				text += "Num Bytes: {}\n".format(n)
+				text += "File Data (header skipped):\n"
+				text += get_hex(self.data[12:]) + "\n"
 				text += "Spare:\n"
 				text += get_hex(self.spare) + "\n"
 			else:

@@ -53,8 +53,8 @@ public:
 	
 	bool is_connected() const { return vusb_pin.read(); }
 	
-	BaseSequentialStream * stream() const {
-		return (BaseSequentialStream *)&driver;
+	BaseSequentialStream * stream()  {
+		return reinterpret_cast<BaseSequentialStream *>(&driver);
 	}
 	
 	SerialUSBDriverVMT const * vmt() const {
@@ -66,9 +66,7 @@ public:
 	}
 	
 	void write_buffer(uint8_t const * buf, uint32_t len){
-		while(len--){
-			chSequentialStreamPut(stream(), *(buf++));
-		}
+		chSequentialStreamWrite(&driver, buf, len);
 	}
 	
 	size_t read(uint8_t *bp, size_t n, systime_t time){

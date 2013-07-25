@@ -175,6 +175,22 @@ class ActionList(QListWidget):
 			layout.addWidget(l, i, 0)
 			layout.addWidget(w, i, 1)
 			i += 1
+		if len(command.returns):
+			retlabel = QLabel("<b>Return Handlers</b>", parent=dialog)
+			layout.addWidget(retlabel, i, 1, 1, 2)
+			i += 1
+			
+			for param in command.returns:
+				try:
+					w = param.make_returnwidget(dialog)
+					if not w:
+						continue
+				except:
+					continue
+				l = QLabel(param.name, parent=dialog)
+				layout.addWidget(l, i, 0)
+				layout.addWidget(w, i, 1)
+				i += 1
 
 		execbutton = QPushButton("Execute", dialog)
 		cancelbutton = QPushButton("Cancel", dialog)

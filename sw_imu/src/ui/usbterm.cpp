@@ -57,10 +57,10 @@ ShellCommand const USBTerm::commands[] = {
 	 "[s]()",
 	 (ShellCommand::shell_callback_t)&USBTerm::cmd_fs_ls},
 	{"fs_append",
-	 "(s:name,buffer:data:max=900)",
+	 "(s:name,buffer:data:maxpkt=512)",
 	 (ShellCommand::shell_callback_t)&USBTerm::cmd_fs_append},
 	{"fs_read",
-	 "[buffer](s:name,u:len)", // Returns an array of buffers
+	 "buffer(s:name,u:len)", // Returns an array of buffers
 	 (ShellCommand::shell_callback_t)&USBTerm::cmd_fs_read},
 	 {"fs_rm",
 	 "(s:name)",
@@ -87,7 +87,7 @@ msg_t USBTerm::terminate(){
 
 void USBTerm::thread_action(){
 	//Euclidean3_f32 m;
-	uint8_t command[1024];
+	uint8_t command[64];
 	uint8_t *iter;
 	uint32_t i;
 	
@@ -118,24 +118,10 @@ void USBTerm::thread_action(){
 				length = 0;
 				len_bytes_recvd = 0;
 			}
-			continue;
-		}
-		// Reset silence counter
-		silent_count = 0;
-		
-		switch(state){
-		case ST_IDLE:
-			len_buffer[len_bytes_recvd] = *iter;
-			// Ignore 0-length commands
-			if(++len_bytes_recvd == 4){
-				state = ST_READING;
-				len_bytes_recvd = 0;
-			}
-			break;
-		case ST_READING:
-			if(--length == 0){
-				// Command complete
-				
+		} else {
+			// Reset silence counter
+			silent_count = 0;
+			if(*iter == 0){
 				for(i = 0; i < num_commands; i++){
 					if(commands[i].match(command, iter + 1 - command)){
 						usbserial1.write_byte(
@@ -146,17 +132,50 @@ void USBTerm::thread_action(){
 				}
 				if(i == num_commands){
 					// No matching command
-					usbserial1.write_byte(0);
+					usbserial1.write_byte(255);
 				}
-				// Reset pointer
 				iter = command;
-				state = ST_IDLE;
 			} else {
-				// Increment pointer
 				iter += 1;
 			}
-			break;
 		}
+
+		continue;
+		
+// 		switch(state){
+// 		case ST_IDLE:
+// 			len_buffer[len_bytes_recvd] = *iter;
+// 			// Ignore 0-length commands
+// 			if(++len_bytes_recvd == 4){
+// 				state = ST_READING;
+// 				len_bytes_recvd = 0;
+// 			}
+// 			break;
+// 		case ST_READING:
+// 			if(--length == 0){
+// 				// Command complete
+//
+// 				for(i = 0; i < num_commands; i++){
+// 					if(commands[i].match(command, iter + 1 - command)){
+// 						usbserial1.write_byte(
+// 							commands[i].call(command, *this)
+// 						);
+// 						break;
+// 					}
+// 				}
+// 				if(i == num_commands){
+// 					// No matching command
+// 					usbserial1.write_byte(0);
+// 				}
+// 				// Reset pointer
+// 				iter = command;
+// 				state = ST_IDLE;
+// 			} else {
+// 				// Increment pointer
+// 				iter += 1;
+// 			}
+// 			break;
+// 		}
 	}
 	usbserial1.stop();
 }
@@ -170,46 +189,49 @@ int32_t USBTerm::cmd_help(const char* cmd){
 
 int32_t USBTerm::cmd_settime(const char* cmd){
 	rtc1::rtc_time_t time;
+	uint8_t buffer[8];
+
+	usbserial1.read(buffer, 8, MS2ST(parse_byte_timeout));
 	
-	parse_string(cmd);
-	
-	if(!is_ascii_num(cmd[0])) goto error;
-	if(!is_ascii_num(cmd[1])) goto error;
-	if(cmd[2] != ':') return 1;
-	if(!is_ascii_num(cmd[3])) goto error;
-	if(!is_ascii_num(cmd[4])) goto error;
-	if(cmd[5] != ':') return 1;
-	if(!is_ascii_num(cmd[6])) goto error;
-	if(!is_ascii_num(cmd[7])) goto error;
+	if(!is_ascii_num(buffer[0])) goto error;
+	if(!is_ascii_num(buffer[1])) goto error;
+	if(buffer[2] != ':') return 1;
+	if(!is_ascii_num(buffer[3])) goto error;
+	if(!is_ascii_num(buffer[4])) goto error;
+	if(buffer[5] != ':') return 1;
+	if(!is_ascii_num(buffer[6])) goto error;
+	if(!is_ascii_num(buffer[7])) goto error;
 	
 	
-	time.years_ten = cmd[0] - '0';
-	time.years_u = cmd[1] - '0';
-	time.months_ten = cmd[3] - '0';
-	time.months_u = cmd[4] - '0';
-	time.days_ten = cmd[6] - '0';
-	time.days_u = cmd[7] - '0';
+	time.years_ten = buffer[0] - '0';
+	time.years_u = buffer[1] - '0';
+	time.months_ten = buffer[3] - '0';
+	time.months_u = buffer[4] - '0';
+	time.days_ten = buffer[6] - '0';
+	time.days_u = buffer[7] - '0';
 	
-	cmd = &cmd[8];
-	while(*cmd == ' ') cmd++;
+	do {
+		usbserial1.read(buffer, 1, MS2ST(parse_byte_timeout));
+	} while(*buffer == ' ');
+	usbserial1.read(buffer + 1, 7, MS2ST(parse_byte_timeout));
 	
-	if(!is_ascii_num(cmd[0])) goto error;
-	if(!is_ascii_num(cmd[1])) goto error;
-	if(cmd[2] != ':') return 1;
-	if(!is_ascii_num(cmd[3])) goto error;
-	if(!is_ascii_num(cmd[4])) goto error;
-	if(cmd[2] != ':') return 1;
-	if(!is_ascii_num(cmd[6])) goto error;
-	if(!is_ascii_num(cmd[7])) goto error;
+	if(!is_ascii_num(buffer[0])) goto error;
+	if(!is_ascii_num(buffer[1])) goto error;
+	if(buffer[2] != ':') return 1;
+	if(!is_ascii_num(buffer[3])) goto error;
+	if(!is_ascii_num(buffer[4])) goto error;
+	if(buffer[2] != ':') return 1;
+	if(!is_ascii_num(buffer[6])) goto error;
+	if(!is_ascii_num(buffer[7])) goto error;
 	
-	time.hours_ten = cmd[0] - '0';
-	time.hours_u = cmd[1] - '0';
-	time.minutes_ten = cmd[3] - '0';
-	time.minutes_u = cmd[4] - '0';
-	time.seconds_ten = cmd[6] - '0';
-	time.seconds_u = cmd[7] - '0';
+	time.hours_ten = buffer[0] - '0';
+	time.hours_u = buffer[1] - '0';
+	time.minutes_ten = buffer[3] - '0';
+	time.minutes_u = buffer[4] - '0';
+	time.seconds_ten = buffer[6] - '0';
+	time.seconds_u = buffer[7] - '0';
 	
-	rtc1::set_time(time);
+	Platform::rtc1::set_time(time);
 	
 	return 0;
 	
@@ -218,12 +240,13 @@ error:
 }
 
 int32_t USBTerm::cmd_ping(const char* cmd){
-	// Advance beyond "ping"
-	parse_string(cmd);
-	// Send back that string
-	chprintf(usbserial1.stream(), parse_string(cmd));
-	// Seal it
-	usbserial1.write_byte(0);
+	bool err;
+	char pong[64];
+	uint32_t len;
+	parse_string(pong, sizeof(pong), len, err);
+	if(err)
+		return 1;
+	usbserial1.write_buffer(reinterpret_cast<uint8_t const *>(pong), len);
 	return 0;
 }
 
@@ -271,7 +294,6 @@ int32_t USBTerm::cmd_liststreams ( const char* cmd ) {
 }
 
 static union {
-	uint8_t usb_flash_buffer[512];
 	flog_write_file_t write_file;
 	flog_read_file_t read_file;
 };
@@ -279,45 +301,57 @@ static union {
 int32_t USBTerm::cmd_flash_read_sector ( const char* cmd ) {
 	uint32_t block, sector;
 	uint8_t spare_buffer[4];
-	parse_string(cmd);
-	block = parse_uint(cmd);
-	sector = parse_uint(cmd);
+	uint8_t sector_buffer[512];
+	bool err;
+
+	block = parse_data<uint32_t>(err);
+	sector = parse_data<uint32_t>(err);
+	if(err)
+		return 1;
 
 	flash.lock();
 
 	bool success = flash.page_open(block, sector / 4);
-	flash.page_read_continued(usb_flash_buffer, 512 * (sector % 4), 512);
+	flash.page_read_continued(sector_buffer, 512 * (sector % 4), 512);
 	flash.page_read_continued(spare_buffer, 0x804 + 16 * (sector % 4), 4);
 
 	flash.unlock();
 
 	write_value<uint32_t>(512);
-	Platform::usbserial1.write_buffer((uint8_t const *)usb_flash_buffer, 512);
+	Platform::usbserial1.write_buffer(sector_buffer, 512);
+	write_value<uint32_t>(0);
 
 	write_value<uint32_t>(4);
-	Platform::usbserial1.write_buffer((uint8_t const *)spare_buffer, 4);
+	Platform::usbserial1.write_buffer(spare_buffer, 4);
+	write_value<uint32_t>(0);
 
 	return (success) ? 0 : 1;
 }
 
 
 int32_t USBTerm::cmd_flash_write_sector ( const char* cmd ) {
+	static constexpr uint32_t bufferlen = 512;
 	uint32_t block, sector;
 	uint32_t len;
-	uint8_t const * buffer;
-	parse_string(cmd);
-	block = parse_uint(cmd);
-	sector = parse_uint(cmd);
+	uint8_t buffer[bufferlen];
+
+	bool err;
+
+	block = parse_data<uint32_t>(err);
+	sector = parse_data<uint32_t>(err);
+
+	if(err) return 1;
+
 	flash.lock();
 	flash.page_open(block, sector / 4);
 
 
 	// Main data
-	buffer = parse_buffer(cmd, len);
+	parse_buffer(buffer, bufferlen, len, err);
 	flash.page_write_continued((uint8_t const *)buffer, 512 * (sector % 4), len);
 
 	// Spare data
-	buffer = parse_buffer(cmd, len);
+	parse_buffer(buffer, bufferlen, len, err);
 	flash.page_write_continued((uint8_t const *)buffer,
 	                           0x804 + 16 * (sector % 4), len);
 
@@ -330,16 +364,16 @@ int32_t USBTerm::cmd_flash_write_sector ( const char* cmd ) {
 
 int32_t USBTerm::cmd_flash_erase_block ( const char* cmd ) {
 	uint32_t block;
-	bool success;
-	parse_string(cmd);
-	block = parse_uint(cmd);
+	bool err;
+	block = parse_data<uint32_t>(err);
+	if(err) return 1;
 	flash.lock();
 
-	success = flash.erase_block(block);
+	err = !flash.erase_block(block);
 
 	flash.unlock();
 
-	return (success) ? 0 : 1;
+	return (err) ? 1 : 0;
 }
 
 int32_t USBTerm::cmd_fs_format ( const char* cmd ) {
@@ -372,20 +406,20 @@ int32_t USBTerm::cmd_fs_ls ( const char* cmd ) {
 }
 
 int32_t USBTerm::cmd_fs_append ( const char* cmd ) {
-	char const * fname;
-	uint8_t const * data;
+	char fname[FLOG_MAX_FNAME_LEN + 1];
+	uint8_t buffer[512];
 	uint32_t len;
-	parse_string(cmd);
-	fname = parse_string(cmd);
-	data = parse_buffer(cmd, len);
+	bool err;
+	parse_string(fname, FLOG_MAX_FNAME_LEN, len, err);
 
 	if(flogfs_open_write(&write_file, fname) != FLOG_SUCCESS){
 		return 1;
 	}
-
-	if(flogfs_write(&write_file, data, len) != len){
-		flogfs_close_write(&write_file);
-		return 1;
+	while(parse_buffer_pkt(buffer, sizeof(buffer), len, err)){
+		if(err || (flogfs_write(&write_file, buffer, len) != len)){
+			flogfs_close_write(&write_file);
+			return 1;
+		}
 	}
 
 	if(flogfs_close_write(&write_file) != FLOG_SUCCESS){
@@ -395,24 +429,30 @@ int32_t USBTerm::cmd_fs_append ( const char* cmd ) {
 }
 
 int32_t USBTerm::cmd_fs_read ( const char* cmd ) {
-	uint8_t buffer[128];
-	char const * fname;
+	uint32_t constexpr buffer_size = 256;
+	uint8_t buffer[buffer_size];
+	char fname[FLOG_MAX_FNAME_LEN + 1];
 	uint32_t to_read, num_read;
+	bool err;
 
-	uint32_t len;
-	parse_string(cmd);
-	fname = parse_string(cmd);
-	len = parse_uint(cmd);
+	uint32_t len, fname_len;
+	parse_string(fname, FLOG_MAX_FNAME_LEN, fname_len, err);
+	if(err)
+		return 1;
+	len = parse_data<uint32_t>(err);
+
+	if(err)
+		return 1;
 
 	if(flogfs_open_read(&read_file, fname) != FLOG_SUCCESS){
 		return 1;
 	}
+	if(len == 0) len = -1;
 	while(len){
-		to_read = min(len, 128);
+		to_read = min(len, buffer_size);
 		num_read = flogfs_read(&read_file, buffer, to_read);
 		if(num_read){
 			// Sending one buffer element
-			usbserial1.write_byte(1);
 			write_value<uint32_t>(num_read);
 			usbserial1.write_buffer(buffer, num_read);
 			len -= num_read;
@@ -423,8 +463,8 @@ int32_t USBTerm::cmd_fs_read ( const char* cmd ) {
 		}
 	}
 
-	// Close the array
-	usbserial1.write_byte(0);
+	// Close the buffer
+	write_value<uint32_t>(0);
 
 	if(flogfs_close_read(&read_file) != FLOG_SUCCESS){
 		return 1;
@@ -433,8 +473,11 @@ int32_t USBTerm::cmd_fs_read ( const char* cmd ) {
 }
 
 int32_t USBTerm::cmd_fs_rm(const char* cmd){
-	parse_string(cmd);
-	if(flogfs_rm(parse_string(cmd)) == FLOG_SUCCESS)
+	char fname[FLOG_MAX_FNAME_LEN + 1];
+	uint32_t len;
+	bool err;
+	parse_string(fname, FLOG_MAX_FNAME_LEN, len, err);
+	if(flogfs_rm(fname) == FLOG_SUCCESS)
 		return 0;
 	return 1;
 }
@@ -444,7 +487,7 @@ int32_t USBTerm::cmd_startstream ( const char* cmd ) {
 	return 0;
 }
 
-
+/*
 int32_t USBTerm::parse_int(const char*& str){
 	int32_t i = *((int32_t const *)str);
 	str += sizeof(int32_t);
@@ -469,8 +512,50 @@ uint8_t const * USBTerm::parse_buffer ( const char*& str, uint32_t& len ) {
 	uint8_t const * const ret = reinterpret_cast<uint8_t const *>(str);
 	str += len;
 	return ret;
+}*/
+
+
+template <typename T>
+T USBTerm::parse_data(bool &err) {
+	T ret;
+	err = (usbserial1.read(reinterpret_cast<uint8_t *>(&ret),
+                           sizeof(ret), parse_byte_timeout) != sizeof(T));
+	return ret;
 }
 
 
+void USBTerm::parse_string(char * str, uint32_t max_len, uint32_t &len, bool &err) {
+	len = 0;
+	while(max_len--){
+		len += 1;
+		err = (usbserial1.read((uint8_t *)str, 1, parse_byte_timeout) != 1);
+		if(err) return;
+		if(*(str++) == 0)
+			return;
+	}
+}
+
+bool USBTerm::parse_buffer_pkt(uint8_t * dst, uint32_t max_len, uint32_t &len, bool &err) {
+	len = parse_data<uint32_t>(err);
+	if(len == 0)
+		return false;
+	if(err) return false;
+	len = min(max_len, len);
+
+	err = (usbserial1.read(dst, len, parse_byte_timeout) != len);
+	if(err) return false;
+	return true;
+}
+
+void USBTerm::parse_buffer(uint8_t * dst, uint32_t max_len, uint32_t &len, bool &err) {
+	len = 0;
+	uint32_t chunk_len;
+	while(parse_buffer_pkt(dst, max_len, chunk_len, err)){
+		if(err) return;
+		max_len -= chunk_len;
+		dst += chunk_len;
+		len += chunk_len;
+	}
+}
 
 
