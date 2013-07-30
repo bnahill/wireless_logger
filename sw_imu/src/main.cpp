@@ -33,7 +33,7 @@ int main(void) {
 	
 	evt_log.add("Started up!", EventItem::SEVERITY_NOTE);
 	
-	//Acquisition::init();
+	Acquisition::init();
 
 	UI::ui.start();
 

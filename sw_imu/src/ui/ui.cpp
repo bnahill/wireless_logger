@@ -61,7 +61,7 @@ msg_t UI::run_monitor(){
 			oled.update();
 		}
 		chThdSleep(MS2ST(500));
-		led1.assign(reg1.is_charging());
+		//led1.assign(reg1.is_charging());
 	}
 	return 0;
 }

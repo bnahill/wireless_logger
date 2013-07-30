@@ -12,7 +12,10 @@ bool Tests::fs_test() {
 	bool res;
 	uint8_t buffer[1024];
 	flog_write_file_t write_file;
+	flog_read_file_t read_file;
 	char txt[32];
+	uint32_t t0, t1;
+	
 
 	for(uint32_t i = 0; i < 1024; i++){
 		buffer[i] = i * 5;
@@ -25,6 +28,8 @@ bool Tests::fs_test() {
 	oled.update();
 
 	UI::wait_for_button(UI::MASK_SELECT);
+	
+	//goto mount;
 
 	oled.fb.clear_area(1);
 	oled.fb.write_text_centered<SmallFont>("Formatting...", 2);
@@ -36,6 +41,8 @@ bool Tests::fs_test() {
 
 	UI::wait_for_button(UI::MASK_SELECT);
 
+mount:
+
 	// Mount it
 	oled.fb.clear_area(1);
 	oled.fb.write_text_centered<SmallFont>("Mounting...", 2);
@@ -46,20 +53,35 @@ bool Tests::fs_test() {
 	oled.update();
 
 	UI::wait_for_button(UI::MASK_SELECT);
+	
+	//goto erase_test;
 
 	oled.fb.clear_area(1);
 	oled.fb.write_text_centered<SmallFont>("Making big file", 2);
 	oled.update();
+	led1.set();
 	res = (flogfs_open_write(&write_file, "test") == FLOG_SUCCESS);
+	led1.clear();
 	if(!res){
 		imu_sprint(txt, "Failed opening");
 		goto failure;
 	}
+	
+	oled.fb.write_text_centered<SmallFont>("Success", 3);
+	oled.update();
+	
+	UI::wait_for_button(UI::MASK_SELECT);
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Writing big file", 2);
+	oled.update();
+	led1.set();
+	t0 = chTimeNow();
 	for(uint32_t i = 0; ; i++){
 		uint32_t count = flogfs_write(&write_file, buffer, sizeof(buffer));
 		if((i & 0x1F) == 0){
-			imu_sprint(txt, "Wrote ", write_file.write_head / 1024, " kB");
-			oled.fb.write_text_centered<SmallFont>(txt, 3);
+		//	imu_sprint(txt, "Wrote ", write_file.write_head / 1024, " kB");
+		//	oled.fb.write_text_centered<SmallFont>(txt, 3);
 			// oled.update();
 		}
 		if(count != sizeof(buffer)){
@@ -67,8 +89,10 @@ bool Tests::fs_test() {
 			break;
 		}
 	}
-	imu_sprint(txt, "Wrote ", write_file.write_head / 1024, " kB");
-	oled.fb.write_text_centered<SmallFont>(txt, 3);
+	t1 = chTimeNow();
+	led1.clear();
+	imu_sprint(txt, "Wrote ", write_file.write_head / 1024, " kB\nin ", (uint32_t)(1000*(t1-t0))/MS2ST(1000), " ms");
+	oled.fb.write_text_centered<SmallFont>(txt, 2);
 	oled.update();
 	txt[0] = 0;
 
@@ -81,7 +105,55 @@ bool Tests::fs_test() {
 	flogfs_close_write(&write_file);
 	oled.fb.write_text_centered<SmallFont>("Success", 3);
 	oled.update();
-
+	
+	UI::wait_for_button(UI::MASK_SELECT);
+	
+read_test:
+	
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Opening file", 2);
+	oled.update();
+	led1.set();
+	res = (flogfs_open_read(&read_file, "test") == FLOG_SUCCESS);
+	led1.clear();
+	if(!res){
+		imu_sprint(txt, "Failed opening");
+		goto failure;
+	}
+	oled.fb.write_text_centered<SmallFont>("Done!", 3);
+	oled.update();
+	UI::wait_for_button(UI::MASK_SELECT);
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Reading File", 2);
+	oled.update();
+	t0 = chTimeNow();
+	while(flogfs_read(&read_file, buffer, 1024) == 1024);
+	t1 = chTimeNow();
+	
+	flogfs_close_read(&read_file);
+	
+	imu_sprint(txt, "Read ", read_file.read_head / 1024, " kB\nin ", (uint32_t)(1000*(t1-t0))/MS2ST(1000), " ms");
+	oled.fb.write_text_centered<SmallFont>(txt, 2);
+	oled.update();
+	txt[0] = 0;
+	
+	UI::wait_for_button(UI::MASK_SELECT);
+	
+erase_test:
+	
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Erasing File", 2);
+	oled.update();
+	led1.set();
+	t0 = chTimeNow();
+	flogfs_rm("test");
+	t1 = chTimeNow();
+	led1.clear();
+	imu_sprint(txt, "Deleted in ", (uint32_t)(1000*(t1-t0))/MS2ST(1000), " ms");
+	oled.fb.write_text_centered<SmallFont>(txt, 2);
+	oled.update();
+	txt[0] = 0;
+	
 	UI::wait_for_button(UI::MASK_SELECT);
 
 	oled.fb.clear_area(1);
