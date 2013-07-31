@@ -17,6 +17,11 @@ target remote | openocd -c "gdb_port pipe; log_output openocd.log" @OPENOCD_ARGS
 
 monitor reset init
 
+@GDB_LOAD_SVD@
+
 l
 r
+
+set *((uint32_t *)  0xE0042004) = 7
+
 r

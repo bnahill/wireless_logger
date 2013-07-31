@@ -63,35 +63,53 @@ set(FLOGFS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/flogfs)
 
 
 
+option(USE_FPU "Use the floating point unit" OFF)
+option(USE_RTC_SCHED_TICK "Use the RTC for scheduler tick instead of SysTick" OFF)
+option(SLEEP_WHEN_IDLE "Try to sleep whenever the CPU is idle" OFF)
 
-
-
-
-
+option(DEBUG_USE_SVD "Use pycmdebug and an SVD file for debugging" OFF)
+SET(XTAL_FREQ "HSE crystal frequency" CACHE STRING "8000000")
 
 ########################################################
 # Build Options
 ########################################################
 
-set(OPTIMIZATION "-Os")
+set(OPTIMIZATION "-Og")
 set(LTO )#"-flto")
 
 set(MCU cortex-m4)
 
-set(USE_FPU false)
-
 set(MCFLAGS "-mcpu=${MCU} -g -mthumb -fsingle-precision-constant -fomit-frame-pointer -D__NEWLIB__")# -fomit-frame-pointer")
 
 if(${USE_FPU})
+	message("Option: Use FPU")
 	set(MCFLAGS "${MCFLAGS} -mfpu=fpv4-sp-d16 -mfloat-abi=hard")
 	add_definitions(-D__FPU_PRESENT -DCORTEX_USE_FPU=1)
 else(${USE_FPU})
+	message("Option: Don't use FPU")
 	set(MCFLAGS "${MCFLAGS} -mfloat-abi=soft")
 	add_definitions(-DCORTEX_USE_FPU=0)
 endif(${USE_FPU})
 
 add_definitions(${MCFLAGS})
-add_definitions(-DHSE_VALUE=8000000 -DARM_MATH_CM4 -DUSE_RESTRICT)
+add_definitions(-DHSE_VALUE=${XTAL_FREQ} -DARM_MATH_CM4 -DUSE_RESTRICT)
+
+if(${USE_RTC_SCHED_TICK})
+	message("Option: Don't use RTC for scheduler tick")
+	add_definitions(-DSCHED_TICK_RTC=1)
+else(${USE_RTC_SCHED_TICK})
+	message("Option: Use RTC for scheduler tick")
+	add_definitions(-DSCHED_TICK_RTC=0)
+endif(${USE_RTC_SCHED_TICK})
+
+if(${SLEEP_WHEN_IDLE})
+	message("Option: Sleep when idle")
+	add_definitions(-DCORTEX_ENABLE_WFI_IDLE=1)
+else(${SLEEP_WHEN_IDLE})
+	message("Option: Don't sleep when idle")
+	add_definitions(-DCORTEX_ENABLE_WFI_IDLE=0)
+endif(${SLEEP_WHEN_IDLE})
+
 
 set(LINKER_SCRIPT ${OS_DIR}/ports/GCC/ARMCMx/STM32F4xx/ld/STM32F405xG.ld)
 
@@ -255,6 +273,7 @@ set(IMU_SOURCES
 	${IMU_DIR}/guardian_spec.cpp
 	${IMU_DIR}/mt29fxg01.cpp
 	${IMU_DIR}/eventlog.cpp
+	${IMU_DIR}/clock_mgr.c
 	
 	${IMU_DIR}/graphics/smallfont.cpp
 	${IMU_DIR}/graphics/mediumfont.cpp
@@ -327,6 +346,12 @@ else(${USE_FPU})
 	set(OPENOCD_RTOS "-c \"stm32f4x.cpu configure -rtos auto\"")
 endif(${USE_FPU})
 
+if(${DEBUG_USE_SVD})
+	set(GDB_LOAD_SVD
+"source ${CMAKE_SOURCE_DIR}/svd/gdb.py
+svd_load ${CMAKE_SOURCE_DIR}/svd/STM32F40x.svd")
+endif(${DEBUG_USE_SVD})
+
 configure_file(${CMAKE_SOURCE_DIR}/start.gdb.in ${CMAKE_CURRENT_BINARY_DIR}/start.gdb)
 set(GDB_ARGS -x start.gdb)
 
@@ -386,3 +411,4 @@ add_custom_target(${TARGET}.hex ALL
 	DEPENDS ${OUTFILE}
 	COMMENT "Generating Intel HEX output..."
 )
+

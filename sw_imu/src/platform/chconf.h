@@ -36,7 +36,7 @@
 //! @addtogroup Kernel
 //! @{
 
-#define SCHED_TICK_RTC                      FALSE
+//#define SCHED_TICK_RTC                      TRUE
 
 /*===========================================================================*/
 /**
