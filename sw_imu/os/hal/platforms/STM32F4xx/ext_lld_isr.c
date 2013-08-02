@@ -33,6 +33,8 @@
 
 #include "ext_lld_isr.h"
 
+#include "imu/clock_mgr.h"
+
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
 /*===========================================================================*/
@@ -61,6 +63,8 @@
 CH_IRQ_HANDLER(EXTI0_IRQHandler) {
 
   CH_IRQ_PROLOGUE();
+  
+  clk_mgr_wakeup();
 
   EXTI->PR = (1 << 0);
   EXTD1.config->channels[0].cb(&EXTD1, 0);
@@ -76,6 +80,8 @@ CH_IRQ_HANDLER(EXTI0_IRQHandler) {
 CH_IRQ_HANDLER(EXTI1_IRQHandler) {
 
   CH_IRQ_PROLOGUE();
+  
+  clk_mgr_wakeup();
 
   EXTI->PR = (1 << 1);
   EXTD1.config->channels[1].cb(&EXTD1, 1);
@@ -91,6 +97,8 @@ CH_IRQ_HANDLER(EXTI1_IRQHandler) {
 CH_IRQ_HANDLER(EXTI2_IRQHandler) {
 
   CH_IRQ_PROLOGUE();
+  
+  clk_mgr_wakeup();
 
   EXTI->PR = (1 << 2);
   EXTD1.config->channels[2].cb(&EXTD1, 2);
@@ -106,6 +114,8 @@ CH_IRQ_HANDLER(EXTI2_IRQHandler) {
 CH_IRQ_HANDLER(EXTI3_IRQHandler) {
 
   CH_IRQ_PROLOGUE();
+  
+  clk_mgr_wakeup();
 
   EXTI->PR = (1 << 3);
   EXTD1.config->channels[3].cb(&EXTD1, 3);
@@ -121,6 +131,8 @@ CH_IRQ_HANDLER(EXTI3_IRQHandler) {
 CH_IRQ_HANDLER(EXTI4_IRQHandler) {
 
   CH_IRQ_PROLOGUE();
+  
+  clk_mgr_wakeup();
 
   EXTI->PR = (1 << 4);
   EXTD1.config->channels[4].cb(&EXTD1, 4);
@@ -137,6 +149,8 @@ CH_IRQ_HANDLER(EXTI9_5_IRQHandler) {
   uint32_t pr;
 
   CH_IRQ_PROLOGUE();
+  
+  clk_mgr_wakeup();
 
   pr = EXTI->PR & ((1 << 5) | (1 << 6) | (1 << 7) | (1 << 8) | (1 << 9));
   EXTI->PR = pr;
@@ -191,6 +205,8 @@ CH_IRQ_HANDLER(EXTI15_10_IRQHandler) {
 CH_IRQ_HANDLER(PVD_IRQHandler) {
 
   CH_IRQ_PROLOGUE();
+  
+  clk_mgr_wakeup();
 
   EXTI->PR = (1 << 16);
   EXTD1.config->channels[16].cb(&EXTD1, 16);
@@ -206,6 +222,8 @@ CH_IRQ_HANDLER(PVD_IRQHandler) {
 CH_IRQ_HANDLER(RTCAlarm_IRQHandler) {
 
   CH_IRQ_PROLOGUE();
+  
+  clk_mgr_wakeup();
 
   EXTI->PR = (1 << 17);
   EXTD1.config->channels[17].cb(&EXTD1, 17);
@@ -273,28 +291,28 @@ CH_IRQ_HANDLER(TAMPER_STAMP_IRQHandler) {
   CH_IRQ_EPILOGUE();
 }
 
+static uint32_t what_happened_test = 0;
+
 /**
  * @brief   EXTI[22] interrupt handler (RTC_WKUP).
  *
  * @isr
  */
 CH_IRQ_HANDLER(RTC_WKUP_IRQHandler) {
-
   CH_IRQ_PROLOGUE();
-
+  what_happened_test = 5;
   EXTI->PR = (1 << 22);
   RTC->ISR &= ~RTC_ISR_WUTF;
-  
+  what_happened_test = 15;
+//   clk_mgr_wakeup();
 #if SCHED_TICK_RTC
-  chSysLockFromIsr();
-  chSysTimerHandlerI();
-  chSysUnlockFromIsr();
-    EXTI->PR = (1 << 22);
-  RTC->ISR &= ~RTC_ISR_WUTF;
-#else
-//  EXTD1.config->channels[22].cb(&EXTD1, 22);
+  SCB->ICSR = ICSR_PENDSTSET;
 #endif
-
+  if(EXTI->PR & (1 << 22)){
+  what_happened_test = 25;
+  } else {
+    what_happened_test = 2200;
+  }
   CH_IRQ_EPILOGUE();
 }
 

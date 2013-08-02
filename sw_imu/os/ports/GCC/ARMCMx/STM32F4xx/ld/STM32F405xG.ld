@@ -21,8 +21,8 @@
 /*
  * ST32F405xG memory setup.
  */
-__main_stack_size__     = 2048;
-__process_stack_size__  = 1024;
+__main_stack_size__     = 4096;
+__process_stack_size__  = 2048;
 
 MEMORY
 {

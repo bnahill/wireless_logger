@@ -17,15 +17,12 @@ SPI::SPI(SPIDriver &driver) :
 void SPI::init(){
 	//! Check to make sure this is only initialized once
 	chSysLock();
-	if(!is_init)
+	if(!is_init) {
+		thread = chThdCreateI(waSPIThread, stack_size, priority, (tfunc_t) start_thread, this);
+		chThdResumeI(thread);
 		is_init = true;
-	else {
-		chSysUnlock();
-		return;
-	}
+	} 
 	chSysUnlock();
-	
-	thread = chThdCreateStatic(waSPIThread, stack_size, priority, (tfunc_t) start_thread, this);
 }
 
 void SPI::transfer(xfer_t &xfer, bool important){
@@ -155,6 +152,7 @@ msg_t SPI::run(){
 			xfer->starting_callback(xfer->starting_param);
 		}
 		spiSelect(&driver);
+		clk_mgr_req_hsi();
 		switch(xfer->operation){
 		case OP_WR_SEQ:
 			spiSend(&driver, xfer->n_tx, xfer->tx_buff);
@@ -179,6 +177,7 @@ msg_t SPI::run(){
 			spiSend(&driver, xfer->n_tx, xfer->tx_buff);
 			break;
 		}
+		clk_mgr_noreq_hsi();
 		spiUnselect(&driver);
 		if(xfer->tc_callback){
 			xfer->tc_callback(xfer->tc_param);

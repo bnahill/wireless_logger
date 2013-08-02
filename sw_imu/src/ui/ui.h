@@ -78,7 +78,7 @@ public:
 	}
 	
 	void enable_suspend(){
-		suspend_enabled = false;
+		suspend_enabled = true;
 		resume();
 	}
 	
@@ -118,7 +118,8 @@ private:
 	
 	void start_suspend_timer(){
 		chSysLock();
-		chVTReset(&timer);
+		if(timer.vt_func)
+			chVTResetI(&timer);
 		chVTSetI(&timer, MS2ST(suspend_timeout_ms), (vtfunc_t)handle_suspend, this);
 		chSysUnlock();
 	}
@@ -137,19 +138,27 @@ private:
 	}
 	
 	static void handle_left(UI * the_ui){
-		chEvtSignal(the_ui->thread, MASK_LEFT | MASK_RESUME);
+		chSysLockFromIsr();
+		chEvtSignalI(the_ui->thread, MASK_LEFT | MASK_RESUME);
+		chSysUnlockFromIsr();
 	}
 	
 	static void handle_right(UI * the_ui){
-		chEvtSignal(the_ui->thread, MASK_RIGHT | MASK_RESUME);
+		chSysLockFromIsr();
+		chEvtSignalI(the_ui->thread, MASK_RIGHT | MASK_RESUME);
+		chSysUnlockFromIsr();
 	}
 	
 	static void handle_select(UI * the_ui){
-		chEvtSignal(the_ui->thread, MASK_SELECT | MASK_RESUME);
+		chSysLockFromIsr();
+		chEvtSignalI(the_ui->thread, MASK_SELECT | MASK_RESUME);
+		chSysUnlockFromIsr();
 	}
 	
 	static void handle_suspend(UI * the_ui){
-		chEvtSignal(the_ui->thread, MASK_SUSPEND);
+		chSysLockFromIsr();
+		chEvtSignalI(the_ui->thread, MASK_SUSPEND);
+		chSysUnlockFromIsr();
 	}
 };
 

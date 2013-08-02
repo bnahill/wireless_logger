@@ -19,24 +19,31 @@ int main(void) {
 	halInit();
 	chSysInit();
 	
+	clk_mgr_req_hsi();
+	
 	Platform::early_init();
 
-	PowerManagement::enable_rtc_tick();
 #if SCHED_TICK_RTC
 	PowerManagement::disable_systick();
+	PowerManagement::enable_rtc_tick();
 #endif
 	oled.init();
 		
- 	if(!guardian1.init()) {
-		evt_log.add("Guardian init\nfailed!", EventItem::SEVERITY_ERROR);
-	}
-	
-	evt_log.add("Started up!", EventItem::SEVERITY_NOTE);
+//  	if(!guardian1.init()) {
+// 		evt_log.add("Guardian init\nfailed!", EventItem::SEVERITY_ERROR);
+// 	}
 	
 	Acquisition::init();
 
 	UI::ui.start();
 
+	clk_mgr_noreq_hsi();
+	
+// 	while(1){
+// 		led1.toggle();
+// 		chThdSleep(MS2ST(1000));
+// 	}
+	
 	chThdSleep(TIME_INFINITE);
 	return 1;
 }

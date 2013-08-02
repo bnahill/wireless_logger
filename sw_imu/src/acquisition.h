@@ -3,32 +3,8 @@
 
 #include "platform/platform.h"
 
-namespace Acquisition {
-	/*!
-	 @brief Initialize acquisition system
-	 */
-	void init();
-	
-	//! Callback from ChibiOS timer driver
-	void tick(GPTDriver *driver);
-	
-	//! Primary sample clock
-	extern GPTDriver &timer;
-	
-	/*!
-	 @name Tick sources
-	 Tick sources as dividers of primary sample clock
-	 @{
-	 */
-	extern EventSource tick_source;
-	extern EventSource tick_source2;
-	extern EventSource tick_source4;
-	extern EventSource tick_source8;
-	//! @}
-	
-	//! Sensor result source
-	extern EventSource sensor_source;
-	
+class Acquisition {
+public:
 	//! Set of flags to wait on for sensor readings
 	typedef enum {
 		SRC_ACC1  = 0x0001,
@@ -43,7 +19,61 @@ namespace Acquisition {
 		SRC_GYRO2 = 0x0200,
 		SRC_GYRO3 = 0x0400,
 		SRC_GYRO4 = 0x0800,
-	} sensor_event_t;
+	} sensor_src_t;
+	
+	/*!
+	 @brief Initialize acquisition system
+	 */
+	static void init();
+	
+	//! Callback from ChibiOS timer driver
+	static void tick(void * nothing);
+	
+	static bool acc_is_enabled(){return acc_enabled;}
+	static bool gyro_is_enabled(){return gyro_enabled;}
+	static bool mag_is_enabled(){return mag_enabled;}
+	
+	static void sleep_all();
+	static void wake_all();
+	static void enable_sources(sensor_src_t sensor);
+	static void disable_sources(sensor_src_t sensor);
+private:
+	//! Primary sample clock
+	//extern GPTDriver &timer;
+	
+	static VirtualTimer vtimer;
+	
+	static bool acc_enabled, gyro_enabled, mag_enabled;
+	
+	/*!
+	 @name Tick sources
+	 Tick sources as dividers of primary sample clock
+	 @{
+	 */
+	static EventSource tick_source;
+	static EventSource tick_source2;
+	static EventSource tick_source4;
+	static EventSource tick_source8;
+	//! @}
+	
+	//! Sensor result source
+	static EventSource sensor_source;
+	
+	typedef enum {
+		TRIG_SLEEP = 0x10000,
+		TRIG_WAKE = 0x20000,
+		TRIG_ALL = 0xF0000
+	} trigger_event_t;
+	
+	static Thread * acc_thread, * gyro_thread, * mag_thread;
+	
+	static msg_t AccThread(void *arg);
+	static msg_t GyroThread(void *arg);
+	static msg_t MagThread(void *arg);
+	
+	static WORKING_AREA(waAccThread, 512);
+	static WORKING_AREA(waGyroThread, 512);
+	static WORKING_AREA(waMagThread, 512);
 };
 
 

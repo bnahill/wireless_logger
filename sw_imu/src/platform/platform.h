@@ -38,6 +38,7 @@
 #include <imu/mt29fxg01.h>
 #include <imu/eventlog.h>
 #include <imu/datasource.h>
+#include <imu/clock_mgr.h>
 #include "rng.h"
 
 /*!

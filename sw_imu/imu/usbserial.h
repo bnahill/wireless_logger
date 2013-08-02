@@ -39,6 +39,7 @@ public:
 	 @brief Initialize the hardware
 	 */
 	void init(){
+		clk_mgr_req_hse();
 		sduStart(&driver, &conf);
 		
 		usbDisconnectBus(conf.usbp);
@@ -49,6 +50,7 @@ public:
 	void stop(){
 		usbStop(conf.usbp);
 		sduStop(&driver);
+		clk_mgr_noreq_hse();
 	}
 	
 	bool is_connected() const { return vusb_pin.read(); }

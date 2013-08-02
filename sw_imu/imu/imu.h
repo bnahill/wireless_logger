@@ -17,6 +17,7 @@
 #endif
 
 #include "imu/imu_math.h"
+#include "imu/clock_mgr.h"
 
 /*!
  @brief A structure defining a single GPIO pin

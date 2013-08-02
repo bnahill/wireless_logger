@@ -17,9 +17,11 @@ void Button< driver >::handle_callback(){
 	// Transition!
 	if(state != new_state){
 		state = new_state;
-		extChannelDisable(&driver, channel);
+		chSysLockFromIsr();
+		extChannelDisableI(&driver, channel);
 		chVTSetI(&timer, MS2ST(debounce_ms),
 		         reinterpret_cast<vtfunc_t>(debounce_cb), this);
+		chSysUnlockFromIsr();
 	}
 }
 
@@ -45,5 +47,7 @@ void Button< driver >::handle_debounce(){
 		}
 	}
 	state = new_state;
-	extChannelEnable(&driver, channel);
+	chSysLockFromIsr();
+	extChannelEnableI(&driver, channel);
+	chSysUnlockFromIsr();
 }

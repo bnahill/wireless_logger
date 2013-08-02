@@ -5,6 +5,8 @@ using namespace Platform;
 void SensorView::exec(){
 	eventmask_t evt;
 	
+	UI::ui.inhibit_suspend();
+	
 	oled.fb.clear_area(1);
 	
 	thread = chThdCreateStatic(SVThread, stack_size, LOWPRIO,(tfunc_t) start_thread, (void *)this);
@@ -51,6 +53,8 @@ void SensorView::exec(){
 	}
 	
 	terminate();
+	
+	UI::ui.enable_suspend();
 }
 	
 msg_t SensorView::terminate(){
@@ -68,28 +72,35 @@ void SensorView::thread_action(){
 	
 	data_listener.init(data_buffer, buffer_len);
 	acc_source.register_queue(data_listener);
+	Acquisition::enable_sources(Acquisition::SRC_ACC1);
 	
 	while(!chThdShouldTerminate()){
 		if(mode != old_mode){
 			switch(old_mode){
 			case MODE_ACC:
 				acc_source.unregister_queue(data_listener);
+				Acquisition::disable_sources(Acquisition::SRC_ACC1);
 				break;
 			case MODE_MAG:
 				mag_source.unregister_queue(data_listener);
+				Acquisition::disable_sources(Acquisition::SRC_MAG1);
 				break;
 			case MODE_GYRO:
 				gyro_source.unregister_queue(data_listener);
+				Acquisition::disable_sources(Acquisition::SRC_GYRO1);
 				break;
 			}
 			switch(mode){
 			case MODE_ACC:
+				Acquisition::enable_sources(Acquisition::SRC_ACC1);
 				acc_source.register_queue(data_listener);
 				break;
 			case MODE_MAG:
+				Acquisition::enable_sources(Acquisition::SRC_MAG1);
 				mag_source.register_queue(data_listener);
 				break;
 			case MODE_GYRO:
+				Acquisition::enable_sources(Acquisition::SRC_GYRO1);
 				gyro_source.register_queue(data_listener);
 				break;
 			}
@@ -138,12 +149,15 @@ void SensorView::thread_action(){
 	
 	switch(old_mode){
 	case MODE_ACC:
+		Acquisition::disable_sources(Acquisition::SRC_ACC1);
 		acc_source.unregister_queue(data_listener);
 		break;
 	case MODE_MAG:
+		Acquisition::disable_sources(Acquisition::SRC_MAG1);
 		mag_source.unregister_queue(data_listener);
 		break;
 	case MODE_GYRO:
+		Acquisition::disable_sources(Acquisition::SRC_GYRO1);
 		gyro_source.unregister_queue(data_listener);
 		break;
 	}

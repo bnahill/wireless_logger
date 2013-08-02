@@ -13,6 +13,7 @@
 
 #include "imu/ssd1306.cpp"
 #include "imu/datasource.cpp"
+#include "imu/clock_mgr.h"
 
 
 using namespace Platform;
@@ -155,6 +156,8 @@ MT29FxG01 Platform::flash(spi2, MT29FxG01::SIZE_1G,
 EventLog Platform::evt_log;
 
 void Platform::early_init(){
+	clk_mgr_init();
+	
 	reg1.high_power(true);
 	reg1.buck_mode(LTC3559::MODE_BURST);
 	rf1.early_init();

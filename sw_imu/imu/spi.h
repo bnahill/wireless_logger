@@ -222,7 +222,7 @@ protected:
 	
 	msg_t run();
 	
-	static constexpr uint32_t stack_size = 1024;
+	static constexpr uint32_t stack_size = 512;
 	static constexpr tprio_t priority = HIGHPRIO;
 	static constexpr tprio_t mb_size = 16;
 	

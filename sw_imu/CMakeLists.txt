@@ -66,6 +66,7 @@ set(FLOGFS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/flogfs)
 option(USE_FPU "Use the floating point unit" OFF)
 option(USE_RTC_SCHED_TICK "Use the RTC for scheduler tick instead of SysTick" OFF)
 option(SLEEP_WHEN_IDLE "Try to sleep whenever the CPU is idle" OFF)
+option(USE_CLK_MGR "Use the clock manager to keep the CPU in its lowest power mode" ON)
 
 option(DEBUG_USE_SVD "Use pycmdebug and an SVD file for debugging" OFF)
 SET(XTAL_FREQ "HSE crystal frequency" CACHE STRING "8000000")
@@ -74,7 +75,7 @@ SET(XTAL_FREQ "HSE crystal frequency" CACHE STRING "8000000")
 # Build Options
 ########################################################
 
-set(OPTIMIZATION "-Og")
+set(OPTIMIZATION "-Os")
 set(LTO )#"-flto")
 
 set(MCU cortex-m4)
@@ -95,10 +96,10 @@ add_definitions(${MCFLAGS})
 add_definitions(-DHSE_VALUE=${XTAL_FREQ} -DARM_MATH_CM4 -DUSE_RESTRICT)
 
 if(${USE_RTC_SCHED_TICK})
-	message("Option: Don't use RTC for scheduler tick")
+	message("Option: Use RTC for scheduler tick")
 	add_definitions(-DSCHED_TICK_RTC=1)
 else(${USE_RTC_SCHED_TICK})
-	message("Option: Use RTC for scheduler tick")
+	message("Option: Don't use RTC for scheduler tick")
 	add_definitions(-DSCHED_TICK_RTC=0)
 endif(${USE_RTC_SCHED_TICK})
 
@@ -110,6 +111,14 @@ else(${SLEEP_WHEN_IDLE})
 	add_definitions(-DCORTEX_ENABLE_WFI_IDLE=0)
 endif(${SLEEP_WHEN_IDLE})
 
+
+if(${USE_CLK_MGR})
+	message("Option: Use clock manager")
+	add_definitions(-DUSE_CLK_MGR=1)
+else(${USE_CLK_MGR})
+	message("Option: Don't use clock manager")
+	add_definitions(-DUSE_CLK_MGR=0)
+endif(${USE_CLK_MGR})
 
 set(LINKER_SCRIPT ${OS_DIR}/ports/GCC/ARMCMx/STM32F4xx/ld/STM32F405xG.ld)
 
@@ -411,4 +420,5 @@ add_custom_target(${TARGET}.hex ALL
 	DEPENDS ${OUTFILE}
 	COMMENT "Generating Intel HEX output..."
 )
+
 

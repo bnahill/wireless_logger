@@ -15,17 +15,36 @@ I2C::I2C(I2CDriver& driver, i2copmode_t opmode,
 	sda(sda), scl(scl){}
 	
 void I2C::init(){
+	lock();
 	if(!(refcnt++)){
-		i2cObjectInit(&driver);
+		clear_bus();
+		clk_mgr_req_hsi();
+		//i2cObjectInit(&driver);
 		i2cStart(&driver, &config);
+		clk_mgr_noreq_hsi();
 	}
+	unlock();
 }
 
 void I2C::close(){
 	if(!(--refcnt)){
+		clk_mgr_req_hsi();
 		i2cStop(&driver);
+		clk_mgr_noreq_hsi();
 	}
 }
+
+void I2C::clear_bus(){
+	scl.set_mode(gpio_pin_t::MODE_OUTPUT);
+	for(uint32_t i = 0; i < 100; i++){
+		scl.set();
+		chThdSleep(1);
+		scl.clear();
+		chThdSleep(1);
+	}
+	scl.set_mode(gpio_pin_t::MODE_ALT);
+}
+
 
 void I2C::reconfig_clock(){
 	i2cStop(&driver);
@@ -37,12 +56,17 @@ msg_t I2C::transmit(i2caddr_t addr, const uint8_t* txbuf, size_t txbytes,
                     uint8_t* rxbuf, size_t rxbytes, systime_t timeout){
 	msg_t msg;
 	lock();
+// 	msg = i2cMasterTransmitTimeout(&driver, addr, txbuf, txbytes, rxbuf,
+// 	                               rxbytes, timeout);
+	clk_mgr_req_hsi();
 	msg = i2cMasterTransmitTimeout(&driver, addr, txbuf, txbytes, rxbuf,
-	                               rxbytes, timeout);
+	                               rxbytes, MS2ST(txbytes+rxbytes));
 	if(msg == RDY_TIMEOUT){
 		i2cStop(&driver);
+		clear_bus();
 		i2cStart(&driver, &config);
 	}
+	clk_mgr_noreq_hsi();
 	unlock();
 	return msg;
 }
@@ -52,11 +76,15 @@ msg_t I2C::receive(i2caddr_t addr, uint8_t* rxbuf, size_t rxbytes,
                    systime_t timeout){
 	msg_t msg;
 	lock();
-	msg = i2cMasterReceiveTimeout(&driver, addr, rxbuf, rxbytes, timeout);
+	//msg = i2cMasterReceiveTimeout(&driver, addr, rxbuf, rxbytes, timeout);
+	clk_mgr_req_hsi();
+	msg = i2cMasterReceiveTimeout(&driver, addr, rxbuf, rxbytes, MS2ST(rxbytes));
 	if(msg == RDY_TIMEOUT){
 		i2cStop(&driver);
+		clear_bus();
 		i2cStart(&driver, &config);
 	}
+	clk_mgr_noreq_hsi();
 	unlock();
 	return msg;
 }
@@ -73,7 +101,7 @@ uint8_t I2C::read_byte_test(i2caddr_t addr, uint8_t regaddr){
 		if((driver.i2c->SR2 & I2C_SR2_MSL) == 0){
 			// I2C is messed up
 			scl.set_mode(gpio_pin_t::MODE_OUTPUT);
-			for(uint32_t i = 0; i < 9; i++){
+			for(uint32_t i = 0; i < 10; i++){
 				scl.clear();
 				chThdSleep(MS2ST(1));
 				scl.set();

@@ -82,8 +82,10 @@ protected:
 	//! ChibiOS I2C driver
 	I2CDriver &driver;
 	
-	gpio_pin_t const &sda;
-	gpio_pin_t const &scl;
+	void clear_bus();
+	
+	gpio_pin_t const sda;
+	gpio_pin_t const scl;
 };
 
 //! @} @}

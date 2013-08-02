@@ -27,6 +27,7 @@
  */
 
 #include "ch.h"
+#include "imu/clock_mgr.h"
 
 /*===========================================================================*/
 /* Port interrupt handlers.                                                  */
@@ -38,9 +39,10 @@
  * @note    The timer must be initialized in the startup code.
  */
 CH_IRQ_HANDLER(SysTickVector) {
-
   CH_IRQ_PROLOGUE();
 
+  clk_mgr_wakeup();
+  
   chSysLockFromIsr();
   chSysTimerHandlerI();
   chSysUnlockFromIsr();

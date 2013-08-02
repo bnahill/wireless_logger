@@ -122,6 +122,11 @@ public:
 	
 	void reset();
 	
+	void set_active_mode(active_mode_t new_mode){
+		active_mode = new_mode;
+		update_ctrl_regs();
+	}
+	
 	/*!
 	 @brief Set a new output rate
 	 @param new_dr The new output rate
