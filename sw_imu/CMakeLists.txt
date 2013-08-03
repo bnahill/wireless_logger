@@ -56,7 +56,6 @@ set(IMU_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imu)
 set(CMSIS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMSIS)
 set(DSP_SRC ${CMSIS_DIR}/DSP_Lib/Source)
 set(OS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/os)
-set(FS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/coffee)
 set(FLOGFS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/flogfs)
 
 
@@ -70,7 +69,10 @@ option(USE_CLK_MGR "Use the clock manager to keep the CPU in its lowest power mo
 option(CHIBIOS_DEBUG "Enable ChibiOS debugging (a bit of CPU overhead)" OFF)
 
 option(DEBUG_USE_SVD "Use pycmdebug and an SVD file for debugging" OFF)
-SET(XTAL_FREQ "HSE crystal frequency" CACHE STRING "8000000")
+set(BOARD_REVISION "Which revision is it? BB=1, SF=2" CACHE STRING "2")
+
+
+
 
 ########################################################
 # Build Options
@@ -83,6 +85,8 @@ set(MCU cortex-m4)
 
 set(MCFLAGS "-mcpu=${MCU} -g -mthumb -fsingle-precision-constant -fomit-frame-pointer -D__NEWLIB__")# -fomit-frame-pointer")
 
+
+
 if(${USE_FPU})
 	message("Option: Use FPU")
 	set(MCFLAGS "${MCFLAGS} -mfpu=fpv4-sp-d16 -mfloat-abi=hard")
@@ -93,8 +97,20 @@ else(${USE_FPU})
 	add_definitions(-DCORTEX_USE_FPU=0)
 endif(${USE_FPU})
 
+if(${BOARD_REVISION} EQUAL "1")
+	add_definitions(-DHSE_VALUE=8000000)
+	message("Option: Building for the blue board")
+	set(PLATFORM_BOARD_DIR "src/platform/bb")
+elseif(${BOARD_REVISION} EQUAL "2")
+	add_definitions(-DHSE_VALUE=25000000)
+	message("Option: Building for strike force board")
+	set(PLATFORM_BOARD_DIR "src/platform/sf")
+else(${BOARD_REVISION} EQUAL "1")
+	message(FATAL_ERROR "You didn't select a valid board revision (either 1 or 2)!")
+endif(${BOARD_REVISION} EQUAL "1")
+
 add_definitions(${MCFLAGS})
-add_definitions(-DHSE_VALUE=${XTAL_FREQ} -DARM_MATH_CM4 -DUSE_RESTRICT)
+add_definitions( -DARM_MATH_CM4 -DUSE_RESTRICT)
 
 if(${USE_RTC_SCHED_TICK})
 	message("Option: Use RTC for scheduler tick")
@@ -185,6 +201,7 @@ include_directories(
 	${FLOGFS_DIR}/inc
 	
 	src/platform
+	${PLATFORM_BOARD_DIR}
 )
 
 
@@ -254,21 +271,13 @@ set(OS_SOURCES
 	${OS_DIR}/various/chrtclib.c
 )
 
-set(FS_SOURCES
-	${FS_DIR}/cfs-coffee.c
-# 	${FS_DIR}/cfs-eeprom.c
-# 	${FS_DIR}/cfs-posix.c
-# 	${FS_DIR}/cfs-posix-dir.c
-# 	${FS_DIR}/cfs-ram.c
-# 	${FS_DIR}/cfs-xmem.c
-)
 
 set(APP_SOURCES
 	src/main.cpp
 	src/acquisition.cpp
 	src/power_management.cpp
 	src/platform/board.c
-	src/platform/platform.cpp
+	${PLATFORM_BOARD_DIR}/platform.cpp
 	src/platform/cfs-coffee-arch.cpp
 	src/ui/ui.cpp
 	src/ui/menu.cpp

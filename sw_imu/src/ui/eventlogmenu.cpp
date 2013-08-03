@@ -1,5 +1,5 @@
 #include "ui/eventlogmenu.h"
-#include "platform/platform.h"
+#include "platform.h"
 
 using namespace Platform;
 

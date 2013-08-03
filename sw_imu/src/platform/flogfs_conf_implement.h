@@ -37,7 +37,7 @@ either expressed or implied, of the FLogFS Project.
 
 #include "flogfs.h"
 
-#include "platform/platform.h"
+#include "platform.h"
 
 using namespace Platform;
 

@@ -3,7 +3,7 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "platform/platform.h"
+#include "platform.h"
 
 class PowerManagement {
 public:

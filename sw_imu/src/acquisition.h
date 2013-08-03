@@ -1,7 +1,7 @@
 #ifndef __ACQUISITION_H_
 #define __ACQUISITION_H_
 
-#include "platform/platform.h"
+#include "platform.h"
 
 class Acquisition {
 public:

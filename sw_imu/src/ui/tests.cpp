@@ -1,5 +1,5 @@
 #include "tests.h"
-#include "platform/platform.h"
+#include "platform.h"
 #include "ui/ui.h"
 #include "stdlib.h"
 #include "string.h"

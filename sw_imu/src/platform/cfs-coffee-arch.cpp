@@ -2,7 +2,7 @@
 #include "hal.h"
 
 #include "platform/cfs-coffee-arch.h"
-#include "platform/platform.h"
+#include "platform.h"
 #include "imu/mt29fxg01.h"
 
 using namespace Platform;
