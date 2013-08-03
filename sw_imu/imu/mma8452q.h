@@ -80,8 +80,8 @@ public:
 	} fast_read_t;
 	
 	typedef enum {
-		ACT_MODE_ACTIVE = 0,
-		ACT_MODE_STANDBY = 1
+		ACT_MODE_STANDBY = 0,
+		ACT_MODE_ACTIVE = 1
 	} active_mode_t;
 	
 	typedef enum {

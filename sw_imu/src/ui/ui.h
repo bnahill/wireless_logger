@@ -157,6 +157,7 @@ private:
 	
 	static void handle_suspend(UI * the_ui){
 		chSysLockFromIsr();
+		the_ui->timer.vt_func = nullptr;
 		chEvtSignalI(the_ui->thread, MASK_SUSPEND);
 		chSysUnlockFromIsr();
 	}

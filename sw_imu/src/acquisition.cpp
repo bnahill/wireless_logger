@@ -41,7 +41,7 @@ msg_t Acquisition::AccThread(void *arg) {
 	
 	acc1.set_active_mode(MMA8452Q::ACT_MODE_STANDBY);
 	while(TRIG_WAKE != chEvtWaitOne(TRIG_ALL));
-	acc1.set_active_mode(MMA8452Q::ACT_MODE_STANDBY);
+	acc1.set_active_mode(MMA8452Q::ACT_MODE_ACTIVE);
 	acc_enabled = true;
 
 	while(1){
@@ -50,14 +50,11 @@ msg_t Acquisition::AccThread(void *arg) {
 				acc1.read();
 				acc1.get_reading(reading);
 				acc_source.put(reading);
-			case 8:
-				gyro1.read_temperature();
 				break;
 			case TRIG_SLEEP:
 				acc1.set_active_mode(MMA8452Q::ACT_MODE_STANDBY);
 				acc_enabled = false;
-				while(TRIG_WAKE !=
-				      chEvtWaitOne(TRIG_ALL));
+				while(TRIG_WAKE != chEvtWaitOne(TRIG_ALL));
 				acc1.set_active_mode(MMA8452Q::ACT_MODE_ACTIVE);
 				acc_enabled = true;
 				break;
@@ -100,8 +97,7 @@ msg_t Acquisition::MagThread(void *arg) {
 		case TRIG_SLEEP:
 			mag1.set_mode(MAG3110::MODE_STANDBY);
 			mag_enabled = false;
-			while(TRIG_WAKE !=
-			      chEvtWaitOne(TRIG_ALL));
+			while(TRIG_WAKE != chEvtWaitOne(TRIG_ALL));
 			mag1.set_mode(MAG3110::MODE_ACTIVE);
 			mag_enabled =true;
 			break;
