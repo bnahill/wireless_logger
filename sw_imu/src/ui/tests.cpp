@@ -17,6 +17,7 @@ bool Tests::logging_test(){
 	Euclidean3_f32 acc_buffer[buffer_size], mag_buffer[buffer_size], gyro_buffer[buffer_size];
 	
 	Euclidean3_f32 reading;
+	Euclidean3_f32 *reading_ptr;
 	
 	acc_listener.init(acc_buffer, buffer_size);
 	mag_listener.init(mag_buffer, buffer_size);
@@ -36,17 +37,27 @@ bool Tests::logging_test(){
 	oled.fb.clear_area(1);
 	oled.fb.write_text_centered<SmallFont>("Writing...", 2);
 	oled.update();
+
+	UI::handle_evt(UI::MASK_SUSPEND);
 	
 	// Take 6000 readings (one minute at 100Hz)
-	for(uint32_t i = 0; i < 6000; i++){
-		acc_listener.receive_to(reading);
-		flogfs_write(&f, (uint8_t const *)&reading, sizeof(reading));
-		gyro_listener.receive_to(reading);
-		flogfs_write(&f, (uint8_t const *)&reading, sizeof(reading));
-		imu_sprint(txt, "Sample ", i);
-		oled.fb.write_text_centered<SmallFont>(txt, 3);
-		oled.update();
+	for(uint32_t i = 0; i < 6000;){
+		if(acc_listener.receive_to(reading, TIME_IMMEDIATE)){
+			flogfs_write(&f, (uint8_t const *)&reading, sizeof(reading));
+			i += 1;
+			//imu_sprint(txt, "Sample ", i);
+			//oled.fb.write_text_centered<SmallFont>(txt, 3);
+			//oled.update();
+		}
+		if(mag_listener.receive_to(reading, TIME_IMMEDIATE)){
+			flogfs_write(&f, (uint8_t const *)&reading, sizeof(reading));
+		}
+		if(gyro_listener.receive_to(reading, TIME_IMMEDIATE)){
+			flogfs_write(&f, (uint8_t const *)&reading, sizeof(reading));
+		}
 	}
+	
+	UI::handle_evt(UI::MASK_RESUME);
 	
 	Acquisition::disable_sources(Acquisition::SRC_ACC1);
 	Acquisition::disable_sources(Acquisition::SRC_MAG1);

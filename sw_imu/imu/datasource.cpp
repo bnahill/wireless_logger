@@ -32,17 +32,13 @@ datatype * DataListener< datatype >::receive(uint32_t timeout_ms){
 }
 
 template < class datatype >
-datatype * DataListener< datatype >::peek(uint32_t timeout_ms){
+datatype * DataListener< datatype >::peekI(uint32_t timeout_ms){
 	datatype * dst;
-	chSysLock();
 	if(RDY_OK == chSemWaitTimeoutS(&sem, timeout_ms)){
 		chSemSignalI(&sem);
 		dst = rd_head;
-		chSysUnlock();
 		return dst;
 	}
-
-	chSysUnlock();
 	return nullptr;
 }
 

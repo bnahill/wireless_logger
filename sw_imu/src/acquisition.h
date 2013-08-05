@@ -35,8 +35,8 @@ public:
 	
 	static void sleep_all();
 	static void wake_all();
-	static void enable_sources(sensor_src_t sensor);
-	static void disable_sources(sensor_src_t sensor);
+	static void enable_sources(uint32_t sensor_mask);
+	static void disable_sources(uint32_t sensor_mask);
 private:
 	//! Primary sample clock
 	//extern GPTDriver &timer;
@@ -55,6 +55,8 @@ private:
 	static EventSource tick_source4;
 	static EventSource tick_source8;
 	//! @}
+	
+	static uint32_t acc_ref_count, mag_ref_count, gyro_ref_count;
 	
 	//! Sensor result source
 	static EventSource sensor_source;

@@ -120,7 +120,7 @@ template class FrameBuffer<4, 128>;
 
 
 LY091WG15 Platform::oled(spi2,
-                        {NULL, GPIOB, 11, SPI_CR1_BR_1 |
+                        {NULL, GPIOB, 11, SPI_CR1_BR_0 |
                          SPI_CR1_CPOL | SPI_CR1_CPHA},
                         {GPIOB, 10}, {GPIOB, 2});
 

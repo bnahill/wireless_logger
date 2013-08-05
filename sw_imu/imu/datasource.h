@@ -41,7 +41,7 @@ public:
 	 
 	 @retval data if successful, 0 if timed out
 	 */
-	datatype * peek(uint32_t timeout_ms = TIME_INFINITE);
+	datatype * peekI(uint32_t timeout_ms = TIME_INFINITE);
 	
 	/*!
 	 @brief Wait for a sample of data and copy it safely

@@ -28,6 +28,10 @@ bool Acquisition::acc_enabled;
 bool Acquisition::gyro_enabled;
 bool Acquisition::mag_enabled;
 
+uint32_t Acquisition::acc_ref_count = 0;
+uint32_t Acquisition::mag_ref_count = 0;
+uint32_t Acquisition::gyro_ref_count = 0;
+
 msg_t Acquisition::AccThread(void *arg) {
 	EventListener listener;
 	Euclidean3_f32 reading;
@@ -210,26 +214,38 @@ void Acquisition::init(){
 	chSysUnlock();
 }
 
-void Acquisition::enable_sources(Acquisition::sensor_src_t sensor){
-	if(sensor & SRC_ACC1){
-		chEvtSignal(acc_thread, TRIG_WAKE);
+void Acquisition::enable_sources(uint32_t sensor_mask){
+	chSysLock();
+	if(sensor_mask & SRC_ACC1){
+		if(!acc_ref_count++)
+			chEvtSignalI(acc_thread, TRIG_WAKE);
 	}
-	if(sensor & SRC_GYRO1){
-		chEvtSignal(gyro_thread, TRIG_WAKE);
+	if(sensor_mask & SRC_GYRO1){
+		if(!gyro_ref_count++)
+			chEvtSignalI(gyro_thread, TRIG_WAKE);
 	}
-	if(sensor & SRC_MAG1){
-		chEvtSignal(mag_thread, TRIG_WAKE);
+	if(sensor_mask & SRC_MAG1){
+		if(!mag_ref_count++)
+			chEvtSignalI(mag_thread, TRIG_WAKE);
 	}
+	chSchRescheduleS();
+	chSysUnlock();
 }
 
-void Acquisition::disable_sources(Acquisition::sensor_src_t sensor){
-	if(sensor & SRC_ACC1){
-		chEvtSignal(acc_thread, TRIG_SLEEP);
+void Acquisition::disable_sources(uint32_t sensor_mask){
+	chSysLock();
+	if(sensor_mask & SRC_ACC1){
+		if(!--acc_ref_count)
+			chEvtSignalI(acc_thread, TRIG_SLEEP);
 	}
-	if(sensor & SRC_GYRO1){
-		chEvtSignal(gyro_thread, TRIG_SLEEP);
+	if(sensor_mask & SRC_GYRO1){
+		if(!--gyro_ref_count)
+			chEvtSignalI(gyro_thread, TRIG_SLEEP);
 	}
-	if(sensor & SRC_MAG1){
-		chEvtSignal(mag_thread, TRIG_SLEEP);
+	if(sensor_mask & SRC_MAG1){
+		if(!--mag_ref_count)
+			chEvtSignalI(mag_thread, TRIG_SLEEP);
 	}
+	chSchRescheduleS();
+	chSysUnlock();
 }
