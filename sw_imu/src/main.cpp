@@ -35,7 +35,7 @@ int main(void) {
 	
 	Acquisition::init();
 
-	UI::ui.start();
+	UI::start();
 
 	clk_mgr_noreq_hsi();
 	

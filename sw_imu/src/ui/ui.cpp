@@ -1,11 +1,23 @@
 #include "ui/ui.h"
 #include "ui/mainmenu.h"
 
-UI UI::ui;
-
 using namespace Platform;
 
-msg_t UI::run(){
+
+
+bool UI::is_suspended = false;
+bool UI::suspend_enabled = true;
+
+Thread * UI::thread = nullptr;
+Thread * UI::monitor_thread = nullptr;
+	
+VirtualTimer UI::timer;
+
+WORKING_AREA(UI::MonitorThread, monitor_stack_size);
+	//! Stack area for the thread
+WORKING_AREA(UI::UIThread, stack_size);
+
+msg_t UI::run(void * nothing){
 	MainMenu menu;
 	button[0].enable();
 	button[1].enable();
@@ -15,18 +27,32 @@ msg_t UI::run(){
 	button[1].clear_callbacks();
 	button[2].clear_callbacks();
 	
-	button[0].set_press_handler((button_t::button_handler)handle_right,
-	                            reinterpret_cast<uint32_t *>(this));
-	button[1].set_press_handler((button_t::button_handler)handle_select,
-	                            reinterpret_cast<uint32_t *>(this));
-	button[2].set_press_handler((button_t::button_handler)handle_left,
-	                            reinterpret_cast<uint32_t *>(this));
+	button[0].set_press_handler((button_t::button_handler)handle_right, nullptr);
+	button[1].set_press_handler((button_t::button_handler)handle_select, nullptr);
+	button[2].set_press_handler((button_t::button_handler)handle_left, nullptr);
 	start_suspend_timer();
 	menu.exec();
 	return 0;
 }
 
-msg_t UI::run_monitor(){
+void UI::wait_for_button(ui_event_t evt, bool allow_sleep){
+	ui_event_t recvd;
+	chEvtGetAndClearEvents(MASK_LEFT | MASK_RIGHT | MASK_SELECT);
+	if(allow_sleep){
+		while(!(evt & chEvtWaitOne(evt | MASK_SUSPEND))){
+			// This must actually be a suspend event
+			suspend();
+			chEvtWaitOne(MASK_RESUME);
+			resume();
+			chEvtGetAndClearEvents(ALL_EVENTS);
+		}
+	} else {
+		chEvtWaitAny(evt);
+	}
+	chEvtGetAndClearEvents(MASK_LEFT | MASK_RIGHT | MASK_SELECT);
+}
+
+msg_t UI::run_monitor(void * nothing){
 	char text[10];
 	EventItem * item;
 	bool ev_note, ev_warn, ev_err;
@@ -86,9 +112,9 @@ void UI::start(){
 		chThdWait(thread);
 	}
 	thread = chThdCreateStatic(&UIThread, stack_size, NORMALPRIO - 2,
-								(tfunc_t)start_thread, this);
+								(tfunc_t)run, nullptr);
 	monitor_thread = chThdCreateStatic(&MonitorThread, monitor_stack_size,
 	                                   NORMALPRIO - 2,
-	                                   (tfunc_t)start_monitor_thread, this);
+	                                   (tfunc_t)run_monitor, nullptr);
 }
 

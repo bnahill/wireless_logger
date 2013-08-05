@@ -59,13 +59,13 @@ void EventMenu::exec() {
 	exit_count = 0;
 	while(!chThdShouldTerminate()){
 		evt = chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(20));
-		evt = UI::ui.handle_evt(evt);
+		evt = UI::handle_evt(evt);
 		
 		switch(evt){
 		case 0:
 			if(button[1].is_pressed()){
 				if(++exit_count > 50){
-					UI::ui.exit_current();
+					UI::exit_current();
 					return;
 				}
 			} else {
@@ -86,7 +86,7 @@ void EventMenu::exec() {
 				display_position(nullptr, POS_ITEMS);
 				break;
 			case POS_EXIT:
-				UI::ui.exit_current();
+				UI::exit_current();
 				break;
 			}
 			break;
@@ -143,7 +143,7 @@ void EventMenu::exec() {
 		case UI::MASK_SUSPEND:
 			evt = chEvtWaitOne(UI::MASK_RESUME);
 			chEvtGetAndClearEvents(ALL_EVENTS);
-			UI::ui.handle_evt(UI::MASK_RESUME);
+			UI::handle_evt(UI::MASK_RESUME);
 			break;
 		default:
 			break;

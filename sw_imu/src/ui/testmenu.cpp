@@ -7,6 +7,7 @@ MenuItem const TestMenu::items[] = {
 	{"FLog Mount", (MenuItem::item_handler)Tests::fs_mount},
 	{"FLog Test", (MenuItem::item_handler)Tests::fs_test},
 	{"Flash Erase", (MenuItem::item_handler)Tests::flash_erase},
+	{"Log Test", (MenuItem::item_handler)Tests::logging_test},
 	//{"FS RW Test", (MenuItem::item_handler)Tests::flash_create_test_file},
 	{"Flash Bad Blocks", (MenuItem::item_handler)Tests::flash_bad_block_check},
 	{"Flash RW Test\n(will corrupt mem)", (MenuItem::item_handler)Tests::flash_test},
@@ -29,7 +30,7 @@ void TestMenu::exec(){
 		evt = chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(5));
 		if(!evt) continue;
 		
-		evt = UI::ui.handle_evt(evt);
+		evt = UI::handle_evt(evt);
 		switch(evt){
 		case UI::MASK_ABORT:
 			get_out = true;
@@ -39,7 +40,7 @@ void TestMenu::exec(){
 			// BLOCK HERE
 			evt = chEvtWaitOne(UI::MASK_RESUME);
 			chEvtGetAndClearEvents(ALL_EVENTS);
-			UI::ui.handle_evt(UI::MASK_RESUME);
+			UI::handle_evt(UI::MASK_RESUME);
 			break;
 		case UI::MASK_RESUME:
 			break;
@@ -50,6 +51,6 @@ void TestMenu::exec(){
 }
 
 void TestMenu::exit(){
-	chEvtSignal(UI::ui.thread, UI::MASK_ABORT);
+	chEvtSignal(UI::thread, UI::MASK_ABORT);
 }
 

@@ -76,7 +76,7 @@ void Menu::run(bool enable_exit){
 		evt = chEvtWaitOne(ALL_EVENTS);
 		if(!evt) continue;
 		
-		evt = UI::ui.handle_evt(evt);
+		evt = UI::handle_evt(evt);
 		switch(evt){
 		case UI::MASK_ABORT:
 			get_out = enable_exit;
@@ -86,7 +86,7 @@ void Menu::run(bool enable_exit){
 			// BLOCK HERE
 			evt = chEvtWaitOne(UI::MASK_RESUME);
 			chEvtGetAndClearEvents(ALL_EVENTS);
-			UI::ui.handle_evt(UI::MASK_RESUME);
+			UI::handle_evt(UI::MASK_RESUME);
 			break;
 		case UI::MASK_RESUME:
 			break;

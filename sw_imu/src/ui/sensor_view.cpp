@@ -5,7 +5,7 @@ using namespace Platform;
 void SensorView::exec(){
 	eventmask_t evt;
 	
-	UI::ui.inhibit_suspend();
+	UI::inhibit_suspend();
 	
 	oled.fb.clear_area(1);
 	
@@ -17,7 +17,7 @@ void SensorView::exec(){
 		evt = chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(50));
 		if(!evt) continue;
 		
-		evt = UI::ui.handle_evt(evt);
+		evt = UI::handle_evt(evt);
 		
 		switch(evt){
 		case 0:
@@ -45,7 +45,7 @@ void SensorView::exec(){
 		case UI::MASK_SUSPEND:
 			evt = chEvtWaitOne(UI::MASK_RESUME);
 			chEvtGetAndClearEvents(ALL_EVENTS);
-			UI::ui.handle_evt(UI::MASK_RESUME);
+			UI::handle_evt(UI::MASK_RESUME);
 			break;
 		default:
 			break;
@@ -54,7 +54,7 @@ void SensorView::exec(){
 	
 	terminate();
 	
-	UI::ui.enable_suspend();
+	UI::enable_suspend();
 }
 	
 msg_t SensorView::terminate(){

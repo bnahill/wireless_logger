@@ -5,8 +5,62 @@
 #include "string.h"
 #include "coffee/cfs-coffee.h"
 #include "flogfs.h"
+#include "acquisition.h"
 
 using namespace Platform;
+
+bool Tests::logging_test(){
+	flog_write_file_t f;
+	char txt[32];
+	constexpr uint32_t buffer_size = 5;
+	DataListener<Euclidean3_f32> acc_listener, mag_listener, gyro_listener;
+	Euclidean3_f32 acc_buffer[buffer_size], mag_buffer[buffer_size], gyro_buffer[buffer_size];
+	
+	Euclidean3_f32 reading;
+	
+	acc_listener.init(acc_buffer, buffer_size);
+	mag_listener.init(mag_buffer, buffer_size);
+	gyro_listener.init(gyro_buffer, buffer_size);
+	
+	flogfs_mount();
+	flogfs_open_write(&f, "logger");
+	
+	acc_source.register_queue(acc_listener);
+	mag_source.register_queue(mag_listener);
+	gyro_source.register_queue(gyro_listener);
+	
+	Acquisition::enable_sources(Acquisition::SRC_ACC1);
+	Acquisition::enable_sources(Acquisition::SRC_MAG1);
+	Acquisition::enable_sources(Acquisition::SRC_GYRO1);
+	
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Writing...", 2);
+	oled.update();
+	
+	// Take 6000 readings (one minute at 100Hz)
+	for(uint32_t i = 0; i < 6000; i++){
+		acc_listener.receive_to(reading);
+		flogfs_write(&f, (uint8_t const *)&reading, sizeof(reading));
+		gyro_listener.receive_to(reading);
+		flogfs_write(&f, (uint8_t const *)&reading, sizeof(reading));
+		imu_sprint(txt, "Sample ", i);
+		oled.fb.write_text_centered<SmallFont>(txt, 3);
+		oled.update();
+	}
+	
+	Acquisition::disable_sources(Acquisition::SRC_ACC1);
+	Acquisition::disable_sources(Acquisition::SRC_MAG1);
+	Acquisition::disable_sources(Acquisition::SRC_GYRO1);
+	
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Done!", 2);
+	
+	flogfs_close_write(&f);
+	
+	UI::wait_for_button(UI::MASK_SELECT);
+	
+	return true;
+}
 
 bool Tests::fs_test() {
 	bool res;
@@ -371,6 +425,8 @@ end:
 	
 	return true;
 }
+
+
 
 
 bool Tests::flash_create_test_file(){

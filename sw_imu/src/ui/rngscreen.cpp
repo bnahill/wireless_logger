@@ -49,7 +49,7 @@ void RNGScreen::exec(){
 
 	while(!chThdShouldTerminate()){
 		evt = chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(5));
-		evt = UI::ui.handle_evt(evt);
+		evt = UI::handle_evt(evt);
 		
 		switch(evt){
 		case 0:
@@ -100,7 +100,7 @@ void RNGScreen::exec(){
 		case UI::MASK_SUSPEND:
 			evt = chEvtWaitOne(UI::MASK_RESUME);
 			chEvtGetAndClearEvents(ALL_EVENTS);
-			UI::ui.handle_evt(UI::MASK_RESUME);
+			UI::handle_evt(UI::MASK_RESUME);
 			break;
 		default:
 			break;

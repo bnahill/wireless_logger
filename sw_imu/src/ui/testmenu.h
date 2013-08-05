@@ -21,7 +21,7 @@ public:
 	void exec();
 private:
 	static void cb_close(uint32_t *){
-		chEvtSignal(UI::ui.thread, UI::MASK_ABORT);
+		chEvtSignal(UI::thread, UI::MASK_ABORT);
 	}
 	
 	static void exit();

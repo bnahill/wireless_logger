@@ -5,6 +5,7 @@ namespace Tests {
 bool flash_create_test_file();
 bool flash_erase();
 bool fs_test();
+
 /*!
 @brief A basic erase/write/read test for flash memory
  */
@@ -13,6 +14,8 @@ bool flash_test();
  @brief A quick check of how many bad blocks exist
  */
 bool flash_bad_block_check();
+
+bool logging_test();
 
 bool flash_ecc_flexibility_test();
 
