@@ -67,6 +67,7 @@ option(USE_RTC_SCHED_TICK "Use the RTC for scheduler tick instead of SysTick" OF
 option(SLEEP_WHEN_IDLE "Try to sleep whenever the CPU is idle" OFF)
 option(USE_CLK_MGR "Use the clock manager to keep the CPU in its lowest power mode" ON)
 option(CHIBIOS_DEBUG "Enable ChibiOS debugging (a bit of CPU overhead)" OFF)
+set(RTOS_TICK_FREQ "The frequency of the RTOS scheduler tick" CACHE STRING "100")
 
 option(DEBUG_USE_SVD "Use pycmdebug and an SVD file for debugging" OFF)
 set(BOARD_REVISION "Which revision is it? BB=1, SF=2" CACHE STRING "2")
@@ -110,7 +111,7 @@ else(${BOARD_REVISION} EQUAL "1")
 endif(${BOARD_REVISION} EQUAL "1")
 
 add_definitions(${MCFLAGS})
-add_definitions( -DARM_MATH_CM4 -DUSE_RESTRICT)
+add_definitions(-DARM_MATH_CM4 -DUSE_RESTRICT -DCH_FREQUENCY=${RTOS_TICK_FREQ})
 
 if(${USE_RTC_SCHED_TICK})
 	message("Option: Use RTC for scheduler tick")
