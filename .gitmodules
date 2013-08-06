@@ -1,0 +1,3 @@
+[submodule "sw_imu/flogfs"]
+	path = sw_imu/flogfs
+	url = git://github.com/bnahill/FLogFS.git
