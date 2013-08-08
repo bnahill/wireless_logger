@@ -62,15 +62,15 @@ set(FLOGFS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/flogfs)
 
 
 
-option(USE_FPU "Use the floating point unit" OFF)
-option(USE_RTC_SCHED_TICK "Use the RTC for scheduler tick instead of SysTick" OFF)
-option(SLEEP_WHEN_IDLE "Try to sleep whenever the CPU is idle" OFF)
+option(USE_FPU "Use the floating point unit" ON)
+option(USE_RTC_SCHED_TICK "Use the RTC for scheduler tick instead of SysTick" ON)
+option(SLEEP_WHEN_IDLE "Try to sleep whenever the CPU is idle" ON)
 option(USE_CLK_MGR "Use the clock manager to keep the CPU in its lowest power mode" ON)
 option(CHIBIOS_DEBUG "Enable ChibiOS debugging (a bit of CPU overhead)" OFF)
-set(RTOS_TICK_FREQ "The frequency of the RTOS scheduler tick" CACHE STRING "100")
+set(RTOS_TICK_FREQ "100" CACHE STRING "The frequency of the RTOS scheduler tick")
 
 option(DEBUG_USE_SVD "Use pycmdebug and an SVD file for debugging" OFF)
-set(BOARD_REVISION "Which revision is it? BB=1, SF=2" CACHE STRING "2")
+set(BOARD_REVISION "1" CACHE STRING "Which revision is it? BB=1, SF=2")
 
 
 
@@ -99,11 +99,11 @@ else(${USE_FPU})
 endif(${USE_FPU})
 
 if(${BOARD_REVISION} EQUAL "1")
-	add_definitions(-DHSE_VALUE=8000000)
+	add_definitions(-DHSE_VALUE=8000000 -DSTM32_HSECLK=8000000)
 	message("Option: Building for the blue board")
 	set(PLATFORM_BOARD_DIR "src/platform/bb")
 elseif(${BOARD_REVISION} EQUAL "2")
-	add_definitions(-DHSE_VALUE=25000000)
+	add_definitions(-DHSE_VALUE=25000000 -DSTM32_HSECLK=25000000)
 	message("Option: Building for strike force board")
 	set(PLATFORM_BOARD_DIR "src/platform/sf")
 else(${BOARD_REVISION} EQUAL "1")
