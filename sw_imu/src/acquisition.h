@@ -35,8 +35,17 @@ public:
 	
 	static void sleep_all();
 	static void wake_all();
-	static void enable_sources(uint32_t sensor_mask);
-	static void disable_sources(uint32_t sensor_mask);
+	
+	/*!
+	 @brief Increment reference count on sources, enable if not already
+	 @param sensor_mask Mask of OR of sensor_src_t sensors
+	 */
+	static void require_sources(uint32_t sensor_mask);
+	/*!
+	 @brief Decrement reference count on sources, disable if no others
+	 @param sensor_mask Mask of OR of sensor_src_t sensors
+	 */
+	static void norequire_sources(uint32_t sensor_mask);
 private:
 	//! Primary sample clock
 	//extern GPTDriver &timer;

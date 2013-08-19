@@ -78,6 +78,11 @@ static inline flog_result_t flash_open_page(uint16_t block, uint16_t page){
 	return FLOG_RESULT(flash.page_open(block, page));
 }
 
+static inline flog_result_t flash_open_page_write(uint16_t block, uint16_t page){
+	// Read flash page to cache
+	return FLOG_RESULT(flash.page_open_write(block, page));
+}
+
 static inline flog_result_t flash_erase_block(uint16_t block){
 	return FLOG_RESULT(flash.erase_block(block));
 }

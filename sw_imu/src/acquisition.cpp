@@ -214,7 +214,7 @@ void Acquisition::init(){
 	chSysUnlock();
 }
 
-void Acquisition::enable_sources(uint32_t sensor_mask){
+void Acquisition::require_sources(uint32_t sensor_mask){
 	chSysLock();
 	if(sensor_mask & SRC_ACC1){
 		if(!acc_ref_count++)
@@ -232,7 +232,7 @@ void Acquisition::enable_sources(uint32_t sensor_mask){
 	chSysUnlock();
 }
 
-void Acquisition::disable_sources(uint32_t sensor_mask){
+void Acquisition::norequire_sources(uint32_t sensor_mask){
 	chSysLock();
 	if(sensor_mask & SRC_ACC1){
 		if(!--acc_ref_count)

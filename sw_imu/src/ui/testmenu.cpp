@@ -9,6 +9,8 @@ MenuItem const TestMenu::items[] = {
 	{"Flash Erase", (MenuItem::item_handler)Tests::flash_erase},
 	{"Log Test", (MenuItem::item_handler)Tests::logging_test},
 	//{"FS RW Test", (MenuItem::item_handler)Tests::flash_create_test_file},
+	{"Flash Power Test\n(will corrupt mem)", (MenuItem::item_handler)Tests::flash_power_test},
+	{"FS Power Test", (MenuItem::item_handler)Tests::fs_power_test},
 	{"Flash Bad Blocks", (MenuItem::item_handler)Tests::flash_bad_block_check},
 	{"Flash RW Test\n(will corrupt mem)", (MenuItem::item_handler)Tests::flash_test},
 	{"Flash ECC Test\n(will corrupt mem)", (MenuItem::item_handler)Tests::flash_ecc_flexibility_test},

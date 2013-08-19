@@ -36,7 +36,6 @@ msg_t UI::run(void * nothing){
 }
 
 void UI::wait_for_button(ui_event_t evt, bool allow_sleep){
-	ui_event_t recvd;
 	chEvtGetAndClearEvents(MASK_LEFT | MASK_RIGHT | MASK_SELECT);
 	if(allow_sleep){
 		while(!(evt & chEvtWaitOne(evt | MASK_SUSPEND))){
@@ -57,12 +56,13 @@ msg_t UI::run_monitor(void * nothing){
 	EventItem * item;
 	bool ev_note, ev_warn, ev_err;
 	uint32_t column;
-	
+
 	oled.fb.draw_horizontal_mask(0, 0x7F, 100, 1);
 	
 	while(!chThdShouldTerminate()){
 		rtc1::get_time_text(text);
 		oled.fb.write_text<SmallFont>(text,0,0);
+
 		
 		// Display event status
 		ev_warn = false;
@@ -107,14 +107,20 @@ eventmask_t UI::handle_evt(eventmask_t evt){
 }
 
 void UI::start(){
+	constexpr bool inhibit_monitor = true;
+
+
 	if(thread){
 		chThdTerminate(thread);
 		chThdWait(thread);
 	}
 	thread = chThdCreateStatic(&UIThread, stack_size, NORMALPRIO - 2,
 								(tfunc_t)run, nullptr);
-	monitor_thread = chThdCreateStatic(&MonitorThread, monitor_stack_size,
-	                                   NORMALPRIO - 2,
-	                                   (tfunc_t)run_monitor, nullptr);
+
+	if(!inhibit_monitor){
+		monitor_thread = chThdCreateStatic(&MonitorThread, monitor_stack_size,
+	                                       NORMALPRIO - 2,
+	                                       (tfunc_t)run_monitor, nullptr);
+	}
 }
 

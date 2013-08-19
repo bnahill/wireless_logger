@@ -172,7 +172,9 @@ void MT29FxG01::cleanup(){
 
 bool MT29FxG01::page_open ( uint16_t block, uint8_t page ) {	
 	current_addr = address_t(block, page, 0);
-	
+	// Make sure that all future load calls are done random
+	writes_so_far = 1;
+
 	page_read_to_cache(current_addr);
 	
 	do {
@@ -181,6 +183,13 @@ bool MT29FxG01::page_open ( uint16_t block, uint8_t page ) {
 	
 	return true;
 }
+
+bool MT29FxG01::page_open_write ( uint16_t block, uint8_t page ) {
+	current_addr = address_t(block, page, 0);
+	// Next call shouldn't be random
+	writes_so_far = 0;
+}
+
 
 bool MT29FxG01::page_commit () {
 	constexpr uint32_t num_tries = 20000;
@@ -223,7 +232,7 @@ bool MT29FxG01::page_read_continued ( uint8_t* dst, uint16_t offset, uint16_t n 
 
 bool MT29FxG01::page_write_continued ( const uint8_t* src, uint16_t offset, uint16_t n ) {
 	current_addr.offset = offset;
-	program_load(current_addr, src, n, true);
+	program_load(current_addr, src, n, (writes_so_far++) > 0);
 	return true;
 }
 

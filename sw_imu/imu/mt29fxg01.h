@@ -109,6 +109,9 @@ public:
 	 @note This MUST be followed by a call to \ref page_commit in the same thread
 	 */
 	bool page_open(uint16_t block, uint8_t page);
+
+	bool page_open_write(uint16_t block, uint8_t page);
+
 	/*!
 	 @brief Write to an open page from \ref page_open
 	 
@@ -172,6 +175,7 @@ protected:
 	void set_feature(feature_addr_t feature, uint8_t value);
 	uint8_t get_feature(feature_addr_t feature);
 	
+	uint8_t writes_so_far;
 
 	
 	/*!

@@ -9,6 +9,244 @@
 
 using namespace Platform;
 
+static void flash_led(){
+	led1.set();
+	chThdSleep(1);
+	led1.clear();
+}
+
+bool Tests::flash_power_test(){
+	uint8_t test_data[128];
+	union {
+		flog_write_file_t write_file;
+		flog_read_file_t read_file;
+	};
+
+	// Each test must disable the OLED, wait 5 ticks, flash the LED, perform the
+	// operation, flash the LED, wait 5 more ticks, re-enable the OLED, and
+	// then declare the test completed.
+
+	clk_mgr_req_hsi();
+	UI::inhibit_suspend();
+
+	flash.init();
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("First\nErasing a block", 1);
+	oled.update();
+	UI::wait_for_button(UI::MASK_SELECT);
+	oled.sleep();
+	chThdSleep(5);
+	flash_led();
+
+	flash.erase_block(flash.num_blocks - 1);
+
+	flash_led();
+	chThdSleep(5);
+	oled.resume();
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Done!", 1);
+	oled.update();
+
+	UI::wait_for_button(UI::MASK_SELECT);
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Now writing\n 1 byte", 1);
+	oled.update();
+	UI::wait_for_button(UI::MASK_SELECT);
+	oled.sleep();
+	chThdSleep(5);
+	flash_led();
+
+	flash.page_open_write(flash.num_blocks - 1, 0);
+	flash.page_write_continued(test_data, 0, 1);
+	flash.page_commit();
+
+	flash_led();
+	chThdSleep(5);
+	oled.resume();
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Done!", 1);
+	oled.update();
+
+
+
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Now writing\n100 bytes", 1);
+	oled.update();
+	UI::wait_for_button(UI::MASK_SELECT);
+	oled.sleep();
+	chThdSleep(5);
+	flash_led();
+
+	flash.page_open_write(flash.num_blocks - 1, 1);
+	flash.page_write_continued(test_data, 0, 100);
+	flash.page_commit();
+
+	flash_led();
+	chThdSleep(5);
+	oled.resume();
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Done!", 1);
+	oled.update();
+
+
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Now reading\n1 byte", 1);
+	oled.update();
+	UI::wait_for_button(UI::MASK_SELECT);
+	oled.sleep();
+	chThdSleep(5);
+	flash_led();
+
+	flash.page_open(flash.num_blocks - 1, 1);
+	flash.page_read_continued(test_data, 0, 1);
+
+	flash_led();
+	chThdSleep(5);
+	oled.resume();
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Done!", 1);
+	oled.update();
+
+
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Now reading\n100 bytes", 1);
+	oled.update();
+	UI::wait_for_button(UI::MASK_SELECT);
+	oled.sleep();
+	chThdSleep(5);
+	flash_led();
+
+	flash.page_open(flash.num_blocks - 1, 1);
+	flash.page_read_continued(test_data, 0, 100);
+
+	flash_led();
+	chThdSleep(5);
+	oled.resume();
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Done!", 1);
+	oled.update();
+
+	clk_mgr_noreq_hsi();
+	UI::enable_suspend();
+
+	return true;
+}
+
+
+bool Tests::fs_power_test() {
+	uint8_t test_data[512];
+	union {
+		flog_write_file_t write_file;
+		flog_read_file_t read_file;
+	};
+
+	// Each test must disable the OLED, wait 5 ticks, flash the LED, perform the
+	// operation, flash the LED, wait 5 more ticks, re-enable the OLED, and
+	// then declare the test completed.
+
+	clk_mgr_req_hsi();
+	UI::inhibit_suspend();
+
+	flash.init();
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("First\nFormatting", 1);
+	oled.update();
+	UI::wait_for_button(UI::MASK_SELECT);
+	oled.sleep();
+	chThdSleep(5);
+	flash_led();
+
+	flogfs_format();
+	flogfs_mount();
+
+	flash_led();
+	chThdSleep(5);
+	oled.resume();
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Done!", 1);
+	oled.update();
+
+	UI::wait_for_button(UI::MASK_SELECT);
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Now opening", 1);
+	oled.update();
+	UI::wait_for_button(UI::MASK_SELECT);
+	oled.sleep();
+	chThdSleep(5);
+	flash_led();
+
+	flogfs_open_write(&write_file, "testfile");
+
+	flash_led();
+	chThdSleep(5);
+	oled.resume();
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Done!", 1);
+	oled.update();
+
+	UI::wait_for_button(UI::MASK_SELECT);
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Now writing\n512x10 bytes", 1);
+	oled.update();
+	UI::wait_for_button(UI::MASK_SELECT);
+	oled.sleep();
+	chThdSleep(5);
+	flash_led();
+
+	for(uint32_t i = 0; i < 10; i++){
+		flogfs_write(&write_file, test_data, sizeof(test_data));
+	}
+
+	flash_led();
+	chThdSleep(5);
+	oled.resume();
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Done!", 1);
+	oled.update();
+
+	flogfs_close_write(&write_file);
+	flogfs_open_read(&read_file, "testfile");
+
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Now reading\n512x10 bytes", 1);
+	oled.update();
+	UI::wait_for_button(UI::MASK_SELECT);
+	oled.sleep();
+	chThdSleep(5);
+	flash_led();
+
+	for(uint32_t i = 0; i < 10; i++){
+		flogfs_read(&read_file, test_data, 512);
+	}
+
+	flash_led();
+	chThdSleep(5);
+	oled.resume();
+	oled.fb.clear_area(1);
+	oled.fb.write_text_centered<SmallFont>("Done!", 1);
+	oled.update();
+
+
+	flogfs_close_read(&read_file);
+
+	UI::wait_for_button(UI::MASK_SELECT);
+
+
+	clk_mgr_noreq_hsi();
+	UI::enable_suspend();
+
+	return true;
+}
+
+
 bool Tests::logging_test(){
 	flog_write_file_t f;
 	char txt[32];
@@ -30,9 +268,9 @@ bool Tests::logging_test(){
 	mag_source.register_queue(mag_listener);
 	gyro_source.register_queue(gyro_listener);
 	
-	Acquisition::enable_sources(Acquisition::SRC_ACC1);
-	Acquisition::enable_sources(Acquisition::SRC_MAG1);
-	Acquisition::enable_sources(Acquisition::SRC_GYRO1);
+	Acquisition::require_sources(Acquisition::SRC_ACC1);
+	Acquisition::require_sources(Acquisition::SRC_MAG1);
+	Acquisition::require_sources(Acquisition::SRC_GYRO1);
 	
 	oled.fb.clear_area(1);
 	oled.fb.write_text_centered<SmallFont>("Writing...", 2);
@@ -59,9 +297,9 @@ bool Tests::logging_test(){
 	
 	UI::handle_evt(UI::MASK_RESUME);
 	
-	Acquisition::disable_sources(Acquisition::SRC_ACC1);
-	Acquisition::disable_sources(Acquisition::SRC_MAG1);
-	Acquisition::disable_sources(Acquisition::SRC_GYRO1);
+	Acquisition::norequire_sources(Acquisition::SRC_ACC1);
+	Acquisition::norequire_sources(Acquisition::SRC_MAG1);
+	Acquisition::norequire_sources(Acquisition::SRC_GYRO1);
 	
 	oled.fb.clear_area(1);
 	oled.fb.write_text_centered<SmallFont>("Done!", 2);
@@ -99,7 +337,9 @@ bool Tests::fs_test() {
 	oled.fb.clear_area(1);
 	oled.fb.write_text_centered<SmallFont>("Formatting...", 2);
 	oled.update();
+	led1.set();
 	res = (flogfs_format() == FLOG_SUCCESS);
+	led1.clear();
 	if(!res) goto failure;
 	oled.fb.write_text_centered<SmallFont>("Success", 3);
 	oled.update();
@@ -112,7 +352,9 @@ mount:
 	oled.fb.clear_area(1);
 	oled.fb.write_text_centered<SmallFont>("Mounting...", 2);
 	oled.update();
+	led1.set();
 	res = (flogfs_mount() == FLOG_SUCCESS);
+	led1.clear();
 	if(!res) goto failure;
 	oled.fb.write_text_centered<SmallFont>("Success", 3);
 	oled.update();
@@ -142,7 +384,7 @@ mount:
 	oled.update();
 	led1.set();
 	t0 = chTimeNow();
-	for(uint32_t i = 0; ; i++){
+	for(uint32_t i = 0; i < 1024*5; i++){
 		uint32_t count = flogfs_write(&write_file, buffer, sizeof(buffer));
 		if((i & 0x1F) == 0){
 		//	imu_sprint(txt, "Wrote ", write_file.write_head / 1024, " kB");
