@@ -55,8 +55,6 @@ public:
 	
 	MT29FxG01(SPI &spi, numblocks_t num_blocks,
 	          gpio_pin_t const &ncs,
-	          gpio_pin_t const &nwp,
-	          gpio_pin_t const &nhold,
 	          uint16_t spi_flags);
 	
 	/*!
@@ -192,7 +190,7 @@ protected:
 	SPI::slave_config_t const spi_slave;
 	
 	//! GPIO pins required
-	gpio_pin_t nwp, ncs, nhold;
+	gpio_pin_t ncs;
 	
 	//! An address in flash
 	struct address_t {

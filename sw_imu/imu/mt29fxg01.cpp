@@ -9,10 +9,8 @@
 MT29FxG01::MT29FxG01(SPI &spi,
                      numblocks_t num_blocks,
                      gpio_pin_t const &ncs,
-                     gpio_pin_t const &nwp,
-                     gpio_pin_t const &nhold,
                      uint16_t spi_flags) :
-	spi(spi), nwp(nwp), ncs(ncs), nhold(nhold), num_blocks(num_blocks),
+	spi(spi), ncs(ncs), num_blocks(num_blocks),
 	spi_slave({nullptr, &ncs.gpio, ncs.index, spi_flags})
 {
 	chMtxInit(&mutex);
@@ -30,9 +28,6 @@ bool MT29FxG01::init(){
 	
 	chPoolInit(&pool, sizeof(*pool_buffer), nullptr);
 	chPoolLoadArray(&pool, pool_buffer, num_page_buffers);
-	
-	nhold.set();
-	nwp.set();
 	
 	spi.init();
 	

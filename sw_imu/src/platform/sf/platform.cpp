@@ -28,7 +28,9 @@ class pin_t {
 };
 
 
-I2C Platform::i2c1(I2CD1, OPMODE_I2C, FAST_DUTY_CYCLE_2, 400000, {GPIOB, 7}, {GPIOB, 6});
+I2C Platform::i2c1(I2CD1, OPMODE_I2C, FAST_DUTY_CYCLE_2, 400000, {GPIOB, 9}, {GPIOB, 8});
+//I2C Platform::i2c2(I2CD2, OPMODE_I2C, FAST_DUTY_CYCLE_2, 400000, {GPIOH, 5}, {GPIOH, 4});
+//I2C Platform::i2c3(I2CD3, OPMODE_I2C, FAST_DUTY_CYCLE_2, 400000, {GPIOC, 9}, {GPIOA, 8});
 MMA8452Q Platform::acc1(Platform::i2c1, 0x1C);
 MAG3110 Platform::mag1(Platform::i2c1, 0x0E);
 
@@ -44,14 +46,13 @@ DataSource<Euclidean3_f32> Platform::gyro_source;
 ///////////////////////////////////////////
 
 SPI Platform::spi1(SPID1);
-
 SPI Platform::spi2(SPID2);
 
 ///////////////////////////////////////////
 // L3GD20 Platform
 ///////////////////////////////////////////
 
-L3GD20_SPI Platform::gyro1(Platform::spi1, {NULL, GPIOC, 4, SPI_CR1_BR_2 |
+L3GD20_SPI Platform::gyro1(Platform::spi1, {NULL, GPIOB, 5, SPI_CR1_BR_2 |
                                             SPI_CR1_BR_1 | SPI_CR1_CPOL |
                                             SPI_CR1_CPHA});
 
@@ -60,10 +61,11 @@ L3GD20_SPI Platform::gyro1(Platform::spi1, {NULL, GPIOC, 4, SPI_CR1_BR_2 |
 // Button platform configuration
 ///////////////////////////////////////////
 
-button_t Platform::button[3] = {
-	{GPIOC, 12, button_t::ACTIVE_LOW},
-	{GPIOC, 10, button_t::ACTIVE_LOW},
-	{GPIOC, 11, button_t::ACTIVE_LOW}
+button_t Platform::button[4] = {
+	{GPIOC, 5, button_t::ACTIVE_LOW},
+	{GPIOF, 6, button_t::ACTIVE_LOW},
+	{GPIOF, 7, button_t::ACTIVE_LOW},
+	{GPIOE, 8, button_t::ACTIVE_LOW}
 };
 
 ///////////////////////////////////////////
@@ -105,10 +107,12 @@ const EXTConfig Platform::extcfg = {
 // LED platform configuration
 ///////////////////////////////////////////
 
-gpio_pin_t Platform::led1(GPIOC, 3);
+gpio_pin_t Platform::led1(GPIOE, 5);
+gpio_pin_t Platform::led2(GPIOE, 3);
+gpio_pin_t Platform::led3(GPIOE, 2);
 
 
-LTC3559 Platform::reg1({GPIOC, 2}, {GPIOC, 1}, {GPIOA, 4}, {GPIOA, 1});
+//LTC3559 Platform::reg1({GPIOC, 2}, {GPIOC, 1}, {GPIOA, 4}, {GPIOA, 1});
 
 ///////////////////////////////////////////
 // OLED display platform configuration
@@ -120,7 +124,7 @@ template class FrameBuffer<4, 128>;
 
 
 LY091WG15 Platform::oled(spi2,
-                        {NULL, GPIOB, 11, SPI_CR1_BR_0 |
+                        {NULL, GPIOF, 10, SPI_CR1_BR_0 |
                          SPI_CR1_CPOL | SPI_CR1_CPHA},
                         {GPIOB, 10}, {GPIOB, 2});
 
@@ -135,7 +139,7 @@ usbserial1_t Platform::usbserial1({GPIOA, 9});
 //                      {NULL, GPIOC, 9, SPI_CR1_BR_2 | SPI_CR1_BR_1});
 
 CC1101 Platform::rf1(Platform::spi1,
-                     {NULL, GPIOA, 15, SPI_CR1_BR_2 | SPI_CR1_BR_1});
+                     {NULL, GPIOE, 15, SPI_CR1_BR_2 | SPI_CR1_BR_1});
 
 GuardianRF Platform::guardian1(rf1);
 
@@ -144,7 +148,7 @@ GuardianRF Platform::guardian1(rf1);
 //////////////////////////////////////////////////////////
 
 MT29FxG01 Platform::flash(spi2, MT29FxG01::SIZE_1G,
-                         {GPIOB, 12}, (SPI_CR1_CPOL | SPI_CR1_CPHA));
+                         {GPIOB, 7},(SPI_CR1_CPOL | SPI_CR1_CPHA));
 
 
 
@@ -157,17 +161,17 @@ EventLog Platform::evt_log;
 void Platform::early_init(){
 	clk_mgr_init();
 	
-	//reg1.high_power(true);
-	//reg1.buck_mode(LTC3559::MODE_BURST);
-	//rf1.early_init();
+// 	reg1.high_power(true);
+// 	reg1.buck_mode(LTC3559::MODE_BURST);
+	rf1.early_init();
 	evt_log.init();
-	//if(!flogfs_init()){
-	//	evt_log.add("FLogFS init\n failed!", EventItem::SEVERITY_ERROR);
-	//} else {
-	//	if(!flogfs_mount()){
-	//		evt_log.add("FLogFS mount\n failed!", EventItem::SEVERITY_ERROR);
-	//	}
-	//}
+	if(!flogfs_init()){
+		evt_log.add("FLogFS init\n failed!", EventItem::SEVERITY_ERROR);
+	} else {
+		if(!flogfs_mount()){
+			evt_log.add("FLogFS mount\n failed!", EventItem::SEVERITY_ERROR);
+		}
+	}
 	//flogfs_mount();
 
 	extStart(&EXTD1, &extcfg);

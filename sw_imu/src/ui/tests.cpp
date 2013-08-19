@@ -156,6 +156,7 @@ mount:
 	}
 	t1 = chTimeNow();
 	led1.clear();
+	oled.fb.clear_area(1);
 	imu_sprint(txt, "Wrote ", write_file.write_head / 1024, " kB\nin ", (uint32_t)(1000*(t1-t0))/MS2ST(1000), " ms");
 	oled.fb.write_text_centered<SmallFont>(txt, 2);
 	oled.update();
