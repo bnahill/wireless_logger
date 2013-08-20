@@ -87,7 +87,6 @@ void clk_mgr_req_hse(){
 	if(hse_sem == 1){
 		// Only task requiring HSE
 		// Enable it
-		GPIOC->ODR |= (1<<3);
 		RCC->CR |= RCC_CR_HSEON;
 		while ((RCC->CR & RCC_CR_HSERDY) == 0);
 		// Switch to HSE
@@ -105,7 +104,6 @@ void clk_mgr_req_hse(){
 		
 		// WHO NEEDS THE HSI!?
 		RCC->CR &= ~RCC_CR_HSION;
-		GPIOC->ODR &= ~(1<<3);
 	}
 	chSysUnlock();
 }
@@ -124,7 +122,6 @@ void clk_mgr_wakeup(){
 	// Wait for regulator
 	while((PWR->CSR & PWR_CSR_VOSRDY) == 0);
 #endif
-	GPIOC->ODR |= (1<<3);
 	if((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL){
 		// FOR SOME REASON THE SOURCE IS PROBABLY HSI
 		if((RCC->CFGR & RCC_CFGR_SWS) == RCC_CFGR_SWS_HSE){
@@ -145,7 +142,6 @@ void clk_mgr_wakeup(){
 		// Switch to PLL for HCLK
 		RCC->CFGR = (RCC->CFGR & ~3) | 2;
 	}
-	GPIOC->ODR &= ~(1<<3);
 	chSysUnlockFromIsr();
 	
 	// Enable HSI -- already on?
