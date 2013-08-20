@@ -18,7 +18,13 @@
 //! @addtogroup MMA8452Q
 //! @{
 
-class MMA8452Q {
+typedef enum {
+	MMA8451Q_T,
+	MMA8452Q_T
+} mma845x_variant_t;
+
+template<mma845x_variant_t variant>
+class MMA845x {
 public:
 	typedef enum {
 		AXIS_X = 1, AXIS_Y = 2, AXIS_Z = 4
@@ -96,7 +102,7 @@ public:
 		AUTOSLEEP_ENABLE = 1
 	} autosleep_t;
 	
-	MMA8452Q(I2C &i2c, uint8_t devaddr) : 
+	MMA845x<variant>(I2C &i2c, uint8_t devaddr) : 
 		i2c(i2c), devaddr(devaddr),
 		dr(DR_800), aslp_dr(ASLP_DR_50), noise_mode(NOISE_NORMAL),
 		active_mode(ACT_MODE_STANDBY), fast_read(FAST_READ_NORMAL),
@@ -198,6 +204,8 @@ private:
 		REG_OFF_Z         = 0x0D
 	} reg_t;
 	
+	constexpr static uint8_t whoami_id();
+	
 	Semaphore result_lock;
 	
 	Euclidean3_f32 reading;
@@ -210,6 +218,15 @@ private:
 	//! I2C device to use
 	I2C &i2c;
 };
+
+template<>
+constexpr uint8_t MMA845x<MMA8451Q_T>::whoami_id(){return 0x1C;}
+
+template<>
+constexpr uint8_t MMA845x<MMA8452Q_T>::whoami_id(){return 0x2C;}
+
+typedef MMA845x<MMA8451Q_T> MMA8451Q;
+typedef MMA845x<MMA8452Q_T> MMA8452Q;
 
 //! @} @} @}
 

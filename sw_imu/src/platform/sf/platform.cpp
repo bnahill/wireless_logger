@@ -13,6 +13,7 @@
 
 #include "imu/ssd1306.cpp"
 #include "imu/datasource.cpp"
+#include "imu/mma845x.cpp"
 #include "imu/clock_mgr.h"
 
 
@@ -31,7 +32,8 @@ class pin_t {
 I2C Platform::i2c1(I2CD1, OPMODE_I2C, FAST_DUTY_CYCLE_2, 400000, {GPIOB, 9}, {GPIOB, 8});
 //I2C Platform::i2c2(I2CD2, OPMODE_I2C, FAST_DUTY_CYCLE_2, 400000, {GPIOH, 5}, {GPIOH, 4});
 //I2C Platform::i2c3(I2CD3, OPMODE_I2C, FAST_DUTY_CYCLE_2, 400000, {GPIOC, 9}, {GPIOA, 8});
-MMA8452Q Platform::acc1(Platform::i2c1, 0x1C);
+template class MMA845x<MMA8451Q_T>;
+MMA8451Q Platform::acc1(Platform::i2c1, 0x1C);
 MAG3110 Platform::mag1(Platform::i2c1, 0x0E);
 
 

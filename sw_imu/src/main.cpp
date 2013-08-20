@@ -23,7 +23,7 @@ int main(void) {
 	
 	Platform::early_init();
 
-#ifdef BOARD_SF
+#ifdef BOARD_SFpoop
 	while(true){
 		chThdSleep(MS2ST(200));
 		led1.toggle();

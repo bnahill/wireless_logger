@@ -298,7 +298,7 @@ set(APP_SOURCES
 
 set(IMU_SOURCES
 	${IMU_DIR}/ltc3559.cpp
-	${IMU_DIR}/mma8452q.cpp
+	${IMU_DIR}/mma845x.cpp
 	${IMU_DIR}/mag3110.cpp
 	${IMU_DIR}/i2c.cpp
 	${IMU_DIR}/spi.cpp

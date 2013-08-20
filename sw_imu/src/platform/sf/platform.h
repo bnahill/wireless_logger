@@ -24,7 +24,7 @@
 #include <imu/i2c.h>
 #include <imu/spi.h>
 
-#include <imu/mma8452q.h>
+#include <imu/mma845x.h>
 #include <imu/mag3110.h>
 #include <imu/ext.h>
 #include <imu/button.h>
@@ -50,7 +50,7 @@
  */
 namespace Platform {
 	extern I2C i2c1;
-	extern MMA8452Q acc1;
+	extern MMA8451Q acc1;
 	extern MAG3110 mag1;
 	
 	extern DataSource<Euclidean3_f32> acc_source;

@@ -24,7 +24,7 @@
 #include <imu/i2c.h>
 #include <imu/spi.h>
 
-#include <imu/mma8452q.h>
+#include <imu/mma845x.h>
 #include <imu/mag3110.h>
 #include <imu/ext.h>
 #include <imu/button.h>

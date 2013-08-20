@@ -40,12 +40,12 @@ msg_t Acquisition::AccThread(void *arg) {
 	
 	chEvtRegisterMask(&Acquisition::tick_source, &listener, 1);
 	
-	acc1.set_dr(MMA8452Q::DR_100, false);
+	acc1.set_dr(acc1.DR_100, false);
 	acc1.init();
 	
-	acc1.set_active_mode(MMA8452Q::ACT_MODE_STANDBY);
+	acc1.set_active_mode(acc1.ACT_MODE_STANDBY);
 	while(TRIG_WAKE != chEvtWaitOne(TRIG_ALL));
-	acc1.set_active_mode(MMA8452Q::ACT_MODE_ACTIVE);
+	acc1.set_active_mode(acc1.ACT_MODE_ACTIVE);
 	acc_enabled = true;
 
 	while(1){
@@ -56,10 +56,10 @@ msg_t Acquisition::AccThread(void *arg) {
 				acc_source.put(reading);
 				break;
 			case TRIG_SLEEP:
-				acc1.set_active_mode(MMA8452Q::ACT_MODE_STANDBY);
+				acc1.set_active_mode(acc1.ACT_MODE_STANDBY);
 				acc_enabled = false;
 				while(TRIG_WAKE != chEvtWaitOne(TRIG_ALL));
-				acc1.set_active_mode(MMA8452Q::ACT_MODE_ACTIVE);
+				acc1.set_active_mode(acc1.ACT_MODE_ACTIVE);
 				acc_enabled = true;
 				break;
 			case TRIG_WAKE:
@@ -83,11 +83,11 @@ msg_t Acquisition::MagThread(void *arg) {
 	
 	mag1.init();
 	
-	mag1.set_mode(MAG3110::MODE_STANDBY);
+	mag1.set_mode(mag1.MODE_STANDBY);
 	
 	while(TRIG_WAKE != chEvtWaitOne(TRIG_ALL));
 	
-	mag1.set_mode(MAG3110::MODE_ACTIVE);
+	mag1.set_mode(mag1.MODE_ACTIVE);
 	mag_enabled = true;
 	
 	
@@ -99,10 +99,10 @@ msg_t Acquisition::MagThread(void *arg) {
 			mag_source.put(reading);
 			break;
 		case TRIG_SLEEP:
-			mag1.set_mode(MAG3110::MODE_STANDBY);
+			mag1.set_mode(mag1.MODE_STANDBY);
 			mag_enabled = false;
 			while(TRIG_WAKE != chEvtWaitOne(TRIG_ALL));
-			mag1.set_mode(MAG3110::MODE_ACTIVE);
+			mag1.set_mode(mag1.MODE_ACTIVE);
 			mag_enabled =true;
 			break;
 		case TRIG_WAKE:
@@ -125,12 +125,12 @@ msg_t Acquisition::GyroThread(void *arg) {
 	
 	gyro1.init();
 	
-	gyro1.set_full_scale(decltype(gyro1)::FS_250);
+	gyro1.set_full_scale(gyro1.FS_250);
 	
-	gyro1.set_power_mode(decltype(gyro1)::POWER_DOWN);
+	gyro1.set_power_mode(gyro1.POWER_DOWN);
 	while(TRIG_WAKE != chEvtWaitOne(TRIG_ALL));
 	
-	gyro1.set_power_mode(decltype(gyro1)::POWER_NORMAL);
+	gyro1.set_power_mode(gyro1.POWER_NORMAL);
 	gyro_enabled = true;
 	
 	while(1){
@@ -146,11 +146,11 @@ msg_t Acquisition::GyroThread(void *arg) {
 				gyro1.read_temperature();
 				break;
 			case TRIG_SLEEP:
-				gyro1.set_power_mode(decltype(gyro1)::POWER_DOWN);
+				gyro1.set_power_mode(gyro1.POWER_DOWN);
 				gyro_enabled = false;
 				while(TRIG_WAKE !=
 				      chEvtWaitOne(TRIG_ALL));
-				gyro1.set_power_mode(decltype(gyro1)::POWER_NORMAL);
+				gyro1.set_power_mode(gyro1.POWER_NORMAL);
 				gyro_enabled = true;
 				break;
 			case TRIG_WAKE:
