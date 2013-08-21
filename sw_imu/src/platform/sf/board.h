@@ -243,12 +243,12 @@
                              PIN_PUDR_PULLUP(14) |                          \
                              PIN_PUDR_PULLUP(15))
 #define VAL_GPIOB_ODR       (0xFFFFFFFF)
-#define VAL_GPIOB_AFRL      (PIN_AFIO_AF(GPIOB_SWO, 0) |                    \
-                             PIN_AFIO_AF(GPIOB_I2C1_SCL, 4) |               \
-                             PIN_AFIO_AF(GPIOB_I2C1_SDA, 4))
-#define VAL_GPIOB_AFRH      (PIN_AFIO_AF(GPIOB_SPI2_NSS, 5) |               \
-                             PIN_AFIO_AF(GPIOB_SPI2_SCK, 5) |               \
-                             PIN_AFIO_AF(GPIOB_SPI2_MISO, 5) |               \
+#define VAL_GPIOB_AFRL      (PIN_AFIO_AF(GPIOB_SWO, 0))
+#define VAL_GPIOB_AFRH      (PIN_AFIO_AF(GPIOB_I2C1_SCL, 4) |               \
+                             PIN_AFIO_AF(GPIOB_I2C1_SDA, 4) |               \
+                             PIN_AFIO_AF(GPIOB_SPI2_NSS, 6) |               \
+                             PIN_AFIO_AF(GPIOB_SPI2_SCK, 3) |               \
+                             PIN_AFIO_AF(GPIOB_SPI2_MISO, 5) |              \
                              PIN_AFIO_AF(GPIOB_SPI2_MOSI, 5))
 
 /*
@@ -458,12 +458,6 @@
  * PH0  - GPIOH_OSC_IN          (input floating).
  * PH1  - GPIOH_OSC_OUT         (input floating).
  */
-#define GPIOH_OSC_IN            0
-#define GPIOH_OSC_OUT           1
-#define GPIOH_OLED_NRES         2
-#define GPIOH_I2C2_SCL          4
-#define GPIOH_I2C2_SDA          5
-
 #define VAL_GPIOH_MODER     (PIN_MODE_INPUT(GPIOH_OSC_IN) |                 \
                              PIN_MODE_INPUT(GPIOH_OSC_OUT) |                \
                              PIN_MODE_OUTPUT(GPIOH_OLED_NRES) |             \
