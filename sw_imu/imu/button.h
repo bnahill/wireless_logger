@@ -121,12 +121,6 @@ protected:
 	
 	polarity_t const polarity;
 	
-	/*!
-	 @brief EXT driver configuration to apply on initialization
-	 @note Platform configuration
-	 */
-	static const EXTConfig extcfg;
-	
 	static constexpr uint32_t debounce_ms = 20;
 };
 

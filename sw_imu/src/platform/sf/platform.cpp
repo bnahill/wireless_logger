@@ -49,6 +49,7 @@ DataSource<Euclidean3_f32> Platform::gyro_source;
 
 SPI Platform::spi1(SPID1);
 SPI Platform::spi2(SPID2);
+SPI Platform::spi3(SPID3);
 
 ///////////////////////////////////////////
 // L3GD20 Platform
@@ -64,9 +65,9 @@ L3GD20_SPI Platform::gyro1(Platform::spi1, {NULL, GPIOB, 5, SPI_CR1_BR_2 |
 ///////////////////////////////////////////
 
 button_t Platform::button[4] = {
-	{GPIOC, 5, button_t::ACTIVE_LOW},
-	{GPIOF, 6, button_t::ACTIVE_LOW},
 	{GPIOF, 7, button_t::ACTIVE_LOW},
+	{GPIOF, 6, button_t::ACTIVE_LOW},
+	{GPIOC, 5, button_t::ACTIVE_LOW},
 	{GPIOE, 8, button_t::ACTIVE_LOW}
 };
 
@@ -81,17 +82,18 @@ const EXTConfig Platform::extcfg = {
 		{EXT_CH_MODE_DISABLED, NULL},
 		{EXT_CH_MODE_DISABLED, NULL},
 		{EXT_CH_MODE_DISABLED, NULL},
-		{EXT_CH_MODE_DISABLED, NULL}, // 5
-		{EXT_CH_MODE_DISABLED, NULL},
-		{EXT_CH_MODE_DISABLED, NULL},
-		{EXT_CH_MODE_DISABLED, NULL},
-		{EXT_CH_MODE_DISABLED, NULL},
 		{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC,
-			Ext1Callback::callback}, // 10
-		{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC,
+			Ext1Callback::callback}, // 5
+		{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOF,
 			Ext1Callback::callback},
-		{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC,
+		{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOF,
 			Ext1Callback::callback},
+		{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOE,
+			Ext1Callback::callback},
+		{EXT_CH_MODE_DISABLED, NULL},
+		{EXT_CH_MODE_DISABLED, NULL}, // 10
+		{EXT_CH_MODE_DISABLED, NULL},
+		{EXT_CH_MODE_DISABLED, NULL},
 		{EXT_CH_MODE_DISABLED, NULL},
 		{EXT_CH_MODE_DISABLED, NULL},
 		{EXT_CH_MODE_DISABLED, NULL}, // 15
@@ -125,10 +127,10 @@ template class SSD1306<4,128>;
 template class FrameBuffer<4, 128>;
 
 
-LY091WG15 Platform::oled(spi2,
+LY091WG15 Platform::oled(spi3,
                         {NULL, GPIOF, 10, SPI_CR1_BR_0 |
                          SPI_CR1_CPOL | SPI_CR1_CPHA},
-                        {GPIOB, 10}, {GPIOB, 2});
+                        {GPIOA, 3}, {GPIOH, 2}, {GPIOE, 4});
 
 usbserial1_t Platform::usbserial1({GPIOA, 9});
 

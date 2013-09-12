@@ -59,6 +59,7 @@ namespace Platform {
 	
 	extern SPI spi1;
 	extern SPI spi2;
+	extern SPI spi3;
 	extern L3GD20_SPI gyro1;
 	
 	typedef ExtCallback<EXTD1> Ext1Callback;

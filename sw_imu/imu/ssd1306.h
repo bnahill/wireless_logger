@@ -28,6 +28,7 @@ template <uint32_t pages, uint32_t columns>
 class SSD1306 {
 public:
 	SSD1306<pages, columns>(SPI &spi, SPI::slave_config_t spi_config, gpio_pin_t nDC, gpio_pin_t nRES);
+	SSD1306<pages, columns>(SPI &spi, SPI::slave_config_t spi_config, gpio_pin_t nDC, gpio_pin_t nRES, gpio_pin_t gate);
 	
 	void dump_fb();
 	
@@ -100,6 +101,8 @@ protected:
 	
 	void write_data(uint8_t const * data);
 	
+	bool const has_gate;
+	
 	/*!
 	 @name Configuration for the panel
 	 All of these should be overridden in specializations
@@ -113,7 +116,7 @@ protected:
 	 @}
 	 */
 	
-	gpio_pin_t const nDC, nRES;
+	gpio_pin_t const nDC, nRES, gate;
 	
 	SPI &spi;
 	SPI::slave_config_t spi_config;

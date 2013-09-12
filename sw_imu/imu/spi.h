@@ -98,11 +98,6 @@ public:
 		//! Address for read or write transfers
 		uint16_t addr;
 		//! @}
-		
-		void tc_sem(Semaphore *sem){
-			tc_callback = (callback) callback_semaphore;
-			tc_param = sem;
-		}
 	};
 	
 	struct new_xfer_t {
@@ -125,10 +120,6 @@ public:
 		new_xfer_t * xfer;
 		callback tc_callback;
 		void *tc_param;
-		void tc_sem(Semaphore *sem){
-			tc_callback = (callback) callback_semaphore;
-			tc_param = sem;
-		}
 	};
 	
 	SPI(SPIDriver &driver);
@@ -142,12 +133,6 @@ public:
 	 */
 	void transfer(xfer_t &xfer, bool important=false);
 	
-	/*!
-	 @brief Add a transfer to the transfer queue (from lock context)
-	 @param xfer The transfer to add
-	 @param important Push to front of queue?
-	 */
-	void transferI(xfer_t &xfer, bool important=false);
 	
 	void reconfig_clock();
 	
@@ -205,8 +190,13 @@ public:
 	                      uint16_t n_tx0, uint8_t const * tx1, uint16_t n_tx1,
 	                      bool important = false);
 	
-	//void acquire(){spiAcquireBus(&driver);}
-	//void release(){spiReleaseBus(&driver);}
+	void lock(){
+		spiAcquireBus(&driver);
+	}
+	
+	void unlock(){
+		spiReleaseBus(&driver);
+	}
 	
 protected:
 	//! The ChibiOS SPI resource
@@ -219,29 +209,6 @@ protected:
 	bool is_init;
 	
 	bool do_sleep;
-	
-	msg_t run();
-	
-	static constexpr uint32_t stack_size = 512;
-	static constexpr tprio_t priority = HIGHPRIO;
-	static constexpr tprio_t mb_size = 16;
-	
-	WORKING_AREA(waSPIThread, stack_size);
-	Thread *thread;
-	Mailbox mb;
-	msg_t mb_buffer[mb_size];
-	
-	static msg_t start_thread(SPI * spi){
-		spi->run();
-		return 0;
-	}
-	
-	/*!
-	 @brief A callback for simply signalling a semaphore
-	 */
-	static void callback_semaphore(Semaphore *sem){
-		chSemSignal(sem);
-	}
 };
 
 

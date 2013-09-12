@@ -36,13 +36,17 @@ void I2C::close(){
 
 void I2C::clear_bus(){
 	scl.set_mode(gpio_pin_t::MODE_OUTPUT);
+	sda.set_mode(gpio_pin_t::MODE_OUTPUT);
 	for(uint32_t i = 0; i < 100; i++){
 		scl.set();
+		sda.clear();
 		chThdSleep(1);
 		scl.clear();
+		sda.set();
 		chThdSleep(1);
 	}
 	scl.set_mode(gpio_pin_t::MODE_ALT);
+	sda.set_mode(gpio_pin_t::MODE_ALT);
 }
 
 
@@ -63,7 +67,7 @@ msg_t I2C::transmit(i2caddr_t addr, const uint8_t* txbuf, size_t txbytes,
 	                               rxbytes, MS2ST(txbytes+rxbytes));
 	if(msg == RDY_TIMEOUT){
 		i2cStop(&driver);
-		clear_bus();
+		//clear_bus();
 		i2cStart(&driver, &config);
 	}
 	clk_mgr_noreq_hsi();
@@ -126,7 +130,8 @@ uint8_t I2C::read_byte(i2caddr_t addr, uint8_t regaddr){
 	i2cflags_t flags;
 	
 	
-	msg = transmit(addr, &regaddr, 1, &ret, 1, MS2ST(4));
+	//msg = transmit(addr, &regaddr, 1, &ret, 1, MS2ST(4));
+	msg = transmit(addr, &regaddr, 1, &ret, 1, TIME_INFINITE);
 	
 	if(msg == RDY_OK){
 		return ret;

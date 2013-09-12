@@ -26,10 +26,11 @@ public:
 		MASK_SUSPEND = 0x40000000,
 		MASK_RESUME  = 0x20000000,
 
+		MASK_BACK    = 0x08000000,
 		MASK_SELECT  = 0x04000000,
 		MASK_LEFT    = 0x02000000,
 		MASK_RIGHT   = 0x01000000,
-		MASK_BUTTONS = MASK_LEFT | MASK_SELECT | MASK_RIGHT,
+		MASK_BUTTONS = MASK_LEFT | MASK_SELECT | MASK_RIGHT | MASK_BACK,
 	} ui_event_t;
 	
 	//! The main UI thread
@@ -131,6 +132,12 @@ private:
 	static void handle_select(void * nothing){
 		chSysLockFromIsr();
 		chEvtSignalI(thread, MASK_SELECT | MASK_RESUME);
+		chSysUnlockFromIsr();
+	}
+	
+	static void handle_back(void * nothing){
+		chSysLockFromIsr();
+		chEvtSignalI(thread, MASK_BACK | MASK_RESUME);
 		chSysUnlockFromIsr();
 	}
 	

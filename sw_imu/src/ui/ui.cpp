@@ -30,6 +30,12 @@ msg_t UI::run(void * nothing){
 	button[0].set_press_handler((button_t::button_handler)handle_right, nullptr);
 	button[1].set_press_handler((button_t::button_handler)handle_select, nullptr);
 	button[2].set_press_handler((button_t::button_handler)handle_left, nullptr);
+	
+#if BOARD_SF
+	button[3].enable();
+	button[3].clear_callbacks();
+	button[3].set_press_handler((button_t::button_handler)handle_back, nullptr);
+#endif
 	start_suspend_timer();
 	menu.exec();
 	return 0;
@@ -107,7 +113,7 @@ eventmask_t UI::handle_evt(eventmask_t evt){
 }
 
 void UI::start(){
-	constexpr bool inhibit_monitor = true;
+	constexpr bool inhibit_monitor = false;
 
 
 	if(thread){

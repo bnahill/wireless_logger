@@ -13,8 +13,18 @@
 
 template <uint32_t pages, uint32_t columns>
 SSD1306<pages, columns>::SSD1306(SPI &spi, SPI::slave_config_t spi_config,
+	                             gpio_pin_t nDC, gpio_pin_t nRES, gpio_pin_t gate) :
+	spi(spi), spi_config(spi_config), nDC(nDC), nRES(nRES),
+	gate(gate), has_gate(true)
+{
+	chMtxInit(&suspend_lock);
+}
+
+template <uint32_t pages, uint32_t columns>
+SSD1306<pages, columns>::SSD1306(SPI &spi, SPI::slave_config_t spi_config,
 	                             gpio_pin_t nDC, gpio_pin_t nRES) :
-	spi(spi), spi_config(spi_config), nDC(nDC), nRES(nRES)
+	spi(spi), spi_config(spi_config), nDC(nDC), nRES(nRES),
+	gate({GPIOA,0}), has_gate(false)
 {
 	chMtxInit(&suspend_lock);
 }
@@ -22,6 +32,10 @@ SSD1306<pages, columns>::SSD1306(SPI &spi, SPI::slave_config_t spi_config,
 template <uint32_t pages, uint32_t columns>
 void SSD1306< pages, columns >::init(){
 	spi.init();
+	
+	if(has_gate){
+		gate.set();
+	}
 	
 	nRES.clear();
 	chThdSleep(MS2ST(10));
@@ -121,11 +135,7 @@ void SSD1306< pages, columns >::transmit_cmd_sync(uint8_t const * buf,
 	xfer.starting_callback = (SPI::callback)callback_set_command;
 	xfer.starting_param = (void*)&nDC;
 	
-	xfer.tc_sem(&done_sem);
-	
 	spi.transfer(xfer);
-	
-	chSemWait(&done_sem);
 }
 
 template <uint32_t pages, uint32_t columns>
@@ -145,11 +155,7 @@ void SSD1306< pages, columns >::transmit_data_sync(uint8_t const * buf,
 	xfer.starting_callback = (SPI::callback)callback_set_data;
 	xfer.starting_param = (void *)&nDC;
 	
-	xfer.tc_sem(&done_sem);
-	
 	spi.transfer(xfer);
-	
-	chSemWait(&done_sem);
 }
 
 template <uint32_t pages, uint32_t columns>
