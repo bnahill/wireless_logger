@@ -8,10 +8,10 @@
 
 MT29FxG01::MT29FxG01(SPI &spi,
                      numblocks_t num_blocks,
-                     gpio_pin_t const &ncs,
+                     gpio_pin_t const &_ncs,
                      uint16_t spi_flags) :
-	spi(spi), ncs(ncs), num_blocks(num_blocks),
-	spi_slave({nullptr, &ncs.gpio, ncs.index, spi_flags})
+	spi(spi), ncs(_ncs), num_blocks(num_blocks),
+	spi_slave({nullptr, &_ncs.gpio, _ncs.index, spi_flags})
 {
 	chMtxInit(&mutex);
 }
