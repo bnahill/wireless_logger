@@ -151,7 +151,7 @@ GuardianRF Platform::guardian1(rf1);
 // Flash platform configuration
 //////////////////////////////////////////////////////////
 
-MT29FxG01 Platform::flash(spi2, MT29FxG01::SIZE_1G,
+MT29FxG01 Platform::flash(spi3, MT29FxG01::SIZE_1G,
                          {GPIOB, 7},(SPI_CR1_CPOL | SPI_CR1_CPHA));
 
 

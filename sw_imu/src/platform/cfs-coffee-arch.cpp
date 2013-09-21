@@ -102,7 +102,7 @@ void fs_flash_write ( coffee_addr_t addr, char const * buf, size_t size ){
 	uint16_t bytes;
 	uint16_t offset;
 	MT29FxG01::page_t * write_buff;
-	write_buff = reinterpret_cast<MT29FxG01::page_t *>(chPoolAlloc(&flash.pool));
+	//write_buff = reinterpret_cast<MT29FxG01::page_t *>(chPoolAlloc(&flash.pool));
 	// Don't actually write anything in less than a page
 	//size -= addr & (flash.page_size - 1);
 	//addr = addr & ~(flash.page_size - 1);
@@ -124,7 +124,7 @@ void fs_flash_write ( coffee_addr_t addr, char const * buf, size_t size ){
 		addr += bytes;
 		size -= bytes;
 	}
-	chPoolFree(&flash.pool, write_buff);
+	//chPoolFree(&flash.pool, write_buff);
 }
 
 

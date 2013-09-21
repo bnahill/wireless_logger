@@ -173,7 +173,7 @@
                              PIN_MODE_ALTERNATE(GPIOA_OTG_FS_DP) |          \
                              PIN_MODE_ALTERNATE(GPIOA_SWDIO) |              \
                              PIN_MODE_ALTERNATE(GPIOA_SWCLK))
-#define VAL_GPIOA_OTYPER    0x00000000
+#define VAL_GPIOA_OTYPER    (PIN_OTYPE_OPENDRAIN(GPIOA_I2C3_SCL))
 #define VAL_GPIOA_OSPEEDR   0xFFFFFFFF
 #define VAL_GPIOA_PUPDR     (PIN_PUDR_PULLUP(0) |                           \
                              PIN_PUDR_PULLUP(1) |                           \
@@ -224,7 +224,9 @@
                              PIN_MODE_ALTERNATE(GPIOB_SPI2_MOSI))
 #define VAL_GPIOB_OTYPER    (PIN_OTYPE_PUSHPULL(GPIOB_GYRO_NCS) |          \
                              PIN_OTYPE_PUSHPULL(GPIOB_PRS_NCS) |           \
-                             PIN_OTYPE_PUSHPULL(GPIOB_FLASH_NCS))
+                             PIN_OTYPE_PUSHPULL(GPIOB_FLASH_NCS) |         \
+                             PIN_OTYPE_OPENDRAIN(GPIOB_I2C1_SCL) |         \
+                             PIN_OTYPE_OPENDRAIN(GPIOB_I2C1_SDA))
 #define VAL_GPIOB_OSPEEDR   0xFFFFFFFF
 #define VAL_GPIOB_PUPDR     (PIN_PUDR_PULLUP(0) |                           \
                              PIN_PUDR_PULLUP(1) |                           \
@@ -276,7 +278,8 @@
                              PIN_MODE_INPUT(13) |                           \
                              PIN_MODE_INPUT(14) |                           \
                              PIN_MODE_INPUT(15))
-#define VAL_GPIOC_OTYPER   (PIN_OTYPE_PUSHPULL(GPIOC_REG_MODE))
+#define VAL_GPIOC_OTYPER   (PIN_OTYPE_PUSHPULL(GPIOC_REG_MODE) |            \
+                            PIN_OTYPE_OPENDRAIN(GPIOC_I2C3_SDA))
 #define VAL_GPIOC_OSPEEDR   0xFFFFFFFF
 #define VAL_GPIOC_PUPDR     (PIN_PUDR_PULLUP(0) |                           \
                              PIN_PUDR_PULLUP(1) |                           \
@@ -474,7 +477,8 @@
                              PIN_MODE_INPUT(13) |                           \
                              PIN_MODE_INPUT(14) |                           \
                              PIN_MODE_INPUT(15))
-#define VAL_GPIOH_OTYPER    0x00000000
+#define VAL_GPIOH_OTYPER    (PIN_OTYPE_OPENDRAIN(GPIOH_I2C2_SCL) |          \
+                             PIN_OTYPE_OPENDRAIN(GPIOH_I2C2_SDA))
 #define VAL_GPIOH_OSPEEDR   0xFFFFFFFF
 #define VAL_GPIOH_PUPDR     (PIN_PUDR_FLOATING(GPIOH_OSC_IN) |              \
                              PIN_PUDR_FLOATING(GPIOH_OSC_OUT) |             \
