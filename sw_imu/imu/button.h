@@ -40,6 +40,7 @@ public:
 		callback(reinterpret_cast<vtfunc_t>(static_cb), this)
 	{
 		ExtCallback<driver>::channels[channel] = &callback;
+		
 		state = check_gpio();
 	}
 	
@@ -66,6 +67,7 @@ public:
 	//! Enable the interrupt for this button
 	void enable(){
 		extChannelEnable(&driver, channel);
+		state = check_gpio();
 	}
 	
 	//! Disable the interrupt for this button
