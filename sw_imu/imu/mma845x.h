@@ -107,8 +107,10 @@ public:
 		dr(DR_800), aslp_dr(ASLP_DR_50), noise_mode(NOISE_NORMAL),
 		active_mode(ACT_MODE_STANDBY), fast_read(FAST_READ_NORMAL),
 		oversmp_mode_active(OVERSMP_NORMAL),
-		oversmp_mode_sleep(OVERSMP_NORMAL)
-		{}
+		oversmp_mode_sleep(OVERSMP_NORMAL), fs(FS_4)
+		{
+			scaling_factor = compute_scaling_factor();
+		}
 
 	/*!
 	 @brief Initialize hardware and set configuration registers
@@ -140,9 +142,12 @@ public:
 	 */
 	void set_dr(dr_t new_dr, bool update=true);
 	
+	void set_fs(fs_t new_fs, bool update=true);
+	
 	//! @name Configuration
 	//! @{
 	dr_t dr;
+	fs_t fs;
 	aslp_dr_t aslp_dr;
 	noise_mode_t noise_mode;
 	fast_read_t fast_read;
@@ -204,6 +209,10 @@ private:
 		REG_OFF_Z         = 0x0D
 	} reg_t;
 	
+	float scaling_factor;
+	
+	inline float compute_scaling_factor();
+	
 	constexpr static uint8_t whoami_id();
 	
 	Semaphore result_lock;
@@ -224,6 +233,34 @@ constexpr uint8_t MMA845x<MMA8451Q_T>::whoami_id(){return 0x1C;}
 
 template<>
 constexpr uint8_t MMA845x<MMA8452Q_T>::whoami_id(){return 0x2C;}
+
+template<>
+inline float MMA845x<MMA8451Q_T>::compute_scaling_factor(){
+	switch(fs){
+	case FS_2:
+		return 0.5 / 16384.0;
+	case FS_4:
+		return 1.0 / 16384.0;
+	case FS_8:
+		return 2.0 / 16384.0;
+	default:
+		return 0;
+	}
+}
+
+template<>
+inline float MMA845x<MMA8452Q_T>::compute_scaling_factor(){
+	switch(fs){
+	case FS_2:
+		return 0.125 / 16384.0;
+	case FS_4:
+		return 0.25 / 16384.0;
+	case FS_8:
+		return 0.5 / 16384.0;
+	default:
+		return 0;
+	}
+}
 
 typedef MMA845x<MMA8451Q_T> MMA8451Q;
 typedef MMA845x<MMA8452Q_T> MMA8452Q;

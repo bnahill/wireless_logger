@@ -24,12 +24,9 @@ bool MMA845x< variant >::init(){
 	
 	//i2c.write_byte(devaddr, REG_CTRL_REG2, 0x40);
 	
-	// Set for +/-4g
-	i2c.write_byte(devaddr, REG_XYZ_DATA_CFG, 0x01);
+	// Set full-scale range
+	i2c.write_byte(devaddr, REG_XYZ_DATA_CFG, fs);
 	i2c.write_byte(devaddr, REG_SYSMOD, 0x02);
-	
-	// Enable device
-	//i2c.write_byte(devaddr, REG_CTRL_REG1, 0x21);
 	
 	update_ctrl_regs();
 	
@@ -47,9 +44,11 @@ void MMA845x< variant >::read(){
 	static const uint8_t addr = REG_OUT_X_MSB;
 	i2c.transmit(devaddr, &addr, 1, xfer_buffer, 6, MS2ST(4));
 	chSemWait(&result_lock);
-	reading.x = ((float)((int16_t)(xfer_buffer[0] << 8) + xfer_buffer[1]) / (512.0 * 16));
-	reading.y = ((float)((int16_t)(xfer_buffer[2] << 8) + xfer_buffer[3]) / (512.0 * 16));
-	reading.z = ((float)((int16_t)(xfer_buffer[4] << 8) + xfer_buffer[5]) / (512.0 * 16));
+	
+	reading.x = ((float)((int16_t)(xfer_buffer[0] << 8) + xfer_buffer[1])) * scaling_factor;
+	reading.y = ((float)((int16_t)(xfer_buffer[2] << 8) + xfer_buffer[3])) * scaling_factor;
+	reading.z = ((float)((int16_t)(xfer_buffer[4] << 8) + xfer_buffer[5])) * scaling_factor;
+
 	chSemSignal(&result_lock);
 }
 
@@ -71,4 +70,11 @@ void MMA845x< variant >::set_dr(dr_t new_dr, bool update){
 	dr = new_dr;
 	if(update)
 		update_ctrl_regs();
+}
+
+template<mma845x_variant_t variant>
+void MMA845x< variant >::set_fs(fs_t new_fs, bool update){
+	fs = new_fs;
+	if(update)
+		i2c.write_byte(devaddr, REG_XYZ_DATA_CFG, fs);
 }
