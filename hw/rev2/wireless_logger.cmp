@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2013-may-18)-stable date = Sun 14 Jul 2013 01:35:38 PM EDT
+Cmp-Mod V01 Created by CvPcb (2013-may-18)-stable date = Tue 24 Sep 2013 06:50:28 PM EDT
 
 BeginCmp
 TimeStamp = /518D865B/51949426;
@@ -407,9 +407,9 @@ IdModule  = SMD0402;
 EndCmp
 
 BeginCmp
-TimeStamp = /51784208/5195629E;
+TimeStamp = /52423FA8;
 Reference = C55;
-ValeurCmp = 10n;
+ValeurCmp = 0.1u;
 IdModule  = SMD0402;
 EndCmp
 
@@ -554,13 +554,6 @@ IdModule  = SMD0603;
 EndCmp
 
 BeginCmp
-TimeStamp = /51DD79DB;
-Reference = D5;
-ValeurCmp = BAT43XV2;
-IdModule  = SOD-523F;
-EndCmp
-
-BeginCmp
 TimeStamp = /518D07D1/518D137C;
 Reference = F1;
 ValeurCmp = PTS120616V025;
@@ -649,20 +642,6 @@ TimeStamp = /51784208/51929B1F;
 Reference = PB5;
 ValeurCmp = KMT0;
 IdModule  = KMT0;
-EndCmp
-
-BeginCmp
-TimeStamp = /518F8CF1/518F8DBC;
-Reference = Q1;
-ValeurCmp = 2N7002P;
-IdModule  = SOT23GDS;
-EndCmp
-
-BeginCmp
-TimeStamp = /518F8CF1/518F9B5D;
-Reference = Q2;
-ValeurCmp = 2N7002P;
-IdModule  = SOT23GDS;
 EndCmp
 
 BeginCmp
@@ -792,9 +771,9 @@ IdModule  = SMD0402;
 EndCmp
 
 BeginCmp
-TimeStamp = /518F8CF1/5194609C;
+TimeStamp = /524244C7;
 Reference = R19;
-ValeurCmp = 100k;
+ValeurCmp = 0R;
 IdModule  = SMD0402;
 EndCmp
 
@@ -932,6 +911,13 @@ IdModule  = SMD0402;
 EndCmp
 
 BeginCmp
+TimeStamp = /52424C2D;
+Reference = R39;
+ValeurCmp = 1M;
+IdModule  = SMD0402;
+EndCmp
+
+BeginCmp
 TimeStamp = /518EE159;
 Reference = U1;
 ValeurCmp = MT29FXX01A;
@@ -1006,6 +992,13 @@ TimeStamp = /51784208/51784288;
 Reference = U11;
 ValeurCmp = STM32F40X_BGA176;
 IdModule  = STM32F4_BGA176;
+EndCmp
+
+BeginCmp
+TimeStamp = /52420F7D;
+Reference = U12;
+ValeurCmp = MEMS_DGTL_MIC;
+IdModule  = ADMP521;
 EndCmp
 
 BeginCmp

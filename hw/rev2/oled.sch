@@ -22,7 +22,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 6 7
 Title "IMU Logger"
-Date "16 jul 2013"
+Date "24 sep 2013"
 Rev "2"
 Comp "McGill Integrated Microsystems Lab"
 Comment1 "Ben Nahill (bnahill@gmail.com)"
@@ -57,7 +57,7 @@ SDIN
 Text HLabel 5300 4450 0    60   Input ~ 0
 SCLK
 Text HLabel 5300 4350 0    60   Input ~ 0
-nD/C
+nD_C
 Text HLabel 4300 4250 0    60   Input ~ 0
 nRES
 Text HLabel 5300 4150 0    60   Input ~ 0
@@ -96,17 +96,6 @@ F 3 "" H 5350 5050 60  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L GND #PWR043
-U 1 1 504A0CF1
-P 5050 6200
-F 0 "#PWR043" H 5050 6200 30  0001 C CNN
-F 1 "GND" H 5050 6130 30  0001 C CNN
-F 2 "" H 5050 6200 60  0001 C CNN
-F 3 "" H 5050 6200 60  0001 C CNN
-	1    5050 6200
-	1    0    0    -1  
-$EndComp
-$Comp
 L RES R21
 U 1 1 504A0CDB
 P 5150 5000
@@ -138,17 +127,6 @@ F 2 "" H 5350 3450 60  0001 C CNN
 F 3 "" H 5350 3450 60  0001 C CNN
 	1    5350 3450
 	-1   0    0    1   
-$EndComp
-$Comp
-L MOS_N Q1
-U 1 1 518F8DBC
-P 4950 5700
-F 0 "Q1" H 4960 5870 60  0000 R CNN
-F 1 "2N7002P" H 4960 5550 60  0000 R CNN
-F 2 "SOT23GDS" H 4950 5700 60  0001 C CNN
-F 3 "~" H 4950 5700 60  0000 C CNN
-	1    4950 5700
-	1    0    0    -1  
 $EndComp
 Connection ~ 4800 3850
 Wire Wire Line
@@ -210,37 +188,10 @@ Wire Wire Line
 Connection ~ 4500 4250
 Wire Wire Line
 	5350 5300 5350 5150
-Wire Wire Line
-	5050 5300 5050 5500
 Connection ~ 5050 5300
 Wire Wire Line
-	5050 5900 5050 6200
-Text HLabel 4050 5700 0    60   Input ~ 0
-EN
-Wire Wire Line
 	4500 5300 5550 5300
-Wire Wire Line
-	4050 5700 5200 5700
-$Comp
-L MOS_N Q2
-U 1 1 518F9B5D
-P 5400 5700
-F 0 "Q2" H 5410 5870 60  0000 R CNN
-F 1 "2N7002P" H 5410 5550 60  0000 R CNN
-F 2 "SOT23GDS" H 5400 5700 60  0001 C CNN
-F 3 "~" H 5400 5700 60  0000 C CNN
-	1    5400 5700
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	5500 5500 5500 5300
 Connection ~ 5500 5300
-Wire Wire Line
-	5500 5900 5500 6000
-Wire Wire Line
-	5500 6000 5050 6000
-Connection ~ 5050 6000
-Connection ~ 4750 5700
 Text GLabel 4700 3850 0    60   Input ~ 0
 Vbat
 Text GLabel 5300 4050 0    60   Input ~ 0
@@ -248,40 +199,20 @@ V3
 Wire Wire Line
 	4950 3950 4950 5300
 Connection ~ 4950 5300
-$Comp
-L RES R19
-U 1 1 5194609C
-P 4300 5900
-F 0 "R19" H 4370 5865 50  0000 L TNN
-F 1 "100k" H 4300 5955 30  0000 C BNN
-F 2 "" H 4300 5900 60  0001 C CNN
-F 3 "" H 4300 5900 60  0001 C CNN
-	1    4300 5900
-	0    -1   -1   0   
-$EndComp
-Wire Wire Line
-	4300 5750 4300 5700
-Connection ~ 4300 5700
-Wire Wire Line
-	5050 6100 4300 6100
-Wire Wire Line
-	4300 6100 4300 6050
-Connection ~ 5050 6100
-Text Label 5550 5300 0    60   ~ 0
-OLED_GND
 Connection ~ 4800 5300
 Wire Wire Line
 	4500 5300 4500 4900
-Wire Notes Line
-	4200 5400 4200 6150
-Wire Notes Line
-	4200 6150 5600 6150
-Wire Notes Line
-	5600 6150 5600 5400
-Wire Notes Line
-	5600 5400 4200 5400
-Text Notes 5700 5800 0    60   ~ 0
-Power gating for entire display\nto reduce pesky leakage
-Text Notes 5700 6150 0    60   ~ 0
-Rds should be around <2R for each transistor while under 200mA
+$Comp
+L GND #PWR044
+U 1 1 5240F94A
+P 5050 5400
+F 0 "#PWR044" H 5050 5400 30  0001 C CNN
+F 1 "GND" H 5050 5330 30  0001 C CNN
+F 2 "" H 5050 5400 60  0000 C CNN
+F 3 "" H 5050 5400 60  0000 C CNN
+	1    5050 5400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5050 5400 5050 5300
 $EndSCHEMATC
