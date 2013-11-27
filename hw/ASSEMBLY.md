@@ -19,7 +19,12 @@ Assembly of the Strike Force rev2c board requires a number of tools:
 
 For assembly by hand, I recommend assembling the board in stages, defined by both regions and functionality, to reduce the search space if errors occur.
 
-First, I recommend to assemble the power supply. Add all components in the region, including the USB port. This is to ensure that the rest of the components will receive a safe voltage when they are populated. Verify the 4.2V and ~3V supplies with the USB cable plugged in.
+First, I recommend to assemble the power supply. Add all components in the region, including the USB port. This is to ensure that the rest of the components will receive a safe voltage when they are populated. Mounting the TPS62698 is not as bad as it looks as long as you get the orientation right. It's odd, but pin A1 is not the one with a dot over it...
+--------------
+|  text  [A1]|
+|o           |
+--------------
+Verify the 4.2V and ~3V supplies with the USB cable plugged in.
 
 Second, mount the processor. This one is finicky and so I recommend adding all of the nearby passive components on the back before soldering on the processor. This way, you won't end up reflowing any of the processor while adding them. Mount both the 32kHz and 25MHz crystals along with the processor for the exact same reason. Once that's done, add the SWD connector (using the iron) and verify that the board and crystals work.
 
