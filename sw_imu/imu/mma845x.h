@@ -15,9 +15,10 @@
 //! @{
 //! @addtogroup Sensors
 //! @{
-//! @addtogroup MMA8452Q
+//! @addtogroup MMA845x
 //! @{
 
+//! Different variants of the MMA845x family
 typedef enum {
 	MMA8451Q_T,
 	MMA8452Q_T
@@ -128,8 +129,6 @@ public:
 	 */
 	void update_ctrl_regs();
 	
-	void reset();
-	
 	void set_active_mode(active_mode_t new_mode){
 		active_mode = new_mode;
 		update_ctrl_regs();
@@ -157,10 +156,13 @@ public:
 	autosleep_t autosleep;
 	//! @}
 	
+	/*!
+	 @brief Safely copy the reading to a definition
+	 */
 	void get_reading(Euclidean3_f32 &dst){
-		chSemWait(&result_lock);
+		__disable_irq();
 		dst = reading;
-		chSemSignal(&result_lock);
+		__enable_irq();
 	}
 
 private:
@@ -209,16 +211,32 @@ private:
 		REG_OFF_Z         = 0x0D
 	} reg_t;
 	
+	/*!
+	 @brief Reset the internal state of the accelerometer
+
+	 @note This does not reset the driver
+	 */
+	void reset();
+
+	//! The current scaling factor
 	float scaling_factor;
 	
+	/*!
+	 @brief Get the correct scaling factor for the current configuration
+
+	 @note This implementation varies between variants of the chip
+	 */
 	inline float compute_scaling_factor();
 	
-	constexpr static uint8_t whoami_id();
+	/*!
+	 @brief The WHOAMI ID of this particular accelerometer variant
+	 */
+	static constexpr uint8_t whoami_id();
 	
-	Semaphore result_lock;
-	
+	//! The most recent reading
 	Euclidean3_f32 reading;
 	
+	//! The I2C address of this chip
 	uint8_t const devaddr;
 	
 	//! A transfer to use for periodic reads

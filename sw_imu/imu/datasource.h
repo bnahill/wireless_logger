@@ -3,6 +3,12 @@
 
 #include "ch.h"
 
+//! @addtogroup IMU
+//! @{
+//! @addtogroup DataAcquisition
+//! @{
+
+
 template <class datatype>
 class DataSource;
 
@@ -97,5 +103,7 @@ protected:
 	
 	DataListener<datatype> * listener_head;
 };
+
+//! @} @}
 
 #endif // __IMU_DATASOURCE_H_

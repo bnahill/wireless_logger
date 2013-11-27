@@ -10,8 +10,6 @@
 
 template<mma845x_variant_t variant>
 bool MMA845x< variant >::init(){
-	chSemInit(&result_lock, 1);
-	
 	// Initialize I2C -- don't care about return value
 	i2c.init();
 	
@@ -43,13 +41,11 @@ template<mma845x_variant_t variant>
 void MMA845x< variant >::read(){
 	static const uint8_t addr = REG_OUT_X_MSB;
 	i2c.transmit(devaddr, &addr, 1, xfer_buffer, 6, MS2ST(4));
-	chSemWait(&result_lock);
-	
+	__disable_irq();
 	reading.x = ((float)((int16_t)(xfer_buffer[0] << 8) + xfer_buffer[1])) * scaling_factor;
 	reading.y = ((float)((int16_t)(xfer_buffer[2] << 8) + xfer_buffer[3])) * scaling_factor;
 	reading.z = ((float)((int16_t)(xfer_buffer[4] << 8) + xfer_buffer[5])) * scaling_factor;
-
-	chSemSignal(&result_lock);
+	__enable_irq();
 }
 
 template<mma845x_variant_t variant>

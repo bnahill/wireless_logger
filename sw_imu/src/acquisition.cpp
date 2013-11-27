@@ -20,9 +20,9 @@ EventSource Acquisition::sensor_source;
 
 VirtualTimer Acquisition::vtimer;
 
-WORKING_AREA(Acquisition::waAccThread, 512);
-WORKING_AREA(Acquisition::waGyroThread, 512);
-WORKING_AREA(Acquisition::waMagThread, 512);
+WORKING_AREA(Acquisition::waAccThread, acq_thread_stack_size);
+WORKING_AREA(Acquisition::waGyroThread, acq_thread_stack_size);
+WORKING_AREA(Acquisition::waMagThread, acq_thread_stack_size);
 
 bool Acquisition::acc_enabled;
 bool Acquisition::gyro_enabled;

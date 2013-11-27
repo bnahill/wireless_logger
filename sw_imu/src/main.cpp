@@ -39,8 +39,9 @@ int main(void) {
 
 	UI::start();
 	
-	Acquisition::require_sources(Acquisition::SRC_ACC1 | Acquisition::SRC_GYRO1);
-	
+	Acquisition::require_sources(Acquisition::SRC_ACC1 |
+	                             Acquisition::SRC_MAG1 |
+		                         Acquisition::SRC_GYRO1);
 	clk_mgr_noreq_hsi();
 	
 // 	while(1){

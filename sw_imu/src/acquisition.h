@@ -3,6 +3,17 @@
 
 #include "platform.h"
 
+//! @addtogroup IMU
+//! @{
+//! @addtogroup DataAcquisition
+//! @{
+
+/*!
+ @brief The high-level interface for sensor data acquisition
+
+ This is a static class which allows for individual sensors to be accessed
+ safely by all tasks in the system.
+ */
 class Acquisition {
 public:
 	//! Set of flags to wait on for sensor readings
@@ -26,15 +37,10 @@ public:
 	 */
 	static void init();
 	
-	//! Callback from ChibiOS timer driver
-	static void tick(void * nothing);
-	
 	static bool acc_is_enabled(){return acc_enabled;}
 	static bool gyro_is_enabled(){return gyro_enabled;}
 	static bool mag_is_enabled(){return mag_enabled;}
 	
-	static void sleep_all();
-	static void wake_all();
 	
 	/*!
 	 @brief Increment reference count on sources, enable if not already
@@ -47,9 +53,10 @@ public:
 	 */
 	static void norequire_sources(uint32_t sensor_mask);
 private:
-	//! Primary sample clock
-	//extern GPTDriver &timer;
-	
+	//! Callback from ChibiOS timer driver
+	static void tick(void * nothing);
+
+	//! Primary sample clock, based on OS tick
 	static VirtualTimer vtimer;
 	
 	static bool acc_enabled, gyro_enabled, mag_enabled;
@@ -65,7 +72,13 @@ private:
 	static EventSource tick_source8;
 	//! @}
 	
+	/*!
+	 @name Sensor reference counts
+	 A count of the number of tasks that indicate that they require each sensor
+	 @{
+	 */
 	static uint32_t acc_ref_count, mag_ref_count, gyro_ref_count;
+	//! @}
 	
 	//! Sensor result source
 	static EventSource sensor_source;
@@ -81,13 +94,15 @@ private:
 	static msg_t AccThread(void *arg);
 	static msg_t GyroThread(void *arg);
 	static msg_t MagThread(void *arg);
+
+	static constexpr uint32_t acq_thread_stack_size = 128;
 	
-	static WORKING_AREA(waAccThread, 512);
-	static WORKING_AREA(waGyroThread, 512);
-	static WORKING_AREA(waMagThread, 512);
+	static WORKING_AREA(waAccThread, acq_thread_stack_size);
+	static WORKING_AREA(waGyroThread, acq_thread_stack_size);
+	static WORKING_AREA(waMagThread, acq_thread_stack_size);
 };
 
-
+//! @} @}
 
 
 #endif // __ACQUISITION_H_

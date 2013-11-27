@@ -65,7 +65,7 @@ L3GD20_SPI Platform::gyro1(Platform::spi1, {NULL, GPIOB, 5, SPI_CR1_BR_2 |
 ///////////////////////////////////////////
 
 button_t Platform::button[4] = {
-	{GPIOF, 7, button_t::ACTIVE_LOW},
+	{GPIOD, 7, button_t::ACTIVE_LOW},
 	{GPIOF, 6, button_t::ACTIVE_LOW},
 	{GPIOC, 5, button_t::ACTIVE_LOW},
 	{GPIOE, 8, button_t::ACTIVE_LOW}
@@ -86,7 +86,7 @@ const EXTConfig Platform::extcfg = {
 			Ext1Callback::callback}, // 5
 		{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOF,
 			Ext1Callback::callback},
-		{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOF,
+		{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOD,
 			Ext1Callback::callback},
 		{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOE,
 			Ext1Callback::callback},
@@ -127,10 +127,10 @@ template class SSD1306<4,128>;
 template class FrameBuffer<4, 128>;
 
 
-LY091WG15 Platform::oled(spi3,
+LY091WG15 Platform::oled(spi1,
                         {NULL, GPIOF, 10, SPI_CR1_BR_0 |
                          SPI_CR1_CPOL | SPI_CR1_CPHA},
-                        {GPIOA, 3}, {GPIOH, 2}, {GPIOE, 4});
+                        {GPIOA, 3}, {GPIOH, 2});
 
 usbserial1_t Platform::usbserial1({GPIOA, 9});
 
@@ -142,7 +142,7 @@ usbserial1_t Platform::usbserial1({GPIOA, 9});
 // CC1101 Platform::rf1(Platform::spi1,
 //                      {NULL, GPIOC, 9, SPI_CR1_BR_2 | SPI_CR1_BR_1});
 
-CC1101 Platform::rf1(Platform::spi1,
+CC1101 Platform::rf1(Platform::spi2,
                      {NULL, GPIOE, 15, SPI_CR1_BR_2 | SPI_CR1_BR_1});
 
 GuardianRF Platform::guardian1(rf1);
@@ -151,8 +151,8 @@ GuardianRF Platform::guardian1(rf1);
 // Flash platform configuration
 //////////////////////////////////////////////////////////
 
-MT29FxG01 Platform::flash(spi3, MT29FxG01::SIZE_1G,
-                         {GPIOB, 7},(SPI_CR1_CPOL | SPI_CR1_CPHA));
+MT29FxG01 Platform::flash(spi1, MT29FxG01::SIZE_1G,
+                         {GPIOD, 6},(SPI_CR1_CPOL | SPI_CR1_CPHA));
 
 
 
