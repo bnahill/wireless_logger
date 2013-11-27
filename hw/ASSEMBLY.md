@@ -1,6 +1,8 @@
 Hardware Assembly
 =================
-This document refers to rev2c. Rev2a and b are no longer supported and no hardware of those revisions should be assembled.
+This document refers to **rev2c**. Rev2a and b are no longer supported and no hardware of those revisions should be assembled.
+
+**Note for rev2a-c: XRCGB crystal footprints are flipped! This applies to the 25MHz, 26MHz, and 32MHz crystals in the design. It's easy enough to mount them rotated 90 degrees but also please take a moment to consider the value of design reviews. Unfortunately, they only help if the documentation is actually clear about whether a given drawing is from top or bottom...**
 
 This document does not teach any skills involved. If you don't have experience with hot air reworking and soldering, you will have a very uncomfortable time and are extremely likely to break things. A lifted pad under any component can mean the entire board and many of the components on it are wasted, so please practice on something else first. THIS IS NOT AN EASY BOARD TO ASSEMBLE.
 
