@@ -1,6 +1,6 @@
 # CMakeLists for STM32F4 using the Sourcery toolchain and OpenOCD with both
 # C and C++ sources
-# 
+#
 # To adapt this for any other STM32 chip should be trivial
 # To adapt to any other ARM controller shouldn't be much worse
 #
@@ -194,13 +194,13 @@ include_directories(
 	${OS_DIR}/hal/platforms/STM32/SPIv1
 	${OS_DIR}/hal/platforms/STM32/OTGv1
 	${OS_DIR}/hal/platforms/STM32/RTCv2
-	
+
 	${IMU_DIR}
-	
+
 	${FS_DIR}
-	
+
 	${FLOGFS_DIR}/inc
-	
+
 	src/platform
 	${PLATFORM_BOARD_DIR}
 )
@@ -279,7 +279,6 @@ set(APP_SOURCES
 	src/power_management.cpp
 	src/platform/board.c
 	${PLATFORM_BOARD_DIR}/platform.cpp
-	src/platform/cfs-coffee-arch.cpp
 	src/ui/ui.cpp
 	src/ui/menu.cpp
 	src/ui/mainmenu.cpp
@@ -310,7 +309,7 @@ set(IMU_SOURCES
 	${IMU_DIR}/mt29fxg01.cpp
 	${IMU_DIR}/eventlog.cpp
 	${IMU_DIR}/clock_mgr.c
-	
+
 	${IMU_DIR}/graphics/smallfont.cpp
 	${IMU_DIR}/graphics/mediumfont.cpp
 	${IMU_DIR}/graphics/comicsans4.cpp

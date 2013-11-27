@@ -95,7 +95,7 @@ private:
 	static msg_t GyroThread(void *arg);
 	static msg_t MagThread(void *arg);
 
-	static constexpr uint32_t acq_thread_stack_size = 128;
+	static constexpr uint32_t acq_thread_stack_size = 512;
 	
 	static WORKING_AREA(waAccThread, acq_thread_stack_size);
 	static WORKING_AREA(waGyroThread, acq_thread_stack_size);

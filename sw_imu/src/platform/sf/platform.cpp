@@ -55,7 +55,7 @@ SPI Platform::spi3(SPID3);
 // L3GD20 Platform
 ///////////////////////////////////////////
 
-L3GD20_SPI Platform::gyro1(Platform::spi1, {NULL, GPIOB, 5, SPI_CR1_BR_2 |
+L3GD20_SPI Platform::gyro1(Platform::spi3, {NULL, GPIOB, 5, SPI_CR1_BR_2 |
                                             SPI_CR1_BR_1 | SPI_CR1_CPOL |
                                             SPI_CR1_CPHA});
 
