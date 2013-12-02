@@ -94,7 +94,11 @@ void clk_mgr_req_hse(){
 		// Disable PLL
 		RCC->CR &= ~RCC_CR_PLLON;
 		// Configure PLL
+#ifdef BOARD_SF
+		RCC->PLLCFGR = HSE25_PLL_VALUE;
+#else
 		RCC->PLLCFGR = HSE8_PLL_VALUE;
+#endif
 		// Re-enable PLL
 		RCC->CR |= RCC_CR_PLLON;
 		// Wait for PLL

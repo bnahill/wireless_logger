@@ -1,6 +1,6 @@
 /*
     ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012 Giovanni Di Sirio.
+                 2011,2012,2013 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -44,7 +51,7 @@
     uninit [label="USB_UNINIT", style="bold"];
     ready [label="USB_READY\nClock Enabled"];
     selected [label="\nUSB_SELECTED\naddress\nassigned"];
-    configured [label="\nUSB_ACTIVE\nconfiguration\nselected"];
+    active [label="\nUSB_ACTIVE\nconfiguration\nselected"];
 
     uninit -> stop [label=" usbInit()", constraint=false];
     stop -> stop [label="\nusbStop()"];
@@ -53,12 +60,14 @@
     ready -> ready [label="\n\nusbStart()"];
     ready -> ready [label="\nSUSPEND/WAKEUP\n>event_cb<"];
     ready -> selected [label="\nSET_ADDRESS\n>event_cb<"];
+    selected -> stop [label="\nusbStop()"];
     selected -> ready [label="\nUSB RESET\n>event_cb<"];
     selected -> selected [label="\nSUSPEND/WAKEUP\n>event_cb<\n\nValid EP0 Message\n>requests_hook_cb<\n\nGET DESCRIPTOR\n>get_descriptor_cb<"];
-    selected -> configured [label="\nSET_CONF(n)\n>event_cb<"];
-    configured -> selected [label="\nSET_CONF(0)\n>event_cb<"];
-    configured -> configured [label="\nSUSPEND/WAKEUP\n>event_cb<\n\nValid EP0 Message\n>requests_hook_cb<\n\nGET DESCRIPTOR\n>get_descriptor_cb<\n\nEndpoints Activity\n >in_cb< or >out_cb<"];
-    configured -> ready [label="\nUSB RESET\n>event_cb<"];
+    selected -> active [label="\nSET_CONF(n)\n>event_cb<"];
+    active -> stop [label="\nusbStop()"];
+    active -> selected [label="\nSET_CONF(0)\n>event_cb<"];
+    active -> active [label="\nSUSPEND/WAKEUP\n>event_cb<\n\nValid EP0 Message\n>requests_hook_cb<\n\nGET DESCRIPTOR\n>get_descriptor_cb<\n\nEndpoints Activity\n >in_cb< or >out_cb<"];
+    active -> ready [label="\nUSB RESET\n>event_cb<"];
   }
  * @enddot
  * @else
@@ -73,7 +82,7 @@
     uninit [label="USB_UNINIT", style="bold"];
     ready [label="USB_READY\nClock Enabled"];
     selected [label="\nUSB_SELECTED\naddress\nassigned"];
-    configured [label="\nUSB_ACTIVE\nconfiguration\nselected"];
+    active [label="\nUSB_ACTIVE\nconfiguration\nselected"];
 
     uninit -> stop [label=" usbInit()", constraint=false];
     stop -> stop [label="\nusbStop()"];
@@ -82,12 +91,14 @@
     ready -> ready [label="\n\nusbStart()"];
     ready -> ready [label="\nSUSPEND/WAKEUP\n>event_cb<"];
     ready -> selected [label="\nSET_ADDRESS\n>event_cb<"];
+    selected -> stop [label="\nusbStop()"];
     selected -> ready [label="\nUSB RESET\n>event_cb<"];
     selected -> selected [label="\nSUSPEND/WAKEUP\n>event_cb<\n\nValid EP0 Message\n>requests_hook_cb<\n\nGET DESCRIPTOR\n>get_descriptor_cb<"];
-    selected -> configured [label="\nSET_CONF(n)\n>event_cb<"];
-    configured -> selected [label="\nSET_CONF(0)\n>event_cb<"];
-    configured -> configured [label="\nSUSPEND/WAKEUP\n>event_cb<\n\nValid EP0 Message\n>requests_hook_cb<\n\nGET DESCRIPTOR\n>get_descriptor_cb<\n\nEndpoints Activity\n >in_cb< >out_cb< >setup_cb<"];
-    configured -> ready [label="\nUSB RESET\n>event_cb<"];
+    selected -> active [label="\nSET_CONF(n)\n>event_cb<"];
+    active -> stop [label="\nusbStop()"];
+    active -> selected [label="\nSET_CONF(0)\n>event_cb<"];
+    active -> active [label="\nSUSPEND/WAKEUP\n>event_cb<\n\nValid EP0 Message\n>requests_hook_cb<\n\nGET DESCRIPTOR\n>get_descriptor_cb<\n\nEndpoints Activity\n >in_cb< or >out_cb<"];
+    active -> ready [label="\nUSB RESET\n>event_cb<"];
   }
  * @enddot
  * @endif

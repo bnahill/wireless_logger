@@ -168,16 +168,20 @@ void Platform::early_init(){
 // 	reg1.high_power(true);
 // 	reg1.buck_mode(LTC3559::MODE_BURST);
 	rf1.early_init();
+
+
 	evt_log.init();
+
+
 	if(!flogfs_init()){
 		evt_log.add("FLogFS init\n failed!", EventItem::SEVERITY_ERROR);
 	} else {
-		if(!flogfs_mount()){
-			evt_log.add("FLogFS mount\n failed!", EventItem::SEVERITY_ERROR);
-		}
+//		if(!flogfs_mount()){
+//			evt_log.add("FLogFS mount\n failed!", EventItem::SEVERITY_ERROR);
+//		}
 	}
-	//flogfs_mount();
 
+	
 	extStart(&EXTD1, &extcfg);
 }
 

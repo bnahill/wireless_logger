@@ -79,12 +79,12 @@ set(BOARD_REVISION "1" CACHE STRING "Which revision is it? BB=1, SF=2")
 # Build Options
 ########################################################
 
-set(OPTIMIZATION "-Os")
+set(OPTIMIZATION "-Og")
 set(LTO )#"-flto")
 
 set(MCU cortex-m4)
 
-set(MCFLAGS "-mcpu=${MCU} -g -mthumb -fsingle-precision-constant -fomit-frame-pointer -D__NEWLIB__")# -fomit-frame-pointer")
+set(MCFLAGS "-mcpu=${MCU} -g3 -mthumb -fsingle-precision-constant -fomit-frame-pointer -D__NEWLIB__")# -fomit-frame-pointer")
 
 
 
@@ -263,8 +263,8 @@ set(OS_SOURCES
 	${OS_DIR}/hal/platforms/STM32/SPIv1/spi_lld.c
 	${OS_DIR}/hal/platforms/STM32/OTGv1/usb_lld.c
 	${OS_DIR}/hal/platforms/STM32/RTCv2/rtc_lld.c
-	${OS_DIR}/hal/platforms/STM32/gpt_lld.c
-	${OS_DIR}/hal/platforms/STM32/pwm_lld.c
+	${OS_DIR}/hal/platforms/STM32/TIMv1/gpt_lld.c
+	${OS_DIR}/hal/platforms/STM32/TIMv1/pwm_lld.c
 	${OS_DIR}/hal/platforms/STM32/i2s_lld.c
 	${OS_DIR}/hal/platforms/STM32/sdc_lld.c
 	${OS_DIR}/hal/platforms/STM32/ext_lld.c

@@ -1,21 +1,17 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
-    This file is part of ChibiOS/RT.
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
+        http://www.apache.org/licenses/LICENSE-2.0
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 */
 
 /**
@@ -34,6 +30,7 @@
  *          - STM32F10X_CL for Connectivity Line devices.
  *          - STM32F2XX for High-performance STM32 F-2 devices.
  *          - STM32F30X for Analog & DSP devices.
+ *          - STM32F37X for Analog & DSP devices.
  *          - STM32F4XX for High-performance STM32 F-4 devices.
  *          - STM32L1XX_MD for Ultra Low Power Medium-density devices.
  *          .
@@ -61,6 +58,9 @@
 #elif defined(STM32F30X)
 #include "stm32f30x.h"
 
+#elif defined(STM32F37X)
+#include "stm32f37x.h"
+
 #elif defined(STM32F4XX)
 #include "stm32f4xx.h"
 
@@ -87,71 +87,9 @@
 /* Driver data structures and types.                                         */
 /*===========================================================================*/
 
-/**
- * @brief   STM32 TIM registers block.
- * @note    Redefined from the ST headers because the non uniform
- *          declaration of the CCR registers among the various
- *          sub-families.
- */
-typedef struct {
-  volatile uint16_t     CR1;
-  uint16_t              _resvd0;
-  volatile uint16_t     CR2;
-  uint16_t              _resvd1;
-  volatile uint16_t     SMCR;
-  uint16_t              _resvd2;
-  volatile uint16_t     DIER;
-  uint16_t              _resvd3;
-  volatile uint16_t     SR;
-  uint16_t              _resvd4;
-  volatile uint16_t     EGR;
-  uint16_t              _resvd5;
-  volatile uint16_t     CCMR1;
-  uint16_t              _resvd6;
-  volatile uint16_t     CCMR2;
-  uint16_t              _resvd7;
-  volatile uint16_t     CCER;
-  uint16_t              _resvd8;
-  volatile uint32_t     CNT;
-  volatile uint16_t     PSC;
-  uint16_t              _resvd9;
-  volatile uint32_t     ARR;
-  volatile uint16_t     RCR;
-  uint16_t              _resvd10;
-  volatile uint32_t     CCR[4];
-  volatile uint16_t     BDTR;
-  uint16_t              _resvd11;
-  volatile uint16_t     DCR;
-  uint16_t              _resvd12;
-  volatile uint16_t     DMAR;
-  uint16_t              _resvd13;
-  volatile uint16_t     OR;
-  uint16_t              _resvd14;
-} stm32_tim_t;
-
 /*===========================================================================*/
 /* Driver macros.                                                            */
 /*===========================================================================*/
-
-/**
- * @name    TIM units references
- * @{
- */
-#define STM32_TIM1      ((stm32_tim_t *)TIM1_BASE)
-#define STM32_TIM2      ((stm32_tim_t *)TIM2_BASE)
-#define STM32_TIM3      ((stm32_tim_t *)TIM3_BASE)
-#define STM32_TIM4      ((stm32_tim_t *)TIM4_BASE)
-#define STM32_TIM5      ((stm32_tim_t *)TIM5_BASE)
-#define STM32_TIM6      ((stm32_tim_t *)TIM6_BASE)
-#define STM32_TIM7      ((stm32_tim_t *)TIM7_BASE)
-#define STM32_TIM8      ((stm32_tim_t *)TIM8_BASE)
-#define STM32_TIM9      ((stm32_tim_t *)TIM9_BASE)
-#define STM32_TIM10     ((stm32_tim_t *)TIM10_BASE)
-#define STM32_TIM11     ((stm32_tim_t *)TIM11_BASE)
-#define STM32_TIM12     ((stm32_tim_t *)TIM12_BASE)
-#define STM32_TIM13     ((stm32_tim_t *)TIM13_BASE)
-#define STM32_TIM14     ((stm32_tim_t *)TIM14_BASE)
-/** @} */
 
 /*===========================================================================*/
 /* External declarations.                                                    */

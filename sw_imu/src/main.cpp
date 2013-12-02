@@ -18,32 +18,33 @@ using namespace Platform;
 int main(void) {
 	halInit();
 	chSysInit();
-	
+
 	clk_mgr_req_hsi();
-	
+
 	Platform::early_init();
 
 
-	
+
+
 #if SCHED_TICK_RTC
 	PowerManagement::disable_systick();
 	PowerManagement::enable_rtc_tick();
 #endif
 	oled.init();
-		
+
 //  if(!guardian1.init()) {
 // 		evt_log.add("Guardian init\nfailed!", EventItem::SEVERITY_ERROR);
 // 	}
-	
+
 	Acquisition::init();
 
 	UI::start();
-	
-	Acquisition::require_sources(Acquisition::SRC_ACC1 |
-	                             Acquisition::SRC_MAG1 |
-		                         Acquisition::SRC_GYRO1);
+
+	//Acquisition::require_sources(Acquisition::SRC_ACC1 |
+	//							 Acquisition::SRC_MAG1 |
+	//							 Acquisition::SRC_GYRO1);
 	clk_mgr_noreq_hsi();
-	
+
 // 	while(1){
 // 		led1.toggle();
 // 		chThdSleep(MS2ST(1000));
@@ -59,6 +60,6 @@ int main(void) {
 		led3.toggle();
 	}
 #endif
-	
+
 	return 1;
 }

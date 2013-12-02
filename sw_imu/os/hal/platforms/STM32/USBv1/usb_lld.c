@@ -1,21 +1,17 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
-    This file is part of ChibiOS/RT.
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
+        http://www.apache.org/licenses/LICENSE-2.0
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 */
 
 /**
@@ -33,6 +29,10 @@
 
 #if HAL_USE_USB || defined(__DOXYGEN__)
 
+/*===========================================================================*/
+/* Driver local definitions.                                                 */
+/*===========================================================================*/
+
 #define BTABLE_ADDR     0x0000
 
 /*===========================================================================*/
@@ -45,7 +45,7 @@ USBDriver USBD1;
 #endif
 
 /*===========================================================================*/
-/* Driver local variables.                                                   */
+/* Driver local variables and types.                                         */
 /*===========================================================================*/
 
 /**
@@ -350,13 +350,11 @@ CH_IRQ_HANDLER(STM32_USB1_LP_HANDLER) {
 
       transmitted = (size_t)USB_GET_DESCRIPTOR(ep)->TXCOUNT0;
       epcp->in_state->txcnt  += transmitted;
-      epcp->in_state->txsize -= transmitted;
-      if (epcp->in_state->txsize > 0) {
+      n = epcp->in_state->txsize - epcp->in_state->txcnt;
+      if (n > 0) {
         /* Transfer not completed, there are more packets to send.*/
-        if (epcp->in_state->txsize > epcp->in_maxsize)
+        if (n > epcp->in_maxsize)
           n = epcp->in_maxsize;
-        else
-          n = epcp->in_state->txsize;
 
         if (epcp->in_state->txqueued)
           usb_packet_write_from_queue(USB_GET_DESCRIPTOR(ep),
@@ -398,19 +396,22 @@ CH_IRQ_HANDLER(STM32_USB1_LP_HANDLER) {
           usb_packet_read_to_buffer(udp,
                                     epcp->out_state->mode.linear.rxbuf,
                                     n);
-          epcp->out_state->mode.linear.rxbuf  += n;
+          epcp->out_state->mode.linear.rxbuf += n;
         }
         /* Transaction data updated.*/
         epcp->out_state->rxcnt              += n;
         epcp->out_state->rxsize             -= n;
         epcp->out_state->rxpkts             -= 1;
-        if (epcp->out_state->rxpkts > 0) {
-          /* Transfer not completed, there are more packets to receive.*/
-          EPR_SET_STAT_RX(ep, EPR_STAT_RX_VALID);
+
+        /* The transaction is completed if the specified number of packets
+           has been received or the current packet is a short packet.*/
+        if ((n < epcp->out_maxsize) || (epcp->out_state->rxpkts == 0)) {
+          /* Transfer complete, invokes the callback.*/
+          _usb_isr_invoke_out_cb(usbp, ep);
         }
         else {
-          /* Transfer completed, invokes the callback.*/
-          _usb_isr_invoke_out_cb(usbp, ep);
+          /* Transfer not complete, there are more packets to receive.*/
+          EPR_SET_STAT_RX(ep, EPR_STAT_RX_VALID);
         }
       }
     }

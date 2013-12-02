@@ -1,21 +1,17 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
-    This file is part of ChibiOS/RT.
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
+        http://www.apache.org/licenses/LICENSE-2.0
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 */
 
 /**
@@ -79,7 +75,7 @@ SPIDriver SPID3;
 #endif
 
 /*===========================================================================*/
-/* Driver local variables.                                                   */
+/* Driver local variables and types.                                         */
 /*===========================================================================*/
 
 static uint16_t dummytx;
@@ -293,7 +289,7 @@ void spi_lld_start(SPIDriver *spip) {
   spip->spi->CR1  = 0;
   spip->spi->CR1  = spip->config->cr1 | SPI_CR1_MSTR | SPI_CR1_SSM |
                     SPI_CR1_SSI;
-  spip->spi->CR2  = spip->config->cr2 | SPI_CR2_SSOE |
+  spip->spi->CR2  = spip->config->cr2 | SPI_CR2_FRXTH | SPI_CR2_SSOE |
                     SPI_CR2_RXDMAEN | SPI_CR2_TXDMAEN;
   spip->spi->CR1 |= SPI_CR1_SPE;
 }
@@ -479,10 +475,26 @@ void spi_lld_receive(SPIDriver *spip, size_t n, void *rxbuf) {
  */
 uint16_t spi_lld_polled_exchange(SPIDriver *spip, uint16_t frame) {
 
-  spip->spi->DR = frame;
-  while ((spip->spi->SR & SPI_SR_RXNE) == 0)
-    ;
-  return spip->spi->DR;
+  /*
+   * Data register must be accessed with the appropriate data size.
+   * Byte size access (uint8_t *) for transactions that are <= 8-bit.
+   * Halfword size access (uint16_t) for transactions that are <= 8-bit.
+   */
+  if ((spip->config->cr2 & SPI_CR2_DS) <= (SPI_CR2_DS_2 |
+                                           SPI_CR2_DS_1 |
+                                           SPI_CR2_DS_0)) {
+    volatile uint8_t *spidr = (volatile uint8_t *)&spip->spi->DR;
+    *spidr = (uint8_t)frame;
+    while ((spip->spi->SR & SPI_SR_RXNE) == 0)
+      ;
+    return (uint16_t)*spidr;
+  }
+  else {
+    spip->spi->DR = frame;
+    while ((spip->spi->SR & SPI_SR_RXNE) == 0)
+      ;
+    return spip->spi->DR;
+  }
 }
 
 #endif /* HAL_USE_SPI */
