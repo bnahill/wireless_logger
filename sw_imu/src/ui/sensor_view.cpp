@@ -22,6 +22,7 @@ void SensorView::exec(){
 		switch(evt){
 		case 0:
 			continue;
+		case UI::MASK_BACK:
 		case UI::MASK_ABORT:
 			terminate();
 			return;

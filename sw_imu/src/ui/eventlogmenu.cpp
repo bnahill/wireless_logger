@@ -72,6 +72,7 @@ void EventMenu::exec() {
 				exit_count = 0;
 			}
 			continue;
+		case UI::MASK_BACK:
 		case UI::MASK_ABORT:
 			return;
 		case UI::MASK_SELECT:
