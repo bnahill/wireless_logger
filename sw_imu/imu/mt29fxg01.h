@@ -87,6 +87,11 @@ public:
 	 @brief Initialize the device
 	 @return Success
 	 @pre The scheduler is running
+
+	 Initialization is made safe with a semaphore to block multiple
+	 initializations. This is maybe excessive, but really not terribly heavy.
+	 A successive call to init will return the result from a previous
+	 initialization.
 	 */
 	bool init();
 	
@@ -177,6 +182,13 @@ protected:
 	
 	uint8_t writes_so_far;
 
+	enum {
+		INIT_NOT_YET,
+		INIT_FAILURE,
+		INIT_SUCCESS
+	} init_success;
+
+	Semaphore init_sem;
 	
 	/*!
 	 @brief Set required configuration (following reset)
