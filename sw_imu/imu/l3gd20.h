@@ -138,6 +138,15 @@ public:
 		chSemSignal(&result_lock);
 	}
 	
+	static char * format_str(char * dst){
+		dst = imu_sprint(dst, 3) + 1;
+		dst = imu_sprint(dst, 'x') + 1;
+		dst = get_type_str<decltype(reading.x)>(dst) + 1;
+		dst = imu_sprint(dst, 'y') + 1;
+		dst = get_type_str<decltype(reading.y)>(dst) + 1;
+		dst = imu_sprint(dst, 'z') + 1;
+		return get_type_str<decltype(reading.z)>(dst);
+	}
 protected:
 	//! @brief Register address map
 	typedef enum {

@@ -18,6 +18,8 @@ WORKING_AREA(UI::MonitorThread, monitor_stack_size);
 WORKING_AREA(UI::UIThread, stack_size);
 
 msg_t UI::run(void * nothing){
+	chRegSetThreadName("UIThread");
+
 	MainMenu menu;
 	button[0].enable();
 	button[1].enable();
@@ -62,6 +64,8 @@ msg_t UI::run_monitor(void * nothing){
 	EventItem * item;
 	bool ev_note, ev_warn, ev_err;
 	uint32_t column;
+
+	chRegSetThreadName("MonThread");
 
 	oled.fb.draw_horizontal_mask(0, 0x7F, 100, 1);
 	

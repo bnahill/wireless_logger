@@ -88,6 +88,9 @@ protected:
 template <class datatype>
 class DataSource {
 public:
+	typedef DataListener<datatype> listener_t;
+	typedef datatype data_t;
+
 	DataSource() :
 		listener_head(nullptr)
 	{}

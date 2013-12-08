@@ -12,6 +12,7 @@ void RealTimeClock< driver >::get_time_text(char * text){
 		rtc_time_t time;
 		RTCTime rtctime;
 	};
+	rtctime.h12 = 0;
 	rtcGetTime(&driver, &rtctime);
 	
 	text[0] = '0' + time.hours_ten;

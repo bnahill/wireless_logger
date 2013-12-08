@@ -52,12 +52,13 @@ int main(void) {
 
 #ifdef BOARD_SF
 	while(true){
-		chThdSleep(MS2ST(200));
-		led1.toggle();
-		chThdSleep(MS2ST(200));
-		led2.toggle();
-		chThdSleep(MS2ST(200));
-		led3.toggle();
+		chThdSleep(TIME_INFINITE);
+//		chThdSleep(MS2ST(200));
+//		led1.toggle();
+// 		chThdSleep(MS2ST(200));
+// 		led2.toggle();
+// 		chThdSleep(MS2ST(200));
+// 		led3.toggle();
 	}
 #endif
 
