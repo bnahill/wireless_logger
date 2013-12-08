@@ -1,6 +1,6 @@
 /*
     ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012 Giovanni Di Sirio.
+                 2011,2012,2013 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -40,7 +47,7 @@
 /*===========================================================================*/
 
 /*===========================================================================*/
-/* Driver local variables.                                                   */
+/* Driver local variables and types.                                         */
 /*===========================================================================*/
 
 /*===========================================================================*/
@@ -131,10 +138,10 @@ void canStop(CANDriver *canp) {
   chDbgAssert((canp->state == CAN_STOP) || (canp->state == CAN_READY),
               "canStop(), #1", "invalid state");
   can_lld_stop(canp);
+  canp->state  = CAN_STOP;
   chSemResetI(&canp->rxsem, 0);
   chSemResetI(&canp->txsem, 0);
   chSchRescheduleS();
-  canp->state  = CAN_STOP;
   chSysUnlock();
 }
 
@@ -145,6 +152,7 @@ void canStop(CANDriver *canp) {
  * @note    Trying to transmit while in sleep mode simply enqueues the thread.
  *
  * @param[in] canp      pointer to the @p CANDriver object
+ * @param[in] mailbox   mailbox number, @p CAN_ANY_MAILBOX for any mailbox
  * @param[in] ctfp      pointer to the CAN frame to be transmitted
  * @param[in] timeout   the number of ticks before the operation timeouts,
  *                      the following special values are allowed:
@@ -158,21 +166,25 @@ void canStop(CANDriver *canp) {
  *
  * @api
  */
-msg_t canTransmit(CANDriver *canp, const CANTxFrame *ctfp, systime_t timeout) {
+msg_t canTransmit(CANDriver *canp,
+                  canmbx_t mailbox,
+                  const CANTxFrame *ctfp,
+                  systime_t timeout) {
 
-  chDbgCheck((canp != NULL) && (ctfp != NULL), "canTransmit");
+  chDbgCheck((canp != NULL) && (ctfp != NULL) && (mailbox <= CAN_TX_MAILBOXES),
+             "canTransmit");
 
   chSysLock();
   chDbgAssert((canp->state == CAN_READY) || (canp->state == CAN_SLEEP),
               "canTransmit(), #1", "invalid state");
-  while ((canp->state == CAN_SLEEP) || !can_lld_can_transmit(canp)) {
+  while ((canp->state == CAN_SLEEP) || !can_lld_is_tx_empty(canp, mailbox)) {
     msg_t msg = chSemWaitTimeoutS(&canp->txsem, timeout);
     if (msg != RDY_OK) {
       chSysUnlock();
       return msg;
     }
   }
-  can_lld_transmit(canp, ctfp);
+  can_lld_transmit(canp, mailbox, ctfp);
   chSysUnlock();
   return RDY_OK;
 }
@@ -183,6 +195,7 @@ msg_t canTransmit(CANDriver *canp, const CANTxFrame *ctfp, systime_t timeout) {
  * @note    Trying to receive while in sleep mode simply enqueues the thread.
  *
  * @param[in] canp      pointer to the @p CANDriver object
+ * @param[in] mailbox   mailbox number, @p CAN_ANY_MAILBOX for any mailbox
  * @param[out] crfp     pointer to the buffer where the CAN frame is copied
  * @param[in] timeout   the number of ticks before the operation timeouts,
  *                      the following special values are allowed:
@@ -198,21 +211,25 @@ msg_t canTransmit(CANDriver *canp, const CANTxFrame *ctfp, systime_t timeout) {
  *
  * @api
  */
-msg_t canReceive(CANDriver *canp, CANRxFrame *crfp, systime_t timeout) {
+msg_t canReceive(CANDriver *canp,
+                 canmbx_t mailbox,
+                 CANRxFrame *crfp,
+                 systime_t timeout) {
 
-  chDbgCheck((canp != NULL) && (crfp != NULL), "canReceive");
+  chDbgCheck((canp != NULL) && (crfp != NULL) && (mailbox < CAN_RX_MAILBOXES),
+             "canReceive");
 
   chSysLock();
   chDbgAssert((canp->state == CAN_READY) || (canp->state == CAN_SLEEP),
               "canReceive(), #1", "invalid state");
-  while ((canp->state == CAN_SLEEP) || !can_lld_can_receive(canp)) {
+  while ((canp->state == CAN_SLEEP) || !can_lld_is_rx_nonempty(canp, mailbox)) {
     msg_t msg = chSemWaitTimeoutS(&canp->rxsem, timeout);
     if (msg != RDY_OK) {
       chSysUnlock();
       return msg;
     }
   }
-  can_lld_receive(canp, crfp);
+  can_lld_receive(canp, mailbox, crfp);
   chSysUnlock();
   return RDY_OK;
 }

@@ -16,7 +16,6 @@
 #define BIT(x) (1 << x)
 #endif
 
-#include "imu/imu_math.h"
 #include "imu/clock_mgr.h"
 
 /*!
@@ -147,6 +146,13 @@ char * imu_snprint_inner(char * dst, const char * c){
 }
 
 template <>
+char * imu_sprint_inner(char * dst, char c){
+    *(dst++) = c;
+    *dst = '\0';
+    return dst;
+}
+
+template <>
 char * imu_sprint_inner(char * dst, uint32_t u){
 	return uint_to_string(u, dst);
 }
@@ -158,6 +164,8 @@ char * imu_sprint(char  * dst, const Thead& head){
 
 /*!
  @brief Print function which doesn't need to allocate memory
+
+ @returns A pointer to the 0-termination
  
  Using the new variadic templates from C++11, we can iterate through arguments
  safely, printing each one after the previous. All types must have a defined
@@ -177,6 +185,8 @@ char * imu_snprint(char  * dst, const Thead& head, const Ttail&... tail){
 // constexpr uint32_t get_af_value(const Thead head, const Ttail... tail){
 // 	
 // }
+
+#include "imu/imu_math.h"
 
 //! @} @}
 

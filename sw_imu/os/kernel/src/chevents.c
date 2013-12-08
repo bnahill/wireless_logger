@@ -1,6 +1,6 @@
 /*
     ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012 Giovanni Di Sirio.
+                 2011,2012,2013 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 /*
    Concepts and parts of this file have been contributed by Scott (skute).
@@ -69,7 +76,7 @@
  *          different threads.
  *
  * @param[in] esp       pointer to the  @p EventSource structure
- * @param[in] elp       pointer to the @p EventListener structure
+ * @param[out] elp      pointer to the @p EventListener structure
  * @param[in] mask      the mask of event flags to be ORed to the thread when
  *                      the event source is broadcasted
  *
@@ -142,7 +149,7 @@ eventmask_t chEvtGetAndClearEvents(eventmask_t mask) {
  * @brief   Adds (OR) a set of event flags on the current thread, this is
  *          @b much faster than using @p chEvtBroadcast() or @p chEvtSignal().
  *
- * @param[in] mask      the event flags to be ORed
+ * @param[in] mask      the event flags to be added
  * @return              The current pending events mask.
  *
  * @api

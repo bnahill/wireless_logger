@@ -9,7 +9,7 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "usb_cdc.h"
+#include "serial_usb.h"
 #include "chprintf.h"
 #include "imu.h"
 
@@ -40,11 +40,17 @@ public:
 	 */
 	void init(){
 		clk_mgr_req_hse();
+		
+		//usbDisconnectBus(conf.usbp);
+		//chThdSleepMilliseconds(1000);
+		//usbStart(conf.usbp, &usbcfg);
+		sduObjectInit(&driver);
 		sduStart(&driver, &conf);
 		
 		usbDisconnectBus(conf.usbp);
 		chThdSleepMilliseconds(1000);
 		usbStart(conf.usbp, &usbcfg);
+	    usbConnectBus(conf.usbp);
 	}
 	
 	void stop(){

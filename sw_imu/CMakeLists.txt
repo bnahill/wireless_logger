@@ -67,6 +67,7 @@ option(USE_RTC_SCHED_TICK "Use the RTC for scheduler tick instead of SysTick" ON
 option(SLEEP_WHEN_IDLE "Try to sleep whenever the CPU is idle" ON)
 option(USE_CLK_MGR "Use the clock manager to keep the CPU in its lowest power mode" ON)
 option(CHIBIOS_DEBUG "Enable ChibiOS debugging (a bit of CPU overhead)" OFF)
+set(OPTIMIZATION_LEVEL "g" CACHE STRING "Compiler optimization flag")
 set(RTOS_TICK_FREQ "100" CACHE STRING "The frequency of the RTOS scheduler tick")
 
 option(DEBUG_USE_SVD "Use pycmdebug and an SVD file for debugging" OFF)
@@ -79,12 +80,12 @@ set(BOARD_REVISION "1" CACHE STRING "Which revision is it? BB=1, SF=2")
 # Build Options
 ########################################################
 
-set(OPTIMIZATION "-Os")
+set(OPTIMIZATION "-O${OPTIMIZATION_LEVEL}")
 set(LTO )#"-flto")
 
 set(MCU cortex-m4)
 
-set(MCFLAGS "-mcpu=${MCU} -g -mthumb -fsingle-precision-constant -fomit-frame-pointer -D__NEWLIB__")# -fomit-frame-pointer")
+set(MCFLAGS "-mcpu=${MCU} -g3 -mthumb -fsingle-precision-constant -fomit-frame-pointer -D__NEWLIB__")# -fomit-frame-pointer")
 
 
 
@@ -263,8 +264,8 @@ set(OS_SOURCES
 	${OS_DIR}/hal/platforms/STM32/SPIv1/spi_lld.c
 	${OS_DIR}/hal/platforms/STM32/OTGv1/usb_lld.c
 	${OS_DIR}/hal/platforms/STM32/RTCv2/rtc_lld.c
-	${OS_DIR}/hal/platforms/STM32/gpt_lld.c
-	${OS_DIR}/hal/platforms/STM32/pwm_lld.c
+	${OS_DIR}/hal/platforms/STM32/TIMv1/gpt_lld.c
+	${OS_DIR}/hal/platforms/STM32/TIMv1/pwm_lld.c
 	${OS_DIR}/hal/platforms/STM32/i2s_lld.c
 	${OS_DIR}/hal/platforms/STM32/sdc_lld.c
 	${OS_DIR}/hal/platforms/STM32/ext_lld.c
@@ -291,6 +292,7 @@ set(APP_SOURCES
 	src/ui/filemenu.cpp
 	src/ui/tests.cpp
 	src/ui/eventlogmenu.cpp
+	src/ui/sensorlog.cpp
 	#src/ui/footstepcount.cpp
 )
 
@@ -299,6 +301,7 @@ set(IMU_SOURCES
 	${IMU_DIR}/ltc3559.cpp
 	${IMU_DIR}/mma845x.cpp
 	${IMU_DIR}/mag3110.cpp
+	${IMU_DIR}/lps331.cpp
 	${IMU_DIR}/i2c.cpp
 	${IMU_DIR}/spi.cpp
 	${IMU_DIR}/ssd1306_spec.cpp
@@ -395,7 +398,7 @@ set(GDB_ARGS -x start.gdb)
 ##############################################################
 
 set(GDB    ${TC_PREFIX}gdb)
-set(GDBTUI ${TC_PREFIX}gdbtui)
+set(GDBTUI ${TC_PREFIX}gdb -tui)
 
 if(${DETECTED_HOST} STREQUAL "Windows")
 endif(${DETECTED_HOST} STREQUAL "Windows")

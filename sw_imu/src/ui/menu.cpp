@@ -72,17 +72,18 @@ void Menu::run(bool enable_exit){
 	chEvtGetAndClearEvents(UI::MASK_BUTTONS);
 	
 	while(!get_out){
-		//evt = chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(50));
 		evt = chEvtWaitOne(ALL_EVENTS);
 		if(!evt) continue;
 		
+		// Let UI try to handle evt
 		evt = UI::handle_evt(evt);
+		// Now do menu things.
 		switch(evt){
+		case UI::MASK_BACK:
 		case UI::MASK_ABORT:
 			get_out = enable_exit;
 			break;
 		case UI::MASK_SUSPEND:
-			
 			// BLOCK HERE
 			evt = chEvtWaitOne(UI::MASK_RESUME);
 			chEvtGetAndClearEvents(ALL_EVENTS);

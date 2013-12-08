@@ -39,10 +39,38 @@ void clk_mgr_init();
  */
 void clk_mgr_wakeup();
 void clk_mgr_gosleep();
+
+//! @name Clock Requirement Routines
+//! @{
+
+/*!
+ * @brief Indicate that calling task requires HSE
+ * 
+ * @note This may require starting up the HSE
+ */
 void clk_mgr_req_hse();
+
+/*!
+ * @brief Indicate that HSE is no longer required
+ * 
+ * @note This may involve an HSI startup
+ */
 void clk_mgr_noreq_hse();
+
+/*!
+ * @brief Indicate that the calling task requires HSI
+ * 
+ * @note No clock will be started with this. HSI or HSE already going...
+ */
 void clk_mgr_req_hsi();
+
+/*!
+ * @brief Indicate that HSI is no longer required
+ * 
+ * Then clocks will shut down when idle
+ */
 void clk_mgr_noreq_hsi();
+//! @}
 
 #endif
 

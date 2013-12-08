@@ -35,6 +35,9 @@ I2C Platform::i2c1(I2CD1, OPMODE_I2C, FAST_DUTY_CYCLE_2, 400000, {GPIOB, 9}, {GP
 template class MMA845x<MMA8451Q_T>;
 MMA8451Q Platform::acc1(Platform::i2c1, 0x1C);
 MAG3110 Platform::mag1(Platform::i2c1, 0x0E);
+LPS331 Platform::prs1(Platform::spi3, {NULL, GPIOD, 5, SPI_CR1_BR_2 |
+                                       SPI_CR1_BR_1 | SPI_CR1_CPOL |
+                                       SPI_CR1_CPHA});
 
 
 template class DataSource<Euclidean3_f32>;
@@ -42,6 +45,10 @@ template class DataListener<Euclidean3_f32>;
 DataSource<Euclidean3_f32> Platform::acc_source;
 DataSource<Euclidean3_f32> Platform::mag_source;
 DataSource<Euclidean3_f32> Platform::gyro_source;
+
+template class DataSource<float>;
+template class DataListener<float>;
+DataSource<float> Platform::prs_source;
 
 ///////////////////////////////////////////
 // SPI Platform
@@ -168,7 +175,11 @@ void Platform::early_init(){
 // 	reg1.high_power(true);
 // 	reg1.buck_mode(LTC3559::MODE_BURST);
 	rf1.early_init();
+
+
 	evt_log.init();
+
+
 	if(!flogfs_init()){
 		evt_log.add("FLogFS init\n failed!", EventItem::SEVERITY_ERROR);
 	} else {
@@ -176,8 +187,8 @@ void Platform::early_init(){
 			evt_log.add("FLogFS mount\n failed!", EventItem::SEVERITY_ERROR);
 		}
 	}
-	//flogfs_mount();
 
+	
 	extStart(&EXTD1, &extcfg);
 }
 

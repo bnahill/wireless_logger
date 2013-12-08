@@ -1,21 +1,17 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
-    This file is part of ChibiOS/RT.
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
+        http://www.apache.org/licenses/LICENSE-2.0
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 */
 
 /**
@@ -177,6 +173,8 @@ CH_IRQ_HANDLER(EXTI15_10_IRQHandler) {
   uint32_t pr;
 
   CH_IRQ_PROLOGUE();
+  
+  clk_mgr_wakeup();
 
   pr = EXTI->PR & ((1 << 10) | (1 << 11) | (1 << 12) | (1 << 13) | (1 << 14) |
                    (1 << 15));
@@ -219,7 +217,7 @@ CH_IRQ_HANDLER(PVD_IRQHandler) {
  *
  * @isr
  */
-CH_IRQ_HANDLER(RTCAlarm_IRQHandler) {
+CH_IRQ_HANDLER(RTC_Alarm_IRQHandler) {
 
   CH_IRQ_PROLOGUE();
   
@@ -291,28 +289,25 @@ CH_IRQ_HANDLER(TAMPER_STAMP_IRQHandler) {
   CH_IRQ_EPILOGUE();
 }
 
-static uint32_t what_happened_test = 0;
-
 /**
  * @brief   EXTI[22] interrupt handler (RTC_WKUP).
  *
  * @isr
  */
 CH_IRQ_HANDLER(RTC_WKUP_IRQHandler) {
+
   CH_IRQ_PROLOGUE();
-  what_happened_test = 5;
+
   EXTI->PR = (1 << 22);
+  
   RTC->ISR &= ~RTC_ISR_WUTF;
-  what_happened_test = 15;
-//   clk_mgr_wakeup();
 #if SCHED_TICK_RTC
+  // Pass the interrupt along to the normal scheduler interrupt
+  // This shouldn't be necessary (can just call appropriate ISR code)
+  // Please revisit this
   SCB->ICSR = ICSR_PENDSTSET;
 #endif
-  if(EXTI->PR & (1 << 22)){
-  what_happened_test = 25;
-  } else {
-    what_happened_test = 2200;
-  }
+
   CH_IRQ_EPILOGUE();
 }
 

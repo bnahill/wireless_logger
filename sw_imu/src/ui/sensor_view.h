@@ -39,7 +39,8 @@ protected:
 	typedef enum {
 		MODE_ACC,
 		MODE_GYRO,
-		MODE_MAG
+		MODE_MAG,
+		MODE_PRS
 	} mode_t;
 	
 	Thread * thread;
@@ -51,9 +52,27 @@ protected:
 		return 0;
 	}
 	
-	DataListener<Euclidean3_f32> data_listener;
-	Euclidean3_f32 data_buffer[buffer_len];
-	
+	union {
+		decltype(Platform::mag_source)::listener_t mag_listener;
+		decltype(Platform::acc_source)::listener_t acc_listener;
+		decltype(Platform::gyro_source)::listener_t gyro_listener;
+		decltype(Platform::prs_source)::listener_t prs_listener;
+	};
+
+	union{
+		decltype(Platform::acc_source)::data_t acc_buffer[buffer_len];
+		decltype(Platform::mag_source)::data_t mag_buffer[buffer_len];
+		decltype(Platform::gyro_source)::data_t gyro_buffer[buffer_len];
+		decltype(Platform::prs_source)::data_t prs_buffer[buffer_len];
+	};
+
+	union{
+		decltype(Platform::acc_source)::data_t acc_measurement;
+		decltype(Platform::mag_source)::data_t mag_measurement;
+		decltype(Platform::gyro_source)::data_t gyro_measurement;
+		decltype(Platform::prs_source)::data_t prs_measurement;
+	};
+
 	mode_t mode;
 	display_mode_t display_mode;
 };

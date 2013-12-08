@@ -1,6 +1,6 @@
 /*
     ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012 Giovanni Di Sirio.
+                 2011,2012,2013 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -26,7 +33,21 @@
  * @{
  */
 
-#include "ch.h"
+#include <stdint.h>
+
+#if !defined(FALSE)
+#define FALSE       0
+#endif
+
+#if !defined(TRUE)
+#define TRUE        (!FALSE)
+#endif
+
+#define SCB_CPACR               *((uint32_t *)0xE000ED88U)
+#define SCB_FPCCR               *((uint32_t *)0xE000EF34U)
+#define SCB_FPDSCR              *((uint32_t *)0xE000EF3CU)
+#define FPCCR_ASPEN             (0x1U << 31)
+#define FPCCR_LSPEN             (0x1U << 30)
 
 typedef void (*funcp_t)(void);
 typedef funcp_t * funcpp_t;
@@ -198,7 +219,7 @@ extern funcp_t __fini_array_end;
 /**
  * @brief   Application @p main() function.
  */
-extern int main(void);
+extern void main(void);
 
 /**
  * @brief   Early initialization.

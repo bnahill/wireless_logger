@@ -23,14 +23,19 @@ VirtualTimer Acquisition::vtimer;
 WORKING_AREA(Acquisition::waAccThread, acq_thread_stack_size);
 WORKING_AREA(Acquisition::waGyroThread, acq_thread_stack_size);
 WORKING_AREA(Acquisition::waMagThread, acq_thread_stack_size);
+WORKING_AREA(Acquisition::waPrsThread, acq_thread_stack_size);
 
 bool Acquisition::acc_enabled;
 bool Acquisition::gyro_enabled;
 bool Acquisition::mag_enabled;
+bool Acquisition::prs_enabled;
 
 uint32_t Acquisition::acc_ref_count = 0;
 uint32_t Acquisition::mag_ref_count = 0;
 uint32_t Acquisition::gyro_ref_count = 0;
+uint32_t Acquisition::prs_ref_count = 0;
+
+const uFractional<10,22> Acquisition::rate = rate_f;
 
 msg_t Acquisition::AccThread(void *arg) {
 	EventListener listener;
@@ -122,6 +127,7 @@ msg_t Acquisition::GyroThread(void *arg) {
 	chRegSetThreadName("GyroThread");
 
 	chEvtRegisterMask(&tick_source, &listener, 1);
+	//chEvtRegisterMask(&tick_source8, &listener, 8);
 	
 	gyro1.init();
 	
@@ -162,6 +168,48 @@ msg_t Acquisition::GyroThread(void *arg) {
 	return 0;
 }
 
+msg_t Acquisition::PrsThread(void *arg) {
+	EventListener listener;
+	float reading;
+	(void)arg;
+	chRegSetThreadName("PrsThread");
+
+	chEvtRegisterMask(&tick_source4, &listener, 1);
+
+	if(!prs1.init()){
+		while(true);
+	}
+
+	prs1.set_pm(prs1.PM_DOWN);
+
+	while(TRIG_WAKE != chEvtWaitOne(TRIG_ALL));
+
+	prs1.set_pm(prs1.PM_ACTIVE);
+	prs_enabled = true;
+
+	while(1){
+		switch(chEvtWaitOne(TRIG_ALL + 1)){
+			case 1:
+				reading = prs1.read();
+				prs_source.put(reading);
+				break;
+			case TRIG_SLEEP:
+				prs1.set_pm(prs1.PM_DOWN);
+				prs_enabled = false;
+				while(TRIG_WAKE !=
+				      chEvtWaitOne(TRIG_ALL));
+				prs1.set_pm(prs1.PM_ACTIVE);
+				prs_enabled = true;
+				break;
+			case TRIG_WAKE:
+				// Don't do anything.
+			default:
+				break;
+		}
+	}
+	return 0;
+}
+
 void Acquisition::tick(void * nothing){
 	static uint32_t count = 0;
 	static uint32_t event;
@@ -187,6 +235,8 @@ void Acquisition::tick(void * nothing){
 Thread * Acquisition::acc_thread;
 Thread * Acquisition::gyro_thread;
 Thread * Acquisition::mag_thread;
+Thread * Acquisition::prs_thread;
+
 
 void Acquisition::init(){
 	chEvtInit(&Acquisition::tick_source);
@@ -199,11 +249,13 @@ void Acquisition::init(){
 	acc_enabled = false;
 	gyro_enabled = false;
 	mag_enabled = false;
+	prs_enabled = false;
 	
 
 	acc_thread = chThdCreateStatic(waAccThread, sizeof(waAccThread), NORMALPRIO + 10, AccThread, NULL);
 	mag_thread = chThdCreateStatic(waMagThread, sizeof(waMagThread), NORMALPRIO + 10, MagThread, NULL);
 	gyro_thread = chThdCreateStatic(waGyroThread, sizeof(waGyroThread), NORMALPRIO + 10, GyroThread, NULL);
+	prs_thread = chThdCreateStatic(waPrsThread, sizeof(waPrsThread), NORMALPRIO + 10, PrsThread, NULL);
 	
 	//static GPTConfig const gpt_config = {10000, Acquisition::tick};
 	
@@ -228,6 +280,10 @@ void Acquisition::require_sources(uint32_t sensor_mask){
 		if(!mag_ref_count++)
 			chEvtSignalI(mag_thread, TRIG_WAKE);
 	}
+	if(sensor_mask & SRC_PRS1){
+		if(!prs_ref_count++)
+			chEvtSignalI(prs_thread, TRIG_WAKE);
+	}
 	chSchRescheduleS();
 	chSysUnlock();
 }
@@ -245,6 +301,10 @@ void Acquisition::norequire_sources(uint32_t sensor_mask){
 	if(sensor_mask & SRC_MAG1){
 		if(!--mag_ref_count)
 			chEvtSignalI(mag_thread, TRIG_SLEEP);
+	}
+	if(sensor_mask & SRC_PRS1){
+		if(!--prs_ref_count)
+			chEvtSignalI(prs_thread, TRIG_SLEEP);
 	}
 	chSchRescheduleS();
 	chSysUnlock();

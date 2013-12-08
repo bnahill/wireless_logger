@@ -11,6 +11,11 @@
 #include "usbserial.h"
 #include "platform.h"
 
+#define USB_CDC_DATA_REQUEST_EP           1
+#define USB_CDC_DATA_AVAILABLE_EP         1
+#define USB_CDC_INTERRUPT_REQUEST_EP      2
+
+
 template <USBDriver &usb_driver>
 void USBSerial< usb_driver >::usb_event(USBDriver *usbp, usbevent_t event) {
 	switch (event) {
@@ -28,7 +33,7 @@ void USBSerial< usb_driver >::usb_event(USBDriver *usbp, usbevent_t event) {
 		usbInitEndpointI(usbp, USB_CDC_INTERRUPT_REQUEST_EP, &this_device.ep2config);
 
 		/* Resetting the state of the CDC subsystem.*/
-		sduConfigureHookI(usbp);
+		sduConfigureHookI(&this_device.driver);
 
 		chSysUnlockFromIsr();
 		return;
@@ -64,7 +69,10 @@ USBDescriptor const *USBSerial< usb_driver >::get_descriptor(USBDriver *usbp,
 
 template <USBDriver &usb_driver>
 const SerialUSBConfig USBSerial< usb_driver >::conf = {
-	&usb_driver
+	&usb_driver,
+	USB_CDC_DATA_REQUEST_EP,
+	USB_CDC_DATA_AVAILABLE_EP,
+	USB_CDC_INTERRUPT_REQUEST_EP
 };
 
 template <USBDriver &usb_driver>

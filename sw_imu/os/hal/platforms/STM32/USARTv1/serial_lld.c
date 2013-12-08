@@ -1,21 +1,17 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
-    This file is part of ChibiOS/RT.
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
+        http://www.apache.org/licenses/LICENSE-2.0
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 */
 
 /**
@@ -30,6 +26,10 @@
 #include "hal.h"
 
 #if HAL_USE_SERIAL || defined(__DOXYGEN__)
+
+/*===========================================================================*/
+/* Driver local definitions.                                                 */
+/*===========================================================================*/
 
 /*===========================================================================*/
 /* Driver exported variables.                                                */
@@ -66,7 +66,7 @@ SerialDriver SD6;
 #endif
 
 /*===========================================================================*/
-/* Driver local variables.                                                   */
+/* Driver local variables and types.                                         */
 /*===========================================================================*/
 
 /** @brief Driver default configuration.*/
@@ -98,16 +98,16 @@ static void usart_init(SerialDriver *sdp, const SerialConfig *config) {
 #else
   if (sdp->usart == USART1)
 #endif
-    u->BRR = STM32_PCLK2 / config->sc_speed;
+    u->BRR = STM32_PCLK2 / config->speed;
   else
-    u->BRR = STM32_PCLK1 / config->sc_speed;
+    u->BRR = STM32_PCLK1 / config->speed;
 
   /* Note that some bits are enforced.*/
-  u->CR2 = config->sc_cr2 | USART_CR2_LBDIE;
-  u->CR3 = config->sc_cr3 | USART_CR3_EIE;
-  u->CR1 = config->sc_cr1 | USART_CR1_UE | USART_CR1_PEIE |
-                            USART_CR1_RXNEIE | USART_CR1_TE |
-                            USART_CR1_RE;
+  u->CR2 = config->cr2 | USART_CR2_LBDIE;
+  u->CR3 = config->cr3 | USART_CR3_EIE;
+  u->CR1 = config->cr1 | USART_CR1_UE | USART_CR1_PEIE |
+                         USART_CR1_RXNEIE | USART_CR1_TE |
+                         USART_CR1_RE;
   u->SR = 0;
   (void)u->SR;  /* SR reset step 1.*/
   (void)u->DR;  /* SR reset step 2.*/

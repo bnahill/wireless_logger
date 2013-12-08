@@ -1,6 +1,6 @@
 /*
     ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012 Giovanni Di Sirio.
+                 2011,2012,2013 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -45,8 +52,15 @@
 /**
  * @brief   Enables an event sources for incoming packets.
  */
+#if !defined(MAC_USE_ZERO_COPY) || defined(__DOXYGEN__)
+#define MAC_USE_ZERO_COPY           FALSE
+#endif
+
+/**
+ * @brief   Enables an event sources for incoming packets.
+ */
 #if !defined(MAC_USE_EVENTS) || defined(__DOXYGEN__)
-#define MAC_USE_EVENTS          TRUE
+#define MAC_USE_EVENTS              TRUE
 #endif
 /** @} */
 
@@ -121,17 +135,58 @@ typedef struct MACDriver MACDriver;
 /**
  * @brief   Reads from a receive descriptor's stream.
  *
- * @param[in] rdp   pointer to a @p MACReceiveDescriptor structure
- * @param[in] buf   pointer to the buffer that will receive the read data
- * @param[in] size  number of bytes to be read
- * @return          The number of bytes read from the descriptor's stream, this
- *                  value can be less than the amount specified in the
- *                  parameter @p size if there are no more bytes to read.
+ * @param[in] rdp       pointer to a @p MACReceiveDescriptor structure
+ * @param[in] buf       pointer to the buffer that will receive the read data
+ * @param[in] size      number of bytes to be read
+ * @return              The number of bytes read from the descriptor's stream,
+ *                      this value can be less than the amount specified in the
+ *                      parameter @p size if there are no more bytes to read.
  *
  * @api
  */
 #define macReadReceiveDescriptor(rdp, buf, size)                            \
     mac_lld_read_receive_descriptor(rdp, buf, size)
+
+#if MAC_USE_ZERO_COPY || defined(__DOXYGEN__)
+/**
+ * @brief   Returns a pointer to the next transmit buffer in the descriptor
+ *          chain.
+ * @note    The API guarantees that enough buffers can be requested to fill
+ *          a whole frame.
+ *
+ * @param[in] tdp       pointer to a @p MACTransmitDescriptor structure
+ * @param[in] size      size of the requested buffer. Specify the frame size
+ *                      on the first call then scale the value down subtracting
+ *                      the amount of data already copied into the previous
+ *                      buffers.
+ * @param[out] sizep    pointer to variable receiving the real buffer size.
+ *                      The returned value can be less than the amount
+ *                      requested, this means that more buffers must be
+ *                      requested in order to fill the frame data entirely.
+ * @return              Pointer to the returned buffer.
+ *
+ * @api
+ */
+#define macGetNextTransmitBuffer(tdp, size, sizep)                          \
+  mac_lld_get_next_transmit_buffer(tdp, size, sizep)
+
+/**
+ * @brief   Returns a pointer to the next receive buffer in the descriptor
+ *          chain.
+ * @note    The API guarantees that the descriptor chain contains a whole
+ *          frame.
+ *
+ * @param[in] rdp       pointer to a @p MACReceiveDescriptor structure
+ * @param[out] sizep    pointer to variable receiving the buffer size, it is
+ *                      zero when the last buffer has already been returned.
+ * @return              Pointer to the returned buffer.
+ * @retval NULL         if the buffer chain has been entirely scanned.
+ *
+ * @api
+ */
+#define macGetNextReceiveBuffer(rdp, sizep)                                 \
+  mac_lld_get_next_receive_buffer(rdp, sizep)
+#endif /* MAC_USE_ZERO_COPY */
 /** @} */
 
 /*===========================================================================*/

@@ -9,7 +9,7 @@
 #ifndef __MAG3110_H_
 #define __MAG3110_H_
 
-#include "imu/imu_math.h"
+#include "imu/imu.h"
 #include "imu/i2c.h"
 
 //! @addtogroup IMU
@@ -138,7 +138,16 @@ public:
 		dst = reading;
 		chSemSignal(&result_lock);
 	}
-	
+
+	static char * format_str(char * dst){
+		dst = imu_sprint(dst, 3) + 1;
+		dst = imu_sprint(dst, 'x') + 1;
+		dst = get_type_str<decltype(reading.x)>(dst) + 1;
+		dst = imu_sprint(dst, 'y') + 1;
+		dst = get_type_str<decltype(reading.y)>(dst) + 1;
+		dst = imu_sprint(dst, 'z') + 1;
+		return get_type_str<decltype(reading.z)>(dst);
+	}
 private:
 	/*!
 	 @brief Write current settings to CTRL_REG1
@@ -190,7 +199,6 @@ private:
 	Euclidean3_f32 reading;
 	
 	Semaphore result_lock;
-	
 };
 
 //! @} @} @}

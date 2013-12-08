@@ -357,8 +357,8 @@
                              PIN_PUDR_PULLUP(GPIOD_REG_NUSB_CONN) |         \
                              PIN_PUDR_PULLUP(GPIOD_REG_NCHG) |              \
                              PIN_PUDR_PULLUP(15))
-#define VAL_GPIOD_ODR       (GPIOD_FLASH_NCS |                              \
-                             GPIOD_PRS_NCS)
+#define VAL_GPIOD_ODR       (PIN(GPIOD_PRS_NCS) |                           \
+                             PIN(GPIOD_FLASH_NCS))
 #define VAL_GPIOD_AFRL      0x00000000
 #define VAL_GPIOD_AFRH      0x00000000
 
@@ -403,7 +403,10 @@
                              PIN_PUDR_PULLUP(13) |                          \
                              PIN_PUDR_PULLUP(14) |                          \
                              PIN_PUDR_PULLUP(15))
-#define VAL_GPIOE_ODR       0xFFFFFFFF
+#define VAL_GPIOE_ODR       (0xFFFFFFFF &                                   \
+                            ~PIN(GPIOE_LED3) &                              \
+                            ~PIN(GPIOE_LED2) &                              \
+                            ~PIN(GPIOE_LED1))
 #define VAL_GPIOE_AFRL      0x00000000
 #define VAL_GPIOE_AFRH      0x00000000
 

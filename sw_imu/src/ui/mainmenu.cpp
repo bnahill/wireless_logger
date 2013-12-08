@@ -5,12 +5,14 @@
 #include "ui/testmenu.h"
 #include "ui/filemenu.h"
 #include "ui/eventlogmenu.h"
+#include "ui/sensorlog.h"
 
 MenuItem const MainMenu::items[] = {
 	{"Sensor output\n(numeric)", (MenuItem::item_handler)launch_sensor_view_num},
 	{"Sensor output\n(bar)", (MenuItem::item_handler)launch_sensor_view_bar},
 	{"USB Mode", (MenuItem::item_handler)UI::launch_screen<USBScreen>},
 	{"Tests", (MenuItem::item_handler)UI::launch_screen<TestMenu>},
+	{"Logger", (MenuItem::item_handler)UI::launch_screen<SensorLogUI>},
 	{"Event Viewer", (MenuItem::item_handler)UI::launch_screen<EventMenu>},
 	{"Files", (MenuItem::item_handler)UI::launch_screen<FileMenu>},
 	{"Random numbers", (MenuItem::item_handler)UI::launch_screen<RNGScreen>},

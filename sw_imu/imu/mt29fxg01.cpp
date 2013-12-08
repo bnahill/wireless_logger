@@ -10,10 +10,11 @@ MT29FxG01::MT29FxG01(SPI &spi,
                      numblocks_t num_blocks,
                      gpio_pin_t const &_ncs,
                      uint16_t spi_flags) :
-	spi(spi), ncs(_ncs), num_blocks(num_blocks),
+	spi(spi), ncs(_ncs), num_blocks(num_blocks), init_success(INIT_NOT_YET),
 	spi_slave({nullptr, &_ncs.gpio, _ncs.index, spi_flags})
 {
 	chMtxInit(&mutex);
+	chSemInit(&init_sem, 1);
 }
 
 void MT29FxG01::write_enable(){
@@ -24,8 +25,17 @@ void MT29FxG01::write_enable(){
 
 bool MT29FxG01::init(){
 	uint8_t rx[4] = {0};
-	uint8_t tx[4] = {CMD_READ_ID, 0,0,0};
+	uint8_t const tx[4] = {CMD_READ_ID, 0,0,0};
 	
+	// Check if already initialized
+	chSemWait(&init_sem);
+
+
+	if(init_success != INIT_NOT_YET){
+		chSemSignal(&init_sem);
+		return init_success == INIT_SUCCESS;
+	}
+
 	chPoolInit(&pool, sizeof(*pool_buffer), nullptr);
 	chPoolLoadArray(&pool, pool_buffer, num_page_buffers);
 	
@@ -33,8 +43,13 @@ bool MT29FxG01::init(){
 	
 	reset();
 
-	spi.exchange_sync(spi_slave, 4, static_cast<void*>(tx), rx);
-	return (rx[2] == 0x2C) && (rx[3] == 0x12);
+	spi.exchange_sync(spi_slave, 4, static_cast<const void *>(tx), rx);
+	init_success = ((rx[2] == 0x2C) && (rx[3] == 0x12)) ? INIT_SUCCESS :
+	                                                      INIT_FAILURE;
+
+
+
+	return init_success;
 }
 
 void MT29FxG01::set_defaults(){

@@ -29,6 +29,7 @@
 #include <imu/ext.h>
 #include <imu/button.h>
 #include <imu/l3gd20.h>
+#include <imu/lps331.h>
 #include <imu/ltc3559.h>
 #include <imu/ssd1306.h>
 #include <imu/usbserial.h>
@@ -52,10 +53,12 @@ namespace Platform {
 	extern I2C i2c1;
 	extern MMA8451Q acc1;
 	extern MAG3110 mag1;
+	extern LPS331 prs1;
 	
 	extern DataSource<Euclidean3_f32> acc_source;
 	extern DataSource<Euclidean3_f32> mag_source;
 	extern DataSource<Euclidean3_f32> gyro_source;
+	extern DataSource<float> prs_source;
 	
 	extern SPI spi1;
 	extern SPI spi2;

@@ -1,6 +1,6 @@
 /*
     ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012 Giovanni Di Sirio.
+                 2011,2012,2013 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -43,7 +50,7 @@
 /*===========================================================================*/
 
 /*===========================================================================*/
-/* Driver local variables.                                                   */
+/* Driver local variables and types.                                         */
 /*===========================================================================*/
 
 static const uint8_t zero_status[] = {0x00, 0x00};
@@ -238,10 +245,14 @@ void usbInit(void) {
  * @init
  */
 void usbObjectInit(USBDriver *usbp) {
+  unsigned i;
 
   usbp->state        = USB_STOP;
   usbp->config       = NULL;
-  usbp->param        = NULL;
+  for (i = 0; i < USB_MAX_ENDPOINTS; i++) {
+    usbp->in_params[i]  = NULL;
+    usbp->out_params[i] = NULL;
+  }
   usbp->transmitting = 0;
   usbp->receiving    = 0;
 }
@@ -282,7 +293,8 @@ void usbStop(USBDriver *usbp) {
   chDbgCheck(usbp != NULL, "usbStop");
 
   chSysLock();
-  chDbgAssert((usbp->state == USB_STOP) || (usbp->state == USB_READY),
+  chDbgAssert((usbp->state == USB_STOP) || (usbp->state == USB_READY) ||
+              (usbp->state == USB_SELECTED) || (usbp->state == USB_ACTIVE),
               "usbStop(), #1", "invalid state");
   usb_lld_stop(usbp);
   usbp->state = USB_STOP;
@@ -692,15 +704,16 @@ void _usb_ep0in(USBDriver *usbp, usbep_t ep) {
     /* If the transmitted size is less than the requested size and it is a
        multiple of the maximum packet size then a zero size packet must be
        transmitted.*/
-    if ((usbp->ep0n < max) &&
-        ((usbp->ep0n % usbp->epc[0]->in_maxsize) == 0)) {
+    if ((usbp->ep0n < max) && ((usbp->ep0n % usbp->epc[0]->in_maxsize) == 0)) {
       usbPrepareTransmit(usbp, 0, NULL, 0);
       chSysLockFromIsr();
       usbStartTransmitI(usbp, 0);
       chSysUnlockFromIsr();
+      usbp->ep0state = USB_EP0_WAITING_TX0;
       return;
     }
-
+    /* Falls into, it is intentional.*/
+  case USB_EP0_WAITING_TX0:
     /* Transmit phase over, receiving the zero sized status packet.*/
     usbp->ep0state = USB_EP0_WAITING_STS;
     usbPrepareReceive(usbp, 0, NULL, 0);
