@@ -19,9 +19,9 @@ int main(void) {
 	halInit();
 	chSysInit();
 
-	clk_mgr_req_hsi();
-
 	Platform::early_init();
+	
+	clk_mgr_req_hsi();
 
 
 
