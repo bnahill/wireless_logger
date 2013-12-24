@@ -180,10 +180,10 @@ void Platform::early_init(){
 	evt_log.init();
 
 
-	if(!flogfs_init()){
+	if(flogfs_init() != FLOG_SUCCESS){
 		evt_log.add("FLogFS init\n failed!", EventItem::SEVERITY_ERROR);
 	} else {
-		if(!flogfs_mount()){
+		if(flogfs_mount() != FLOG_SUCCESS){
 			evt_log.add("FLogFS mount\n failed!", EventItem::SEVERITY_ERROR);
 		}
 	}

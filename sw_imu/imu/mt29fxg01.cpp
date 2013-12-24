@@ -43,13 +43,13 @@ bool MT29FxG01::init(){
 	
 	reset();
 
-	spi.exchange_sync(spi_slave, 4, static_cast<const void *>(tx), rx);
+	spi.exchange_sync(spi_slave, 4, static_cast<void const *>(tx), rx);
 	init_success = ((rx[2] == 0x2C) && (rx[3] == 0x12)) ? INIT_SUCCESS :
 	                                                      INIT_FAILURE;
 
+	chSemSignal(&init_sem);
 
-
-	return init_success;
+	return (init_success == INIT_SUCCESS);
 }
 
 void MT29FxG01::set_defaults(){
