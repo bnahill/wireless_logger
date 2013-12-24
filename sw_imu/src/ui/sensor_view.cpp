@@ -22,10 +22,6 @@ void SensorView::exec(){
 		switch(evt){
 		case 0:
 			continue;
-		case UI::MASK_BACK:
-		case UI::MASK_ABORT:
-			terminate();
-			return;
 		case UI::MASK_LEFT:
 			switch(mode){
 			case MODE_ACC: mode = MODE_PRS; break;
@@ -42,9 +38,12 @@ void SensorView::exec(){
 			case MODE_PRS: mode = MODE_ACC; break;
 			}
 			break;
-		case UI::MASK_SELECT:
+		case UI::MASK_BACK:
+		case UI::MASK_ABORT:
+		case UI::MASK_SELECT:	
 			terminate();
-			return;
+			UI::enable_suspend();
+			break;
 		case UI::MASK_SUSPEND:
 			evt = chEvtWaitOne(UI::MASK_RESUME);
 			chEvtGetAndClearEvents(ALL_EVENTS);
