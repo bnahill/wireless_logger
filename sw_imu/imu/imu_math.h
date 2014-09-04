@@ -15,6 +15,13 @@
 #include <cmath>
 #include <algorithm>
 
+template<typename T> constexpr
+T const& max(T const& a, T const& b) {
+	return a > b ? a : b;
+}
+
+
+
 /*!
  * @brief A class for accessing usable types from arbitrary bit lengths
  * @tparam n_bits The minimum number of bits required
@@ -31,6 +38,7 @@ public:
 template<>
 class IntLength<8>{
 public:
+	static constexpr size_t bits = 8;
 	typedef uint_fast8_t unsigned_fast_t;
 	typedef uint8_t unsigned_t;
 	typedef int_fast8_t signed_fast_t;
@@ -39,6 +47,7 @@ public:
 template<>
 class IntLength<16>{
 public:
+	static constexpr size_t bits = 16;
 	typedef uint_fast16_t unsigned_fast_t;
 	typedef uint16_t unsigned_t;
 	typedef int_fast16_t signed_fast_t;
@@ -47,6 +56,7 @@ public:
 template<>
 class IntLength<32>{
 public:
+	static constexpr size_t bits = 32;
 	typedef uint_fast32_t unsigned_fast_t;
 	typedef uint32_t unsigned_t;
 	typedef int_fast32_t signed_fast_t;
@@ -55,6 +65,7 @@ public:
 template<>
 class IntLength<64>{
 public:
+	static constexpr size_t bits = 64;
 	typedef uint_fast64_t unsigned_fast_t;
 	typedef uint64_t unsigned_t;
 	typedef int_fast64_t signed_fast_t;
@@ -67,26 +78,30 @@ template <size_t i_bits, size_t f_bits>
 class uFractional {
 public:
 	typedef typename IntLength<i_bits + f_bits>::unsigned_t internal_t;
+	static constexpr size_t bits =  IntLength<i_bits + f_bits>::bits;
+	static constexpr size_t bits_i = i_bits;
+	static constexpr size_t bits_f = f_bits;
 
+	template<size_t mi_bits, size_t mf_bits>
+	constexpr uFractional(const uFractional<mi_bits, mf_bits> &val) :
+		i(val.normalize<i_bits, f_bits>().i){}
 	constexpr uFractional(const uFractional<i_bits, f_bits> &val) :
-			 i(val.i){}
-	constexpr uFractional(const internal_t &val) :
-			 i(val){}
-	constexpr uFractional(const double &val) :
-		i(val * (1 << f_bits)){}
-	constexpr uFractional(const float &val) :
-		i(val * (1 << f_bits)){}
-	constexpr uFractional(const int &val) :
-		i(((unsigned int)val) << f_bits){}
-	double asDouble() const{
-		return ((double)i) / (1 << f_bits);
+		i(val.i){}
+	//constexpr uFractional(const internal_t &val) :
+	//	i(val){}
+	constexpr uFractional(const double val) :
+		i(val * (double)((typename IntLength<f_bits + 1>::unsigned_t)1 << f_bits)){}
+	constexpr uFractional(const float val) :
+		i(val * (float)((typename IntLength<f_bits + 1>::unsigned_t)1 << f_bits)){}
+	constexpr double asDouble() const{
+		return ((double)i) / (double)((1 << f_bits) - 1);
 	}
 
 	/*!
 	 * @brief Convert a fractional number to a different format
 	 */
 	template<size_t ni_bits, size_t nf_bits>
-	uFractional<ni_bits, nf_bits> normalize(){
+	constexpr uFractional<ni_bits, nf_bits> normalize() const {
 		typedef uFractional<ni_bits, nf_bits> n_t;
 		return n_t((typename n_t::internal_t) (i >> (f_bits - nf_bits)));
 	}
@@ -97,33 +112,37 @@ public:
 	 * This will not change the value unless it exceeds the final format
 	 */
 	template<size_t ni_bits>
-	uFractional<ni_bits, f_bits> resize(){
+	constexpr uFractional<ni_bits, f_bits> resize() const {
 		typedef uFractional<ni_bits, f_bits> n_t;
 		return n_t((typename n_t::internal_t) i);
 	}
 
 	template<size_t mi_bits, size_t mf_bits>
-	uFractional<mi_bits + i_bits, mf_bits + f_bits> operator * (uFractional<mi_bits, mf_bits> &m){
-		return m.i * i;
+	constexpr uFractional<mi_bits + i_bits, mf_bits + f_bits> operator * (uFractional<mi_bits, mf_bits> &m) const {
+		typedef typename IntLength<mi_bits + i_bits + mf_bits + f_bits>::unsigned_t res_t;
+		return (res_t)m.i * i;
 	}
 
 	template<size_t mi_bits, size_t mf_bits>
-	uFractional<std::max(mi_bits, i_bits), std::max(mf_bits, f_bits)> operator + (uFractional<mi_bits, mf_bits> &m){
-		return m.i + i;
+	constexpr uFractional<max(mi_bits, i_bits), max(mf_bits, f_bits)> operator + (uFractional<mi_bits, mf_bits> &m) const {
+		return i + m.i;
 	}
 
 	template<size_t mi_bits, size_t mf_bits>
-	uFractional<std::max(mi_bits, i_bits), std::max(mf_bits, f_bits)> operator - (uFractional<mi_bits, mf_bits> &m){
-		return m.i - i;
+	constexpr uFractional<max(mi_bits, i_bits), max(mf_bits, f_bits)> operator - (uFractional<mi_bits, mf_bits> &m) const {
+		return i - m.i;
 	}
 
-	static char * format_str(char * dst) {
-		return imu_sprint(dst, "u", (uint32_t)i_bits, ".", (uint32_t)f_bits);
+	constexpr uFractional<i_bits, f_bits> operator - (uFractional<i_bits, f_bits> &m) const {
+		return i - m.i;
 	}
 
-private:
+
+	static constexpr uFractional<i_bits,f_bits> minval(){return (internal_t)0;}
+	static constexpr uFractional<i_bits,f_bits> maxval(){return (internal_t)(-1);}
+
 	internal_t i : i_bits + f_bits;
-};
+} __attribute__((packed));
 
 
 
@@ -136,35 +155,55 @@ template <size_t i_bits, size_t f_bits>
 class sFractional {
 public:
 	typedef typename IntLength<i_bits + f_bits + 1>::signed_t internal_t;
+	static constexpr size_t bits =  IntLength<i_bits + f_bits + 1>::bits;
+	static constexpr size_t bits_i = i_bits;
+	static constexpr size_t bits_f = f_bits;
 
-	constexpr sFractional(const sFractional<i_bits, f_bits> &val) :
+	constexpr inline sFractional(const sFractional<i_bits, f_bits> &val) :
 			 i(val.i){}
+
+	constexpr inline sFractional(int i) :
+			 i(i){}
+
+	constexpr sFractional() {}
 
 	/*!
 	 * @brief Constructor for arbitrary signed fractionals
 	 */
 	template<size_t mi_bits, size_t mf_bits>
-	constexpr sFractional(const sFractional<mi_bits, mf_bits> &val) :
-		i(val.normalize<mi_bits, mf_bits>().i){}
-	constexpr sFractional(const internal_t &val) :
-			 i(val){}
-	constexpr sFractional(const double &val) :
-		i(val * (1 << f_bits)){}
-	constexpr sFractional(const float &val) :
-		i(val * (1 << f_bits)){}
-	constexpr sFractional(const int &val) :
-		i(((signed int)val) << f_bits){}
-	double asDouble() const{
-		return ((double)i) / (1 << f_bits);
+	constexpr inline sFractional(const sFractional<mi_bits, mf_bits> val) :
+		i(val.normalize<i_bits, f_bits>().i){}
+
+	static inline sFractional<i_bits, f_bits> fromInternal(const internal_t val){
+		sFractional<i_bits, f_bits> out;
+		out.i = val;
+		return out;
+	}
+
+	constexpr inline sFractional(const double val) :
+		i(val * ( (typename IntLength<i_bits + f_bits + 1>::unsigned_t)1 << f_bits) - 1){}
+	//constexpr sFractional(const float &val) :
+	//	i(val * (1 << f_bits)){}
+//	constexpr sFractional(const int &val) :
+//		i(((signed int)val) << f_bits){}
+	constexpr double asDouble() const {
+		return ((double)i) / (double)(((unsigned)1) << (f_bits));
+	}
+	constexpr float asFloat() const {
+		return ((float)i) / (float)(((unsigned)1) << (f_bits));
+	}
+
+	void setInternal(internal_t internal){
+		i = internal;
 	}
 
 	/*!
 	 * @brief Convert a fractional number to a different format
 	 */
 	template<size_t ni_bits, size_t nf_bits>
-	sFractional<ni_bits, nf_bits> normalize(){
+	constexpr inline sFractional<ni_bits, nf_bits> normalize() const {
 		typedef sFractional<ni_bits, nf_bits> n_t;
-		return n_t((typename n_t::internal_t) (i >> (f_bits - nf_bits)));
+		return n_t::fromInternal((typename n_t::internal_t) (i >> (f_bits - nf_bits)));
 	}
 
 	/*!
@@ -173,33 +212,60 @@ public:
 	 * This will not change the value unless it exceeds the final format
 	 */
 	template<size_t ni_bits>
-	sFractional<ni_bits, f_bits> resize(){
+	constexpr inline sFractional<ni_bits, f_bits> resize() const {
 		typedef sFractional<ni_bits, f_bits> n_t;
 		return n_t((typename n_t::internal_t) i);
 	}
 
 	template<size_t mi_bits, size_t mf_bits>
-	sFractional<mi_bits + i_bits, mf_bits + f_bits> operator * (sFractional<mi_bits, mf_bits> &m){
-		return m.i * i;
+	sFractional<mi_bits + i_bits, mf_bits + f_bits> operator * (sFractional<mi_bits, mf_bits> const m) const {
+		typedef typename IntLength<mi_bits + i_bits + mf_bits + f_bits + 1>::signed_t res_t;
+		return sFractional<mi_bits + i_bits, mf_bits + f_bits>::fromInternal((res_t)m.i * (res_t)i);
+	}
+
+
+	constexpr sFractional<2 * i_bits, 2 * f_bits> square() {
+		return *this * *this;
+	}
+
+	static sFractional<i_bits, f_bits> mk_frac(internal_t a, internal_t b){
+		typedef typename IntLength<2*(i_bits + f_bits) + 1>::signed_t double_len_t;
+		double_len_t shifted = ((double_len_t)a) << (i_bits + f_bits);
+		shifted = (shifted / ((double_len_t)b)) >> (i_bits + 1);
+		return sFractional<i_bits, f_bits>::fromInternal((sFractional<i_bits, f_bits>::internal_t) shifted);
 	}
 
 	template<size_t mi_bits, size_t mf_bits>
-	sFractional<std::max(mi_bits, i_bits), std::max(mf_bits, f_bits)> operator + (sFractional<mi_bits, mf_bits> &m){
-		return m.i + i;
+	constexpr inline sFractional<mi_bits + i_bits, mf_bits + f_bits> operator * (uFractional<mi_bits, mf_bits> const m) const {
+		typedef sFractional<mi_bits + i_bits, mf_bits + f_bits> res_t;
+		typedef typename res_t::internal_t res_internal_t;
+		return res_t::fromInternal((res_internal_t)i * m.i);
 	}
 
 	template<size_t mi_bits, size_t mf_bits>
-	sFractional<std::max(mi_bits, i_bits), std::max(mf_bits, f_bits)> operator - (sFractional<mi_bits, mf_bits> &m){
-		return m.i - i;
+	constexpr inline sFractional<max(mi_bits, i_bits), max(mf_bits, f_bits)> operator + (sFractional<mi_bits, mf_bits> const m) const {
+		typedef sFractional<max(mi_bits, i_bits), max(mf_bits, f_bits)> res_t;
+		typedef typename res_t::internal_t res_internal_t;
+		return res_t::fromInternal((res_internal_t)i + m.i);
 	}
 
-	static char * format_str(char * dst) {
-		return imu_sprint(dst, "s", (uint32_t)i_bits, ".", (uint32_t)f_bits);
+	template<size_t mi_bits, size_t mf_bits>
+	constexpr inline sFractional<max(mi_bits, i_bits), max(mf_bits, f_bits)> operator - (sFractional<mi_bits, mf_bits> const m) const {
+		typedef sFractional<max(mi_bits, i_bits), max(mf_bits, f_bits)> res_t;
+		typedef typename res_t::internal_t res_internal_t;
+		return res_t::fromInternal((res_internal_t)i - m.i);
 	}
 
-private:
+	constexpr inline sFractional<i_bits, f_bits> operator-() const {
+		return sFractional<i_bits, f_bits>::fromInternal(-i);
+	}
+
+
+	static constexpr sFractional<i_bits,f_bits> minval(){return (internal_t)(1 << (f_bits + i_bits));}
+	static constexpr sFractional<i_bits,f_bits> maxval(){return (internal_t)minval().i - 1;}
+
 	internal_t i : i_bits + f_bits + 1;
-};
+} __attribute__((packed));
 
 /*!
  @brief A 3-dimensional vector in euclidean space
