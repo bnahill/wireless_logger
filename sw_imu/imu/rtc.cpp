@@ -8,21 +8,18 @@
 
 template <RTCDriver &driver>
 void RealTimeClock< driver >::get_time_text(char * text){
-	union {
-		rtc_time_t time;
-		RTCTime rtctime;
-	};
-	rtctime.h12 = 0;
-	rtcGetTime(&driver, &rtctime);
-	
+	rtc_time_t time = {0};
+
+	rtcGetTime(&driver, (RTCTime *) &time);
+
 	text[0] = '0' + time.hours_ten;
 	text[1] = '0' + time.hours_u;
 	text[2] = ':';
-	
+
 	text[3] = '0' + time.minutes_ten;
 	text[4] = '0' + time.minutes_u;
 	text[5] = ':';
-	
+
 	text[6] = '0' + time.seconds_ten;
 	text[7] = '0' + time.seconds_u;
 	text[8] = 0;
