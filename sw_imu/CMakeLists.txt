@@ -413,11 +413,6 @@ add_custom_target(ddd COMMAND ddd --gdb --debugger \"${GDB} ${GDB_ARGS}\" > /dev
 	COMMENT "Launching DDD"
 )
 
-add_dependencies(gdb gdb_script)
-add_dependencies(gdbtui gdb_script)
-add_dependencies(ddd gdb_script)
-
-
 add_custom_command(
 	OUTPUT ${TARGET}_size DEPENDS ${OUTFILE}
 	COMMAND arm-none-eabi-size --format=berkeley ${OUTFILE}
